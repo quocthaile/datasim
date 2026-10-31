@@ -1,6 +1,7 @@
 #include "datasim/simulation/backend/ngspice.hpp"
 #include "datasim/simulation/backend/process.hpp"
 #include "datasim/simulation/validation/validation.hpp"
+#include "datasim/simulation/io/report.hpp"
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -30,6 +31,14 @@ int main(int argc, char** argv) {
         bool rejected = false;
         try { run_ngspice(RcConfig{}, exe, dir); } catch (const std::exception&) { rejected = true; }
         if (!rejected) throw std::runtime_error("stale artifact guard failed");
+        const auto run=execute_rc_run(RcConfig{},exe.string(),dir/"reported-run");
+        if (!run.validation.passed || run.validation.errors.size()!=4001 || !fs::exists(dir/"reported-run"/"validation_report.json"))
+            throw std::runtime_error("reported common-grid run failed");
+        const auto bad=unique_workspace(dir);
+        { std::ofstream out(bad/"invalid.cir"); out << "Invalid netlist regression\nR1 vin vout not_a_value\n.tran 1u 1m\n.end\n"; }
+        const int exit=run_process(exe,{"-n","-b","invalid.cir"},bad,bad/"invalid.log");
+        if (exit==0) throw std::runtime_error("ngspice accepted invalid netlist");
+        std::cout << "PASS: real invalid netlist rejected with exit " << exit << '\n';
         std::cout << "PASS: samples=" << samples.size() << " max_error_V=" << report.max_absolute_error_V
             << " rmse_V=" << report.rmse_V << " artifacts=" << dir.string() << '\n';
         return 0;

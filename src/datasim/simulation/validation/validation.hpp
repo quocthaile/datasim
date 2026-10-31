@@ -9,5 +9,6 @@ struct Validation {
     bool passed = false;
 };
 Validation validate(const RcConfig&, const Samples&);
+Validation validate_on_grid(const RcConfig&, const Samples&, const std::vector<double>&);
 void write_errors(std::ostream&, const Validation&);
 }

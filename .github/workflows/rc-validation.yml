@@ -1,0 +1,52 @@
+name: RC verification
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows-ucrt:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+      - name: Install pinned ngspice release
+        run: |
+          curl --fail --location https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-ngspice-47-1-any.pkg.tar.zst -o ngspice.pkg.tar.zst
+          echo 'a9f615da61165c79a904232641e5c3e31fcc5b21c01b1018965b95d543faadf4  ngspice.pkg.tar.zst' | sha256sum --check
+          pacman --noconfirm -U ngspice.pkg.tar.zst
+          ngspice_con --version | tee backend-version.txt
+          grep -q 'ngspice-47 ' backend-version.txt
+          # Package spinit uses MSYS absolute paths; native ngspice needs native paths.
+          prefix=$(cygpath -m /ucrt64)
+          sed -i "s|/ucrt64/|${prefix}/|g" /ucrt64/share/ngspice/scripts/spinit
+      - name: Configure and build clean checkout
+        run: |
+          cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release -DDATASIM_NGSPICE="$(cygpath -m /ucrt64/bin/ngspice_con.exe)"
+          cmake --build build/ci
+      - name: Unit and process tests without backend requirement
+        run: ctest --test-dir build/ci -L unit --output-on-failure --output-junit unit.xml
+      - name: Required real backend integration
+        run: ctest --test-dir build/ci -L integration --output-on-failure --output-junit integration.xml
+      - name: Convergence and repeatability
+        run: ./build/ci/rc_study.exe "$(cygpath -m /ucrt64/bin/ngspice_con.exe)" build/ci-study
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rc-verification-windows
+          path: |
+            backend-version.txt
+            build/ci/Testing/
+            build/ci/*.xml
+            build/ci/integration run */
+            build/ci/fault tests/
+            build/ci-study/
+          if-no-files-found: warn

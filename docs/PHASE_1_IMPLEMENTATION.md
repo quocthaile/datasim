@@ -3,6 +3,14 @@
 Status: IMPLEMENTED and VERIFIED for the Windows/GCC/ngspice configuration below.
 This is an ideal first-order RC feasibility spike, not a general circuit simulator.
 
+Phase 1.5 adds common-grid validation, JSON artifacts, a convergence/repeatability
+study and process hardening. Current instructions and evidence are in
+[reproducibility](PHASE_1_REPRODUCIBILITY.md) and the
+[architecture review](PHASE_1_ARCHITECTURE_REVIEW.md). The original Phase 1 commands
+below remain useful, but new runs emit `run_metadata.json` and
+`validation_report.json` instead of `metadata.txt`; `errors.csv` now uses the
+common grid. Historical snapshots retain their original files and metrics.
+
 ## Initial state and scope
 
 The starting checkout was clean on `docs/project-foundation`, tracking its origin

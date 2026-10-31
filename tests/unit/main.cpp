@@ -1,4 +1,6 @@
 #include "datasim/simulation/analysis/reference.hpp"
+#include "datasim/simulation/analysis/grid.hpp"
+#include "datasim/simulation/io/report.hpp"
 #include "datasim/simulation/backend/ngspice.hpp"
 #include "datasim/simulation/validation/validation.hpp"
 #include <cmath>
@@ -21,10 +23,17 @@ int main() {
         require(analytical_voltage(c, c.delay_s) == 0);
         require(std::abs(analytical_voltage(c, 0.002) - 3.1606027941427883) < 1e-12);
         require(std::abs(analytical_voltage(c, 0.006) - 4.966310265004573) < 1e-12);
+        require(std::abs(analytical_voltage(c, 0.003) - 4.3233235838169365) < 1e-12);
+        require(std::abs(analytical_voltage(c, 0.004) - 4.7510646581606805) < 1e-12);
+        require(std::abs(ramp_voltage(c,c.delay_s+c.rise_s)-2.499999166666875e-6) < 1e-12);
+        require(ramp_voltage(c,0)==c.initial_voltage_V);
+        require(ramp_voltage(c,0.002)<analytical_voltage(c,0.002));
         for (double bad : {0., -1., std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()}) {
             auto x = c; x.resistance_ohm = bad; rejects([&]{ check_config(x); });
             x = c; x.capacitance_F = bad; rejects([&]{ check_config(x); });
             x = c; x.voltage_V = bad; rejects([&]{ check_config(x); });
+            x = c; x.duration_s = bad; rejects([&]{ check_config(x); });
+            x = c; x.step_s = bad; rejects([&]{ check_config(x); });
         }
         for (auto mutate : std::vector<std::function<void(RcConfig&)>>{
             [](auto& x){ x.initial_voltage_V = 1; }, [](auto& x){ x.duration_s = 0.012; },
@@ -69,6 +78,26 @@ int main() {
         }
         Samples nonfinite{{0, 0, std::numeric_limits<double>::infinity()}};
         rejects([&]{ check_samples(nonfinite); });
+        Samples line{{0,0,1},{1,2,3},{2,4,5}};
+        const auto linear=interpolate(line,{0.,0.25,1.,1.75,2.});
+        require(linear[1].vin_V==0.5 && linear[1].vout_V==1.5 && linear[3].vout_V==4.5);
+        require(linear.front().vout_V==1 && linear.back().vout_V==5);
+        for (const auto& grid : std::vector<std::vector<double>>{{},{-1},{3},{1,1},{1,0},{std::numeric_limits<double>::quiet_NaN()}})
+            rejects([&]{ interpolate(line,grid); });
+        rejects([&]{ interpolate({}, {0}); });
+        const auto grid=validation_grid(c);
+        require(grid.size()==4001 && grid.front()==c.delay_s+c.rise_s && grid.back()==c.duration_s);
+        rejects([&]{ validation_grid(c,0); });
+        rejects([&]{ validate_on_grid(c,samples,{c.delay_s,c.duration_s}); });
+        const auto resampled=validate_on_grid(c,samples,grid);
+        require(!resampled.passed && resampled.errors.size()==grid.size());
+        require(content_id("")=="cbf29ce484222325");
+        require(content_id("hello")=="a430d84680aabd0b");
+        require(json_string("a\"\\\n\t")=="\"a\\\"\\\\\\u000a\\u0009\"");
+        require(config_json(c).find("\"resistance_ohm\":1000")!=std::string::npos);
+        require(config_json(c)==config_json(RcConfig{}));
+        require(config_json(c)!=config_json(other));
+        auto invalid=c; invalid.capacitance_F=0; rejects([&]{ config_json(invalid); });
         std::cout << "PASS: " << checks << " unit checks\n";
         return 0;
     } catch (const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }

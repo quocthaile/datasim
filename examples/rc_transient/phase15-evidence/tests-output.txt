@@ -1,0 +1,74 @@
+Start testing: Oct 31 22:37 SE Asia Standard Time
+----------------------------------------------------------
+1/3 Testing: unit
+1/3 Test: unit
+Command: "D:/projects/datasim/build/phase15/unit_tests.exe"
+Directory: D:/projects/datasim/build/phase15
+"unit" start time: Oct 31 22:37 SE Asia Standard Time
+Output:
+----------------------------------------------------------
+PASS: 92 unit checks
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"unit" end time: Oct 31 22:37 SE Asia Standard Time
+"unit" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/3 Testing: backend_errors
+2/3 Test: backend_errors
+Command: "D:/projects/datasim/build/phase15/backend_error_tests.exe" "D:/projects/datasim/build/phase15/backend_fixture.exe"
+Directory: D:/projects/datasim/build/phase15
+"backend_errors" start time: Oct 31 22:37 SE Asia Standard Time
+Output:
+----------------------------------------------------------
+exit: rejected: ngspice exit status 9; see ngspice.log
+missing: rejected: missing ngspice result file samples.dat
+warning: rejected: ngspice diagnostic requires review; see ngspice.log
+empty: rejected: empty ngspice output
+malformed: rejected: malformed ngspice numerical row
+nonfinite: rejected: malformed ngspice numerical row
+signal: rejected: unexpected ngspice table header
+PASS: backend faults, missing signal, timeout termination, concurrent workspaces, literal argv, cwd, retained logs, input gate and user data protection
+<end of output>
+Test time =   1.68 sec
+----------------------------------------------------------
+Test Passed.
+"backend_errors" end time: Oct 31 22:37 SE Asia Standard Time
+"backend_errors" time elapsed: 00:00:01
+----------------------------------------------------------
+
+3/3 Testing: ngspice_rc
+3/3 Test: ngspice_rc
+Command: "D:/projects/datasim/build/phase15/integration_tests.exe" "D:/projects/datasim/build/tools/msys2-ngspice/ucrt64/bin/ngspice_con.exe"
+Directory: D:/projects/datasim/build/phase15
+"ngspice_rc" start time: Oct 31 22:37 SE Asia Standard Time
+Output:
+----------------------------------------------------------
+******
+** ngspice-47 : Circuit level simulation program
+** Compiled with KLU Direct Linear Solver
+** The U. C. Berkeley CAD Group
+** Copyright 1985-1994, Regents of the University of California.
+** Copyright 2001-2026, The ngspice team.
+** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html
+** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html
+** Creation Date: Mon Sep  7 15:42:04 UTC 2026
+******
+PASS: real invalid netlist rejected with exit 1
+PASS: samples=640 max_error_V=1.42982e-05 rmse_V=8.487e-06 artifacts=D:\projects\datasim\build\phase15\integration run 86290842135300
+<end of output>
+Test time =   0.46 sec
+----------------------------------------------------------
+Test Passed.
+"ngspice_rc" end time: Oct 31 22:37 SE Asia Standard Time
+"ngspice_rc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 31 22:37 SE Asia Standard Time
+
+integration =   0.46 sec*proc
+
+unit =   1.76 sec*proc
+

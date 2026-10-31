@@ -3,14 +3,38 @@ project(Datasim VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# Identity includes all build/source/test inputs, even in an exported source tree.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
+    execute_process(COMMAND git describe --always --dirty WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        OUTPUT_VARIABLE DATASIM_GIT_REVISION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+endif()
+if(NOT DATASIM_GIT_REVISION)
+    set(DATASIM_GIT_REVISION "source-export")
+endif()
+file(GLOB_RECURSE identity_files CONFIGURE_DEPENDS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+    src/*.cpp src/*.hpp apps/*.cpp tests/*.cpp cmake/*.in)
+list(APPEND identity_files CMakeLists.txt)
+list(SORT identity_files)
+set(identity "")
+foreach(path IN LISTS identity_files)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${path}")
+    file(READ "${path}" contents)
+    string(REPLACE "\r\n" "\n" contents "${contents}")
+    string(SHA256 digest "${contents}")
+    string(APPEND identity "${path}:${digest}\n")
+endforeach()
+string(SHA256 DATASIM_SOURCE_SHA256 "${identity}")
+configure_file(cmake/build_info.hpp.in generated/datasim/build_info.hpp @ONLY)
 add_library(datasim
     src/datasim/simulation/circuit/rc.cpp
     src/datasim/simulation/analysis/reference.cpp
+    src/datasim/simulation/analysis/grid.cpp
     src/datasim/simulation/validation/validation.cpp
     src/datasim/simulation/io/samples.cpp
+    src/datasim/simulation/io/report.cpp
     src/datasim/simulation/backend/process.cpp
     src/datasim/simulation/backend/ngspice.cpp)
-target_include_directories(datasim PUBLIC src)
+target_include_directories(datasim PUBLIC src PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 if(MSVC)
     target_compile_options(datasim PRIVATE /W4 /permissive-)
 else()
@@ -18,6 +42,8 @@ else()
 endif()
 add_executable(rc_demo apps/rc_demo/main.cpp)
 target_link_libraries(rc_demo PRIVATE datasim)
+add_executable(rc_study apps/rc_study/main.cpp)
+target_link_libraries(rc_study PRIVATE datasim)
 include(CTest)
 if(BUILD_TESTING)
     add_executable(unit_tests tests/unit/main.cpp)
@@ -32,4 +58,6 @@ if(BUILD_TESTING)
     set(DATASIM_NGSPICE "" CACHE FILEPATH "Optional path to ngspice executable")
     add_test(NAME ngspice_rc COMMAND integration_tests "${DATASIM_NGSPICE}")
     set_tests_properties(ngspice_rc PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 45)
+    set_tests_properties(unit backend_errors PROPERTIES LABELS unit TIMEOUT 15)
+    set_tests_properties(ngspice_rc PROPERTIES LABELS integration)
 endif()

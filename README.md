@@ -11,6 +11,12 @@ See [build/run instructions](docs/PHASE_1_IMPLEMENTATION.md) and
 [actual validation evidence](docs/PHASE_1_VALIDATION.md). A C++20 compiler and
 CMake build the application; an external ngspice executable runs integration tests.
 
+Phase 1.5 hardening adds common-grid convergence/checkpoint validation, repeat-run
+evidence, JSON reports and timeout/concurrency tests. See
+[reproducibility](docs/PHASE_1_REPRODUCIBILITY.md) and the
+[architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md) for verification scope
+and open release gates. No Phase 2 capability is implemented.
+
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet
 parameter is not automatically a complete mathematical model. Local LLMs may

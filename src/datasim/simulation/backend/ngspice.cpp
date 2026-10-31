@@ -52,6 +52,7 @@ std::string backend_version(const fs::path& exe, const fs::path& dir) {
     return version;
 }
 Samples run_ngspice(const RcConfig& c, const fs::path& exe, const fs::path& directory) {
+    check_config(c); // Reject before even opening a netlist or launching a process.
     const auto dir = fs::absolute(directory);
     if (fs::exists(dir / "samples.dat") || fs::exists(dir / "circuit.cir"))
         throw std::runtime_error("refusing to reuse backend artifacts");

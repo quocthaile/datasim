@@ -39,7 +39,9 @@ analytical reference, validation and CSV export have no ngspice API dependency.
 
 Use a zero-volt operating point and explicit `.ic V(vout)=0` with no UIC, then
 transient integration of a delayed pulse. Retain adaptive output points and set
-the maximum integration step to the requested 10 us. No resampling is needed.
+the maximum integration step to the requested 10 us. Phase 1.5 additionally
+resamples a copy onto an explicit common validation grid for timestep comparisons;
+native output and native acceptance are retained unchanged.
 The user selected C++20; CMake is the initial build system. No GUI, database,
 LLM runtime, shared-library integration, or custom solver is introduced.
 

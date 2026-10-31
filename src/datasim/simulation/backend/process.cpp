@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <thread>
+#include <mutex>
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -46,7 +47,12 @@ fs::path find_executable(const std::string& name) {
     return {};
 }
 int run_process(const fs::path& exe, const std::vector<std::string>& args,
-                const fs::path& directory, const fs::path& log) {
+                const fs::path& directory, const fs::path& log, std::chrono::milliseconds timeout) {
+    if (timeout.count() <= 0 || timeout > std::chrono::minutes(10)) throw std::invalid_argument("invalid process timeout");
+    if (!exe.is_absolute() || !directory.is_absolute() || !log.is_absolute())
+        throw std::invalid_argument("process paths must be absolute");
+    for (const auto& arg : args) if (arg.find('\0') != std::string::npos)
+        throw std::invalid_argument("NUL in process argument");
 #ifdef _WIN32
     // Quote using Windows argv rules; no command shell or command substitution.
     auto quote = [](const std::wstring& s) {
@@ -60,25 +66,43 @@ int run_process(const fs::path& exe, const std::vector<std::string>& args,
     };
     std::wstring command = quote(exe.wstring());
     for (const auto& a : args) command += L" " + quote(fs::path(a).wstring());
+    // Keep our inheritable handles from crossing simultaneous launches.
+    static std::mutex launch_mutex;
+    std::unique_lock launch_lock(launch_mutex);
     SECURITY_ATTRIBUTES sa{sizeof(sa), nullptr, TRUE};
     HANDLE output = CreateFileW(log.c_str(), GENERIC_WRITE, FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (output == INVALID_HANDLE_VALUE) throw std::runtime_error("cannot create process log");
     HANDLE input = CreateFileW(L"NUL", GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa, OPEN_EXISTING, 0, nullptr);
+    if (input == INVALID_HANDLE_VALUE) { CloseHandle(output); throw std::runtime_error("cannot open process stdin"); }
+    HANDLE job = CreateJobObjectW(nullptr, nullptr);
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
+    limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    if (!job || !SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits))) {
+        CloseHandle(input); CloseHandle(output); if (job) CloseHandle(job);
+        throw std::runtime_error("cannot establish process cleanup job");
+    }
     STARTUPINFOW si{}; si.cb = sizeof(si); si.dwFlags = STARTF_USESTDHANDLES;
     si.hStdOutput = output; si.hStdError = output; si.hStdInput = input;
     PROCESS_INFORMATION pi{};
     const BOOL ok = CreateProcessW(exe.c_str(), command.data(), nullptr, nullptr, TRUE,
-                                   CREATE_NO_WINDOW, nullptr, directory.c_str(), &si, &pi);
+                                   CREATE_NO_WINDOW | CREATE_SUSPENDED, nullptr, directory.c_str(), &si, &pi);
+    const DWORD launch_error = GetLastError();
     CloseHandle(output); if (input != INVALID_HANDLE_VALUE) CloseHandle(input);
-    if (!ok) throw std::runtime_error("process launch failed: Windows error " + std::to_string(GetLastError()));
-    const DWORD wait = WaitForSingleObject(pi.hProcess, 30000);
+    launch_lock.unlock();
+    if (!ok) { CloseHandle(job); throw std::runtime_error("process launch failed: Windows error " + std::to_string(launch_error)); }
+    if (!AssignProcessToJobObject(job,pi.hProcess) || ResumeThread(pi.hThread) == static_cast<DWORD>(-1)) {
+        TerminateProcess(pi.hProcess,124); WaitForSingleObject(pi.hProcess,INFINITE);
+        CloseHandle(pi.hThread); CloseHandle(pi.hProcess); CloseHandle(job);
+        throw std::runtime_error("failed to manage child process");
+    }
+    const DWORD wait = WaitForSingleObject(pi.hProcess, static_cast<DWORD>(timeout.count()));
     if (wait != WAIT_OBJECT_0) {
-        TerminateProcess(pi.hProcess, 124); WaitForSingleObject(pi.hProcess, INFINITE);
+        TerminateJobObject(job, 124); WaitForSingleObject(pi.hProcess, INFINITE);
         CloseHandle(pi.hThread); CloseHandle(pi.hProcess);
-        throw std::runtime_error("backend timeout or wait failure (30 s)");
+        CloseHandle(job); throw std::runtime_error("backend timeout or wait failure");
     }
     DWORD code = 1; GetExitCodeProcess(pi.hProcess, &code);
-    CloseHandle(pi.hThread); CloseHandle(pi.hProcess); return static_cast<int>(code);
+    CloseHandle(pi.hThread); CloseHandle(pi.hProcess); CloseHandle(job); return static_cast<int>(code);
 #else
     std::vector<std::string> storage{exe.string()};
     storage.insert(storage.end(), args.begin(), args.end());
@@ -88,23 +112,27 @@ int run_process(const fs::path& exe, const std::vector<std::string>& args,
     const pid_t pid = fork();
     if (pid < 0) throw std::runtime_error("fork failed");
     if (pid == 0) {
+        if (setpgid(0,0) != 0) _exit(126);
         const int out = open(log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);
         const int in = open("/dev/null", O_RDONLY);
         if (out < 0 || in < 0 || chdir(directory.c_str()) ||
             dup2(out, STDOUT_FILENO) < 0 || dup2(out, STDERR_FILENO) < 0 || dup2(in, STDIN_FILENO) < 0) _exit(126);
         close(out); close(in); execv(exe.c_str(), argv.data()); _exit(127);
     }
-    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+    setpgid(pid,pid);
+    const auto deadline = std::chrono::steady_clock::now() + timeout;
     int status = 0;
     while (true) {
         const auto waited = waitpid(pid, &status, WNOHANG);
         if (waited == pid) break;
         if (waited < 0 && errno != EINTR) throw std::runtime_error("waitpid failed");
         if (std::chrono::steady_clock::now() >= deadline) {
-            kill(pid, SIGKILL); waitpid(pid, &status, 0); throw std::runtime_error("backend timeout (30 s)");
+            kill(-pid, SIGKILL); while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {}
+            throw std::runtime_error("backend timeout");
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+    kill(-pid,SIGKILL); // Do not leave backend descendants after normal exit either.
     return WIFEXITED(status) ? WEXITSTATUS(status) : 128 + WTERMSIG(status);
 #endif
 }
