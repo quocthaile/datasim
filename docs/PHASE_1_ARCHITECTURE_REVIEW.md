@@ -5,8 +5,11 @@ Status: IMPLEMENTED corrections; local and hosted Windows verification recorded 
 
 ## Inspection baseline
 
-Started from clean `021513c` on `feat/phase-1-ngspice-rc`, not from `main`.
-That feature branch is still unmerged. Created `codex/phase-1-5-hardening` from it.
+At the start of Phase 1.5 inspection, work began from clean `021513c` on
+`feat/phase-1-ngspice-rc` (which had not yet been merged into `main`), creating
+`codex/phase-1-5-hardening` from it. Phase 1 and Phase 1.5 were subsequently
+completed and merged into `main` through PR #1 at
+`86b924b4b49d69c70c1688a8748cb1c2893adc34`.
 Read root/docs agent guidance, architecture, Phase 1 implementation/validation,
 both ADRs, and every RC source/test file. Rebuilt the original CMake tree and ran
 CTest: 3/3 passed, 59 unit checks, zero skips, actual ngspice-47 integration.

@@ -2,27 +2,30 @@
 
 These stages are ordered by dependency, not promised delivery dates.
 
-Phase 1.5 hardening: numerical/common-grid validation, four timestep refinements,
-characteristic checkpoints, repeatability, JSON reports and expanded failure tests
-are VERIFIED locally on Windows/GCC/ngspice-47. The fresh-checkout build and all
-three tests passed; local Phase 1.5 exit criteria are satisfied. Hosted Windows CI
-is VERIFIED by [run 41217248663](https://github.com/quocthaile/datasim/actions/runs/41217248663):
-build, 3/3 tests with zero skips, real integration and the six-run study passed
-after correcting ngspice runtime paths. See [reproducibility](PHASE_1_REPRODUCIBILITY.md)
-and [architecture review](PHASE_1_ARCHITECTURE_REVIEW.md). Do not begin Phase 2.
+Phase 1 and Phase 1.5 foundation: manual ideal-RC transient orchestration,
+executable ngspice-47 integration, common-grid validation across four timestep
+refinements, characteristic checkpoints, repeatability, JSON reports, and process
+fault hardening are completed, merged into `main` via PR #1
+(`86b924b4b49d69c70c1688a8748cb1c2893adc34`), and **VERIFIED** locally on Windows
+x64 (MSYS2 UCRT GCC 16.2.0 / ngspice-47) and in hosted Windows CI by
+[run 41217248663](https://github.com/quocthaile/datasim/actions/runs/41217248663)
+(3/3 tests with zero skips, real integration, and six-run study). POSIX and MSVC
+builds remain unverified. See [implementation](PHASE_1_IMPLEMENTATION.md),
+[evidence](PHASE_1_VALIDATION.md), [reproducibility](PHASE_1_REPRODUCIBILITY.md),
+and [architecture review](PHASE_1_ARCHITECTURE_REVIEW.md).
 
-The separately authorized **Phase 1 RC feasibility spike is VERIFIED** on the
-documented Windows/GCC/ngspice environment: manual ideal components, executable
-adapter, CSV retrieval and analytical validation. See [implementation](PHASE_1_IMPLEMENTATION.md)
-and [evidence](PHASE_1_VALIDATION.md). This does not complete the broader knowledge
-contracts or reviewed-datasheet vertical slice below, and Phase 2 has not begun.
+Phase 2 (**Component Domain Model & Knowledge Contracts**, implementing the in-memory
+C++20 contracts of Stage 3 below) is **PLANNED** and authorized on
+`feat/phase-2-component-model` strictly within [PHASE_2_PLAN.md](PHASE_2_PLAN.md)
+and [ADR-0003](decisions/ADR-0003-component-domain-model.md). Later stages,
+persistence, datasheet parsing, LLM integration, and GUI remain unauthorized.
 
 | Stage | Status | Scope and exit criteria |
 | --- | --- | --- |
 | 0: Foundation | IMPLEMENTED | Foundation committed at b319636; documentation available for review. |
-| 1: Engineering scope | PROPOSED | Select an initial component family, analyses, licensed fixtures, and review responsibilities; define acceptance tolerances. |
-| 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. |
-| 3: Knowledge contracts | PROPOSED | Specify evidence, observation, knowledge and model schemas with revision rules; demonstrate review on synthetic or permitted examples. |
+| 1: Engineering scope | PROPOSED | Select an initial component family, analyses, licensed fixtures, and review responsibilities; define acceptance tolerances. (Phase 1/1.5 verified only manual ideal-RC transient feasibility.) |
+| 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. (ADR-0002 selected ngspice executable integration for Phase 1 ideal RC only.) |
+| 3: Knowledge contracts | PLANNED | Specify and implement in-memory C++20 evidence, observation, review lifecycle, knowledge and model metadata contracts with deterministic validation on synthetic Resistor/Capacitor fixtures ([Phase 2 plan](PHASE_2_PLAN.md)). Persistence and serialization remain deferred. |
 | 4: Deterministic vertical slice | PROPOSED | Implement only after separate authorization: approved knowledge, explicit model, run configuration, backend adapter, and traceable results with numerical checks. |
 | 5: Assisted extraction | PROPOSED | Evaluate document processing and optional local LLM assistance against reviewed fixtures; prove the review gate blocks invalid inputs. |
 | 6: Visualization and validation | PROPOSED | Present results and evidence with units, warnings and assumptions; conduct separately scoped physical validation if equipment/data are available. |
