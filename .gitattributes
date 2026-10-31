@@ -1,0 +1,2 @@
+# Preserve the captured Phase 1.5 numerical CSV bytes across Git checkouts.
+examples/rc_transient/phase15-evidence/**/*.csv text eol=lf

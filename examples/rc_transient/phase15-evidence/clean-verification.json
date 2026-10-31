@@ -1,0 +1,15 @@
+{
+  "status": "PASSED",
+  "clean_checkout_commit": "52e562a2e616fafe41ef75d68991be0bdb818681",
+  "source_sha256": "7eb377c10b7150080a2c67211ba3016b88baf42865ec9fcc66938aa546877db3",
+  "compiler": "GNU 16.2.0",
+  "platform": "Windows AMD64",
+  "build_configuration": "Release",
+  "tests_passed": 3,
+  "tests_failed": 0,
+  "tests_skipped": 0,
+  "unit_checks": 92,
+  "all_six_csvs_identical_to_original_study": true,
+  "clean_git_status_after_tests": true,
+  "scope": "Fresh local checkout, new build directory, restricted PATH; existing pinned ngspice runtime and installed Windows toolchain; not a fresh OS or hosted CI"
+}

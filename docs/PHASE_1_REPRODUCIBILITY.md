@@ -1,7 +1,7 @@
 # Phase 1.5 reproducibility
 
-Status: VERIFIED local Windows numerical repeatability. Fresh-checkout and hosted
-CI verification are tracked separately below; no multi-platform claim is made.
+Status: VERIFIED local Windows numerical repeatability and fresh-checkout build.
+Hosted CI is tracked separately below; no multi-platform claim is made.
 
 ## Environment and commands
 
@@ -93,8 +93,38 @@ checking its SHA256, checks the reported version, fixes package relocation paths
 builds a clean checkout, runs unit/process tests and required real integration,
 runs the study, and collects logs/reports even on failure. Toolchain/dependency
 package versions can evolve; they are recorded at execution rather than claimed
-fully locked. Hosted CI is IMPLEMENTED, not yet executed or VERIFIED.
+fully locked. Hosted CI is IMPLEMENTED; no hosted result has been observed, so it is not VERIFIED.
 
-Fresh-checkout verification is pending at this documentation snapshot. It must
-run before declaring the local Phase 1.5 exit complete. A clean build on the same
-installed Windows toolchain does not constitute a fresh-OS or Linux verification.
+## Fresh-checkout verification completed
+
+Cloned implementation commit `52e562a` into `build/phase15-clean-checkout` with
+`git clone --no-hardlinks --branch codex/phase-1-5-hardening D:/projects/datasim D:/projects/datasim/build/phase15-clean-checkout`.
+Confirmed an empty Git status before and after the test run. No prior build files
+were copied. The exact commands in that new checkout were:
+
+```powershell
+$env:PATH = 'C:\msys64\ucrt64\bin;C:\Program Files\CMake\bin;C:\Program Files\Git\cmd;C:\Windows\System32;C:\Windows'
+cmake -S . -B build/clean -G Ninja -DCMAKE_BUILD_TYPE=Release -DDATASIM_NGSPICE=D:/projects/datasim/build/tools/msys2-ngspice/ucrt64/bin/ngspice_con.exe
+cmake --build build/clean
+ctest --test-dir build/clean --output-on-failure -V --output-junit clean-tests.xml
+./build/clean/rc_study.exe D:/projects/datasim/build/tools/msys2-ngspice/ucrt64/bin/ngspice_con.exe build/clean-study
+```
+
+Clean configure/build succeeded; **3 tests passed, 0 failed, 0 skipped**, including
+92 unit checks. All six clean-study CSVs were byte-identical to the original study,
+and the build's normalized source SHA256 matched. The only later changes are
+documentation/evidence and CSV checkout attributes, not executable source.
+See [clean verification JSON](../examples/rc_transient/phase15-evidence/clean-verification.json),
+[clean test log](../examples/rc_transient/phase15-evidence/clean-tests-output.txt),
+[clean study](../examples/rc_transient/phase15-evidence/clean-study.json).
+
+The clean checkout also exposed Git's Windows CRLF conversion of captured CSVs.
+Targeted `.gitattributes` now preserves LF for Phase 1.5 evidence CSVs. This does
+not change generated waveforms or numerical values. The original run SHA256 above
+refers to the LF waveform bytes.
+
+The local Phase 1.5 exit criteria are satisfied for this Windows environment.
+This verifies a fresh checkout/build with explicitly selected existing toolchain
+and runtime dependencies, not a fresh OS installation or Linux/MSVC support.
+Hosted Actions execution remains unverified; no claim is made that its installation
+steps or runner image have already passed. No Phase 2 work is authorized by this result.

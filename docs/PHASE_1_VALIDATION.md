@@ -103,10 +103,13 @@ Evidence: [study JSON](../examples/rc_transient/phase15-evidence/study.json),
 [test log](../examples/rc_transient/phase15-evidence/tests-output.txt).
 All per-refinement reports/configurations/logs are adjacent to the study JSON.
 
-The local numerical/fault work is VERIFIED on Windows/GCC/ngspice-47. The fresh
-checkout gate is pending at this snapshot and hosted CI is IMPLEMENTED, not yet
-VERIFIED. Phase 1.5 remains open until the clean-build gate is completed. Physical
-measurements, multi-platform support, advanced models and Phase 2 are not claimed.
+The local numerical/fault work and fresh-checkout build are VERIFIED on
+Windows/GCC/ngspice-47: 3/3 clean-checkout tests passed and all six regenerated
+waveforms matched the original study. Phase 1.5 local exit criteria are satisfied
+for this environment. Hosted CI is IMPLEMENTED, not yet VERIFIED. Physical
+measurements, fresh-OS provisioning, multi-platform support, advanced models and
+Phase 2 are not claimed. See the clean-build evidence in
+[reproducibility](PHASE_1_REPRODUCIBILITY.md).
 
 ## Historical Phase 1 record
 

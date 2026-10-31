@@ -4,10 +4,10 @@ These stages are ordered by dependency, not promised delivery dates.
 
 Phase 1.5 hardening: numerical/common-grid validation, four timestep refinements,
 characteristic checkpoints, repeatability, JSON reports and expanded failure tests
-are VERIFIED locally on Windows/GCC/ngspice-47. CI is IMPLEMENTED; fresh-checkout
-verification is pending at this snapshot. See [reproducibility](PHASE_1_REPRODUCIBILITY.md)
-and [architecture review](PHASE_1_ARCHITECTURE_REVIEW.md). Keep the Phase 1.5 gate
-open until mandatory clean-build verification succeeds; do not begin Phase 2.
+are VERIFIED locally on Windows/GCC/ngspice-47. The fresh-checkout build and all
+three tests passed; local Phase 1.5 exit criteria are satisfied. CI is IMPLEMENTED
+but hosted execution remains unverified. See [reproducibility](PHASE_1_REPRODUCIBILITY.md)
+and [architecture review](PHASE_1_ARCHITECTURE_REVIEW.md). Do not begin Phase 2.
 
 The separately authorized **Phase 1 RC feasibility spike is VERIFIED** on the
 documented Windows/GCC/ngspice environment: manual ideal components, executable
