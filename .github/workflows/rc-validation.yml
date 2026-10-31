@@ -25,9 +25,22 @@ jobs:
           pacman --noconfirm -U ngspice.pkg.tar.zst
           ngspice_con --version | tee backend-version.txt
           grep -q 'ngspice-47 ' backend-version.txt
-          # Package spinit uses MSYS absolute paths; native ngspice needs native paths.
-          prefix=$(cygpath -m /ucrt64)
-          sed -i "s|/ucrt64/|${prefix}/|g" /ucrt64/share/ngspice/scripts/spinit
+          mkdir -p build/runtime-config
+          tar -xOf ngspice.pkg.tar.zst .INSTALL > build/runtime-config/package-install.txt
+          tar -xOf ngspice.pkg.tar.zst ucrt64/share/ngspice/scripts/spinit > build/runtime-config/spinit.packaged
+          echo "NGSPICE_PREFIX=$(cygpath -m /ucrt64)" >> "$GITHUB_ENV"
+      - name: Verify installed code-model paths and runtime initialization
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests/ci -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $spinit = "$env:NGSPICE_PREFIX/share/ngspice/scripts/spinit"
+          $executable = "$env:NGSPICE_PREFIX/bin/ngspice_con.exe"
+          python scripts/ci/configure_ngspice.py --spinit $spinit --prefix $env:NGSPICE_PREFIX --ngspice $executable --diagnostics build/runtime-config/first
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python scripts/ci/configure_ngspice.py --spinit $spinit --prefix $env:NGSPICE_PREFIX --ngspice $executable --diagnostics build/runtime-config/second
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ((Get-FileHash build/runtime-config/first/spinit.after).Hash -ne (Get-FileHash build/runtime-config/second/spinit.after).Hash) { throw 'spinit changed on second invocation' }
       - name: Configure and build clean checkout
         run: |
           cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release -DDATASIM_NGSPICE="$(cygpath -m /ucrt64/bin/ngspice_con.exe)"
@@ -44,6 +57,7 @@ jobs:
           name: rc-verification-windows
           path: |
             backend-version.txt
+            build/runtime-config/
             build/ci/Testing/
             build/ci/*.xml
             build/ci/integration run */
