@@ -35,10 +35,18 @@ add_library(datasim
     src/datasim/simulation/backend/process.cpp
     src/datasim/simulation/backend/ngspice.cpp)
 target_include_directories(datasim PUBLIC src PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+add_library(datasim_component
+    src/datasim/component/observation/review.cpp
+    src/datasim/component/knowledge/component_knowledge.cpp
+    src/datasim/component/model/model_validation.cpp
+    src/datasim/component/validation/domain_validation.cpp)
+target_include_directories(datasim_component PUBLIC src)
 if(MSVC)
     target_compile_options(datasim PRIVATE /W4 /permissive-)
+    target_compile_options(datasim_component PRIVATE /W4 /permissive-)
 else()
     target_compile_options(datasim PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(datasim_component PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 add_executable(rc_demo apps/rc_demo/main.cpp)
 target_link_libraries(rc_demo PRIVATE datasim)
