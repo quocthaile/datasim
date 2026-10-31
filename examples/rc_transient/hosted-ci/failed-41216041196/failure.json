@@ -1,0 +1,8 @@
+{
+  "run_url": "https://github.com/quocthaile/datasim/actions/runs/41216041196",
+  "commit": "b88ddec6d4f5509c59546d7ff1bb01385a969bc7",
+  "conclusion": "failure",
+  "failed_step": "Required real backend integration",
+  "study_status": "skipped",
+  "root_cause": "Package post_install already rewrites MSYS paths; workflow global substring replacement duplicated the native prefix."
+}

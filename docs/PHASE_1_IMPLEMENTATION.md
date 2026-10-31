@@ -118,13 +118,23 @@ tar -xf build/tools/fftw.pkg.tar.zst -C build/tools/msys2-ngspice ucrt64/bin/lib
 
 The extracted package's `spinit` contained absolute `/ucrt64/lib/ngspice/` paths
 that did not resolve in the relocated Windows runtime. The first real simulation
-was rejected for those startup errors even though it produced samples. Replace
-`/ucrt64/` in the extracted `build/tools/msys2-ngspice/ucrt64/share/ngspice/scripts/spinit`
-with the absolute extracted prefix ending in `/ucrt64/` (forward slashes). On this
-checkout that prefix is `D:/projects/datasim/build/tools/msys2-ngspice/ucrt64/`.
-This local runtime correction restored successful code-model loading; the adapter
-continues to reject warnings/errors. No third-party binary or runtime script is
-included in source control. Normal system installations may not need relocation.
+was rejected for those startup errors even though it produced samples. The local
+runtime correction restored successful code-model loading; the adapter continues
+to reject warnings/errors. Use the path-aware provisioning helper for new
+extractions (Python is required only for this provisioning/check step):
+
+```powershell
+python scripts/ci/configure_ngspice.py --spinit build/tools/msys2-ngspice/ucrt64/share/ngspice/scripts/spinit --prefix D:/projects/datasim/build/tools/msys2-ngspice/ucrt64 --ngspice D:/projects/datasim/build/tools/msys2-ngspice/ucrt64/bin/ngspice_con.exe --diagnostics build/runtime-check-new
+```
+
+Substitute the actual absolute prefix/executable for your extraction and use a
+new diagnostics directory. This converts only `/ucrt64/...` path arguments and
+leaves native paths unchanged, verifies files and starts real ngspice. Package
+installation via `pacman` already converts paths in its post-install hook; a
+global substring replacement would corrupt those native paths. Hosted CI now
+checks both native-path preservation and repeated invocation; see
+[failure and repair evidence](PHASE_1_REPRODUCIBILITY.md). No third-party binaries
+are included in source control; captured runtime text is retained as CI evidence.
 
 ## Outputs and failure behavior
 

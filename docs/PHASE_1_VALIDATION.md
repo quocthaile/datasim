@@ -106,10 +106,50 @@ All per-refinement reports/configurations/logs are adjacent to the study JSON.
 The local numerical/fault work and fresh-checkout build are VERIFIED on
 Windows/GCC/ngspice-47: 3/3 clean-checkout tests passed and all six regenerated
 waveforms matched the original study. Phase 1.5 local exit criteria are satisfied
-for this environment. Hosted CI is IMPLEMENTED, not yet VERIFIED. Physical
-measurements, fresh-OS provisioning, multi-platform support, advanced models and
-Phase 2 are not claimed. See the clean-build evidence in
+for this environment. Hosted Windows CI is also VERIFIED separately below. Physical
+measurements, general multi-platform support, advanced models and Phase 2 are
+not claimed. See the clean-build and hosted evidence in
 [reproducibility](PHASE_1_REPRODUCIBILITY.md).
+
+### Hosted Windows validation (2026-10-31)
+
+[Actions run 41217248663](https://github.com/quocthaile/datasim/actions/runs/41217248663)
+completed successfully on repair commit `86d6666677b98bef8ac4959b7f25fa9bd15cbe9f`.
+This is separate evidence from the local Windows results above. The prior hosted
+failure remains documented in [reproducibility](PHASE_1_REPRODUCIBILITY.md).
+The repair changes only CI runtime configuration; all C++ source, ideal-RC topology,
+parameters, analytical reference and solver/acceptance tolerances are unchanged.
+
+| Maximum step (us) | Native samples | Common-grid max error (V) | RMSE (V) | NRMSE | Hosted backend seconds |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 10 | 640 | 6.31105602105e-5 | 1.13391840822e-5 | 2.26783681644e-6 | 0.0249423 |
+| 5 | 1240 | 1.78925399309e-5 | 3.29100412231e-6 | 6.58200824462e-7 | 0.0414715 |
+| 2.5 | 2441 | 6.00291222685e-6 | 1.34292221758e-6 | 2.68584443516e-7 | 0.0424255 |
+| 1.25 | 4840 | 2.66872907693e-6 | 7.51051401115e-7 | 1.50210280223e-7 | 0.0664282 |
+
+All four refinements and both baseline repeats pass common/native-grid acceptance
+at **0.05 V**. Every common grid has 4001 points and retains checkpoints at
+td, td+tau, td+2tau, td+3tau and td+5tau. Independently parsed CSVs have unchanged
+`time_s,vin_V,vout_V` headers, finite values and strictly increasing times. A
+separate Python audit recomputed the ideal response directly from R/C/source/time,
+interpolated the raw waveform, and checked every error row, metric and all 30
+checkpoint records. It also verified normalized netlist hashes and unchanged
+configuration/report objects against local evidence.
+
+All six hosted waveform CSVs match the original local files byte for byte; study
+numerical metrics match exactly. Independent recomputation differs only by RMSE
+roundoff below 4e-19 V. Both baseline repeat deltas are 0 V at the retained
+1e-12 V threshold. Backend paths, environment versions and durations differ;
+the durations above are observations, not a speed comparison.
+
+Hosted CTest: **3 passed, 0 failed, 0 skipped**, including 92 unit checks, the
+process/fault suite and required real ngspice integration. Five provisioning tests
+and two real runtime-startup checks also passed. Successful backend logs contain
+no unexpected diagnostic; expected warning/error fixtures remain rejected.
+See [hosted audit](../examples/rc_transient/hosted-ci/passed-41217248663/audit.json),
+[study](../examples/rc_transient/hosted-ci/passed-41217248663/study.json), and
+[baseline report](../examples/rc_transient/hosted-ci/passed-41217248663/run-0/validation_report.json).
+Historical local artifacts have not been overwritten.
 
 ## Historical Phase 1 record
 

@@ -5,8 +5,10 @@ These stages are ordered by dependency, not promised delivery dates.
 Phase 1.5 hardening: numerical/common-grid validation, four timestep refinements,
 characteristic checkpoints, repeatability, JSON reports and expanded failure tests
 are VERIFIED locally on Windows/GCC/ngspice-47. The fresh-checkout build and all
-three tests passed; local Phase 1.5 exit criteria are satisfied. CI is IMPLEMENTED
-but hosted execution remains unverified. See [reproducibility](PHASE_1_REPRODUCIBILITY.md)
+three tests passed; local Phase 1.5 exit criteria are satisfied. Hosted Windows CI
+is VERIFIED by [run 41217248663](https://github.com/quocthaile/datasim/actions/runs/41217248663):
+build, 3/3 tests with zero skips, real integration and the six-run study passed
+after correcting ngspice runtime paths. See [reproducibility](PHASE_1_REPRODUCIBILITY.md)
 and [architecture review](PHASE_1_ARCHITECTURE_REVIEW.md). Do not begin Phase 2.
 
 The separately authorized **Phase 1 RC feasibility spike is VERIFIED** on the

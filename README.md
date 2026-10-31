@@ -12,10 +12,12 @@ See [build/run instructions](docs/PHASE_1_IMPLEMENTATION.md) and
 CMake build the application; an external ngspice executable runs integration tests.
 
 Phase 1.5 hardening adds common-grid convergence/checkpoint validation, repeat-run
-evidence, JSON reports and timeout/concurrency tests. See
+evidence, JSON reports and timeout/concurrency tests. Local verification and
+[hosted Windows CI](https://github.com/quocthaile/datasim/actions/runs/41217248663)
+passed, including real ngspice integration and all six study runs. See
 [reproducibility](docs/PHASE_1_REPRODUCIBILITY.md) and the
 [architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md) for verification scope
-and open release gates. No Phase 2 capability is implemented.
+and remaining limitations. No Phase 2 capability is implemented.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet

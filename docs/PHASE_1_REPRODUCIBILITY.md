@@ -1,7 +1,8 @@
 # Phase 1.5 reproducibility
 
-Status: VERIFIED local Windows numerical repeatability and fresh-checkout build.
-Hosted CI is tracked separately below; no multi-platform claim is made.
+Status: VERIFIED local Windows numerical repeatability, fresh-checkout build and
+hosted Windows CI. Hosted evidence is recorded separately below; no multi-platform
+claim is made.
 
 ## Environment and commands
 
@@ -93,7 +94,7 @@ checking its SHA256, checks the reported version, fixes package relocation paths
 builds a clean checkout, runs unit/process tests and required real integration,
 runs the study, and collects logs/reports even on failure. Toolchain/dependency
 package versions can evolve; they are recorded at execution rather than claimed
-fully locked. Hosted CI is IMPLEMENTED; no hosted result has been observed, so it is not VERIFIED.
+fully locked. Hosted CI is now VERIFIED by the completed run documented below.
 
 ## Fresh-checkout verification completed
 
@@ -112,8 +113,9 @@ ctest --test-dir build/clean --output-on-failure -V --output-junit clean-tests.x
 
 Clean configure/build succeeded; **3 tests passed, 0 failed, 0 skipped**, including
 92 unit checks. All six clean-study CSVs were byte-identical to the original study,
-and the build's normalized source SHA256 matched. The only later changes are
-documentation/evidence and CSV checkout attributes, not executable source.
+and the build's normalized source SHA256 matched. Later changes cover
+documentation/evidence, CSV checkout attributes and CI provisioning, not C++
+executable source.
 See [clean verification JSON](../examples/rc_transient/phase15-evidence/clean-verification.json),
 [clean test log](../examples/rc_transient/phase15-evidence/clean-tests-output.txt),
 [clean study](../examples/rc_transient/phase15-evidence/clean-study.json).
@@ -126,5 +128,88 @@ refers to the LF waveform bytes.
 The local Phase 1.5 exit criteria are satisfied for this Windows environment.
 This verifies a fresh checkout/build with explicitly selected existing toolchain
 and runtime dependencies, not a fresh OS installation or Linux/MSVC support.
-Hosted Actions execution remains unverified; no claim is made that its installation
-steps or runner image have already passed. No Phase 2 work is authorized by this result.
+At that point hosted Actions execution remained unverified. The subsequent hosted
+repair and verification are recorded below. No Phase 2 work is authorized by this result.
+
+## Hosted CI failure and repair (2026-10-31)
+
+The release-gate task started at `b88ddec6d4f5509c59546d7ff1bb01385a969bc7`
+on `codex/phase-1-5-hardening`, with a clean working tree.
+[Failed run 41216041196](https://github.com/quocthaile/datasim/actions/runs/41216041196)
+built successfully and passed unit/process tests, but real integration failed;
+the convergence step did not run. Its archived backend log contains duplicated
+paths such as `D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/analog.cm`.
+The [failure record](../examples/rc_transient/hosted-ci/failed-41216041196/failure.json)
+and [original backend output](../examples/rc_transient/hosted-ci/failed-41216041196/backend-output.txt)
+are preserved separately from all historical local evidence.
+
+The pinned archive contains `/ucrt64/...` paths, but its `.INSTALL` `post_install`
+hook already rewrites them with `cygpath -m`. The workflow's subsequent global
+`sed` replacement matched `/ucrt64/` inside those valid native paths and duplicated
+the drive-qualified prefix. The installed format was confirmed from the repaired
+runner's captured `spinit.before`, not inferred from the raw archive alone.
+
+The workflow now passes a dynamic `cygpath -m /ucrt64` prefix to
+[`configure_ngspice.py`](../scripts/ci/configure_ngspice.py). It converts only
+`codemodel`/`osdi` argument tokens beginning `/ucrt64/`, preserves native absolute
+tokens, comments, quoting and conditionals, and rejects unknown/corrupted paths.
+Five tests cover raw, native, mixed/quoted paths, repeated conversion and the
+actual duplicated-prefix regression. Before/after files and path reports are
+uploaded. The helper checks all seven code-model files and starts actual ngspice
+with installed initialization enabled; exit errors, warnings and failed startup
+remain fatal. The workflow invokes it twice and verifies unchanged final hashes.
+The C++ diagnostic gate, model, independent reference and 0.05 V tolerance were
+not modified.
+
+## Hosted verification completed
+
+[Successful run 41217248663](https://github.com/quocthaile/datasim/actions/runs/41217248663)
+completed successfully at repair commit
+`86d6666677b98bef8ac4959b7f25fa9bd15cbe9f` on 2026-10-31 (UTC).
+The full [rc-verification-windows artifact](https://github.com/quocthaile/datasim/actions/runs/41217248663/artifacts/13048542135)
+was downloaded and audited after completion. It includes raw samples, all six
+waveform/error CSVs, netlists, logs, JSON reports, fault artifacts, JUnit output,
+the packaged install script and runtime configuration before/after both checks.
+GitHub artifact availability is subject to repository retention settings.
+
+| Item | Observed hosted result |
+| --- | --- |
+| Runner | Windows Server 2025 Datacenter 10.0.26100, AMD64; Actions runner 2.338.2 |
+| Image | `windows-2025-vs2026`, version `20261021.278.1` |
+| Compiler/build | GNU 16.2.0, MSYS2 UCRT package 16.2.0-6; C++20 Release; CMake 4.4.5-1; Ninja 1.13.2-1 |
+| Backend | Hash-checked ngspice 47-1; reported ngspice-47; actual RC solver SPARSE 1.3 |
+| Package/runtime checks | PASS; five normalization tests; seven code models checked on each of two real startup invocations; zero unexpected diagnostics |
+| Installed paths | Native Windows paths already correct; zero conversions, before/after hashes equal on both invocations |
+| Configure/build | PASS from Actions checkout |
+| CTest | 3 passed, 0 failed, 0 skipped: unit (92 checks), backend_errors, ngspice_rc |
+| Real integration | PASS; 640 samples; intentionally invalid netlist separately rejected with exit 1 |
+| Study | PASS; four refinements and two additional baseline repeats; 4001-point grid and 0.05 V tolerance retained |
+| Repeats | Maximum numerical delta 0 V at 1e-12 V repeat tolerance; baseline CSV bytes identical |
+
+The [audit record](../examples/rc_transient/hosted-ci/passed-41217248663/audit.json)
+contains run/head identity, step outcomes, artifact and CSV hashes, independent
+metric recomputation and environment versions. [Study JSON](../examples/rc_transient/hosted-ci/passed-41217248663/study.json),
+[unit/process JUnit](../examples/rc_transient/hosted-ci/passed-41217248663/unit.xml),
+[integration JUnit](../examples/rc_transient/hosted-ci/passed-41217248663/integration.xml),
+and all six reports/netlists/logs are retained next to it. Runtime snapshots are
+under `runtime-config/`; captured `.log` files use `.txt` in this evidence copy.
+Full downloaded artifacts remain locally under `build/hosted-ci/passed-41217248663/`.
+
+Hosted and local configurations, normalized netlists, validation report objects
+and study numerical fields match exactly. All six hosted waveform CSVs are
+byte-identical to their original local run files. Independent Python CSV/math
+recomputation agrees with reported metrics to floating-point rounding (RMSE
+differences below 4e-19 V). All 30 characteristic checkpoints pass. The recorded
+source SHA256 is the same `7eb377c...77db3` cited above.
+
+Environment differences include a hosted Windows Server image, package-managed
+runtime rather than local extraction, GCC package revision 6 rather than 3,
+CMake 4.4.5 rather than 4.4.0-rc2, executable paths and run durations. None produced
+a numerical or waveform-byte difference in this experiment; durations are not
+controlled benchmarks. Hosted run metadata records `git_revision_at_configure`
+as `source-export` because Git revision discovery fell back in that build
+environment. The Actions head SHA and matching normalized C++ source hash provide
+the verified revision association; the metadata field is preserved as generated.
+It does not hash the Python helper or workflow; those are identified by the
+Actions commit. Cross-platform identity and fully locked transitive dependencies
+remain unverified. No Phase 2 work has started.

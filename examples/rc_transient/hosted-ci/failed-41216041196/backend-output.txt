@@ -1,0 +1,39 @@
+Error opening code model "D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/spice2poly.cm": No such file or directory!
+Error: Library D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/spice2poly.cm couldn't be loaded!
+Error opening code model "D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/analog.cm": No such file or directory!
+Error: Library D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/analog.cm couldn't be loaded!
+Error opening code model "D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/digital.cm": No such file or directory!
+Error: Library D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/digital.cm couldn't be loaded!
+Error opening code model "D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/xtradev.cm": No such file or directory!
+Error: Library D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/xtradev.cm couldn't be loaded!
+Error opening code model "D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/xtraevt.cm": No such file or directory!
+Error: Library D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/xtraevt.cm couldn't be loaded!
+Error opening code model "D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/table.cm": No such file or directory!
+Error: Library D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/table.cm couldn't be loaded!
+Error opening code model "D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/tlines.cm": No such file or directory!
+Error: Library D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/tlines.cm couldn't be loaded!
+Warning: code models like D:/a/_temp/msys64D:/a/_temp/msys64/ucrt64/lib/ngspice/tlines.cm have not been loaded successfully.
+    Any of the following steps may fail, if code models are involved!.
+
+
+Note: No compatibility mode selected!
+
+
+Circuit: datasim manually configured ideal rc transient
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vin                                          0
+vout                                         0
+v1#branch                                    0
+
+
+No. of Data Rows : 640
+ngspice-47 done

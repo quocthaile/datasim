@@ -1,6 +1,6 @@
 # Phase 1.5 architecture review
 
-Status: IMPLEMENTED corrections; local Windows verification recorded in
+Status: IMPLEMENTED corrections; local and hosted Windows verification recorded in
 [validation](PHASE_1_VALIDATION.md) and [reproducibility](PHASE_1_REPRODUCIBILITY.md).
 
 ## Inspection baseline
@@ -39,7 +39,8 @@ Native-grid baseline maximum error was 1.429824283105674e-5 V. There was no CI.
 | Concurrent Windows launches could inherit each other's temporary handles. | Serialize only creation/launch/closure of this launcher's inheritable handles; processes still run concurrently. | Two simultaneous literal-argv/cwd tests pass with distinct atomic workspaces. Arbitrary external inheritable handles are not a supported sandbox contract. |
 | Unique paths relied on a timestamp without retry. | Atomic create with collision retries for helper/test workspaces; exact requested run directories reject collisions. | Concurrency and user-sentinel preservation tests. |
 | Missing-signal, real invalid-netlist and argument tests absent. | Add strict header fault, real ngspice invalid-netlist test, shell-metacharacter/quote/space/backslash/empty-argument cases. | All pass; invalid ngspice netlist exits 1. No parameter string enters a command shell. |
-| No hosted build pipeline. | Windows UCRT GitHub Actions workflow pins ngspice 47-1 archive/hash, configures/tests and collects artifacts. | IMPLEMENTED; hosted execution not yet VERIFIED. No Linux/MSVC support claim. |
+| No hosted build pipeline. | Windows UCRT GitHub Actions workflow pins ngspice 47-1 archive/hash, configures/tests and collects artifacts. | VERIFIED on hosted Windows after the runtime-path repair; see [run/evidence](PHASE_1_REPRODUCIBILITY.md). No Linux/MSVC support claim. |
+| Hosted initialization double-prefixed already native code-model paths. | Token-aware conversion of only MSYS-rooted arguments; preserve native paths and package conditionals; capture configuration and check real initialization twice. | Five regression tests, seven model files checked, idempotent snapshots, strict diagnostics and real RC integration passed in hosted run 41217248663. |
 
 No numerical solver tolerance, component model, supported component family, GUI,
 database or LLM dependency changed. [ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md)
