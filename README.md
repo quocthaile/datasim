@@ -2,9 +2,14 @@
 
 **Datasheet-driven electronic component modeling, simulation, and visualization.**
 
-Datasim is at the documentation-foundation stage. The application, parser,
-simulation integration, and visualization are **PROPOSED**, not implemented.
-There is no build system or runnable application yet.
+Datasim has a **VERIFIED Phase 1 feasibility spike** for an ideal RC transient:
+C++20 orchestration, ngspice batch execution, CSV export, and independent analytical
+validation. This is not a production simulator. Datasheet extraction, component
+knowledge management, and interactive visualization remain **PROPOSED**.
+
+See [build/run instructions](docs/PHASE_1_IMPLEMENTATION.md) and
+[actual validation evidence](docs/PHASE_1_VALIDATION.md). A C++20 compiler and
+CMake build the application; an external ngspice executable runs integration tests.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet
@@ -21,16 +26,17 @@ assist document work and explanations; they are never the numerical authority.
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)
-- [Agent instructions](AGENTS.md) and [repository initialization prompt](prompts/AGENT_INIT_REPOSITORY.md)
+- [Agent instructions](AGENTS.md) and [repository initialization prompt](docs/AGENT_INIT_REPOSITORY.md)
+- [ADR-0002: Phase 1 executable integration](docs/decisions/ADR-0002-phase-1-ngspice-executable.md)
 
 ## Contributing at this stage
 
-Keep changes documentation-first. Preserve evidence, units, operating conditions,
+Keep changes scoped to the current phase. Preserve evidence, units, operating conditions,
 and review history. Record technology choices in decision records before adopting
-them. ngspice is the first integration candidate, not an installed dependency.
-Language, UI toolkit, graphics stack, storage, and LLM runtime remain undecided.
+them. Phase 1 selects C++20, CMake/CTest and ngspice executable integration.
+UI toolkit, graphics stack, storage, and LLM runtime remain undecided.
 
-The existing `.gitignore` mentions native build tools; it does not select them.
+The original `.gitignore` is unchanged; generated runs and local tools belong under `build/`.
 No license file is present. Project licensing remains an owner decision; do not
 assume redistribution rights for this repository or third-party assets. Link to
 datasheets and vendor models instead of copying them into the repository.

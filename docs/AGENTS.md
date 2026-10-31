@@ -2,15 +2,17 @@
 
 ## Scope
 
-Datasim currently contains a documentation foundation. Read [README.md](README.md),
-the [charter](docs/PROJECT_CHARTER.md), and relevant decision records before edits.
-Do not implement a simulator, parser, UI, database, or LLM integration during this
-initialization task. Do not add source code, dependencies, or a build system.
+Read [README.md](../README.md), the [charter](PROJECT_CHARTER.md), and relevant
+decision records before edits. The documentation-only initialization task is
+complete. The user's Phase 1 request authorizes C++20/CMake RC orchestration,
+ngspice batch integration, validation, export and tests, as recorded in
+[ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md). Do not implement
+datasheet parsing, UI, database, LLM integration, or a custom solver; do not start Phase 2.
 
 ## Working practices
 
 - Inspect Git status, branches, recent commits, and existing files before editing.
-- Preserve user changes. Use `docs/project-foundation` for this task; do not commit
+- Preserve user changes. Use `feat/phase-1-ngspice-rc` for Phase 1; do not commit
   directly to the default branch or merge the work.
 - Keep documentation links relative within the repository. Use stable original
   URLs and identifiers for research, with matching BibTeX keys.
@@ -33,11 +35,12 @@ All extracted information needs structured validation and engineering review
 before it becomes trusted simulation input. LLM output is candidate information,
 not numerical authority. Simulation must use deterministic computation through a
 backend-independent boundary. Evaluate existing simulators before proposing a
-custom SPICE solver; ngspice is only the first candidate.
+custom SPICE solver; ngspice executable integration is selected only for Phase 1.
 
 ## Documentation checks
 
 Check relative links, Mermaid syntax, citation identifiers, status language, and
 agreement between the charter, architecture, model, roadmap, and ADR. Confirm the
-diff contains only intended documentation and existing tracked files are preserved.
-Report unavailable tools or remote access honestly. No application tests exist yet.
+diff contains only authorized changes and existing user work is preserved.
+Run the CMake build and CTest suite documented in [Phase 1](PHASE_1_IMPLEMENTATION.md).
+Report unavailable tools or remote access honestly; skipped integration tests are not passes.

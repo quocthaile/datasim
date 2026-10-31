@@ -9,6 +9,12 @@ researchers comparing models, and learners inspecting assumptions.
 
 ## Scope
 
+Phase 1 update: the user has authorized a bounded implementation of manual ideal
+RC configuration, ngspice orchestration, analytical validation and export.
+[ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md) records the technology
+choices and the scope change. [Validation evidence](PHASE_1_VALIDATION.md) covers
+only this spike. The following paragraphs describe the original initialization scope.
+
 PROPOSED capabilities include document processing, evidence-linked parameter
 extraction, engineering review, component knowledge management, model association,
 deterministic simulation, and interactive explanation. The immediate PLANNED

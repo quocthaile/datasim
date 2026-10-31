@@ -2,9 +2,15 @@
 
 These stages are ordered by dependency, not promised delivery dates.
 
+The separately authorized **Phase 1 RC feasibility spike is VERIFIED** on the
+documented Windows/GCC/ngspice environment: manual ideal components, executable
+adapter, CSV retrieval and analytical validation. See [implementation](PHASE_1_IMPLEMENTATION.md)
+and [evidence](PHASE_1_VALIDATION.md). This does not complete the broader knowledge
+contracts or reviewed-datasheet vertical slice below, and Phase 2 has not begun.
+
 | Stage | Status | Scope and exit criteria |
 | --- | --- | --- |
-| 0: Foundation | PLANNED | Prepare these documents for review; check links, diagrams, references, status consistency, and preservation of existing files. |
+| 0: Foundation | IMPLEMENTED | Foundation committed at b319636; documentation available for review. |
 | 1: Engineering scope | PROPOSED | Select an initial component family, analyses, licensed fixtures, and review responsibilities; define acceptance tolerances. |
 | 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. |
 | 3: Knowledge contracts | PROPOSED | Specify evidence, observation, knowledge and model schemas with revision rules; demonstrate review on synthetic or permitted examples. |
@@ -24,6 +30,7 @@ These stages are ordered by dependency, not promised delivery dates.
 - Is local LLM assistance beneficial on the selected corpus, and which runtime/model fits?
 - What repository license should the owner adopt?
 
-Answer these with evidence and ADRs. No choice of Qt, OpenGL, Python, SQLite, or
-another implementation technology is authorized by this roadmap. A custom solver
+Phase 1 answers the initial ideal-RC/transient scope and selects C++20, CMake and
+executable integration in ADR-0002. The broader questions remain open. No choice
+of Qt, OpenGL, Python, SQLite, or other product infrastructure is made. A custom solver
 would require a demonstrated unmet need after evaluating existing tools.

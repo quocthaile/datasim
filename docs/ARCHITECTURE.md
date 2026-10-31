@@ -3,6 +3,12 @@
 Status: PROPOSED application architecture. These are conceptual boundaries, not
 implemented services or a commitment to deployment topology or language.
 
+Phase 1 implements a narrow slice using manually configured ideal RC components,
+the ngspice executable adapter, generic samples, and independent validation.
+See [ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md). No document-to-knowledge
+pipeline or general backend/plugin framework is implemented. The discussion below
+is the wider target architecture; its original candidate status is refined by ADR-0002.
+
 ```mermaid
 flowchart TD
     DS["Datasheet"] --> DP["Document Processing"]

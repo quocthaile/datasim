@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 3.20)
+project(Datasim VERSION 0.1.0 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+add_library(datasim
+    src/datasim/simulation/circuit/rc.cpp
+    src/datasim/simulation/analysis/reference.cpp
+    src/datasim/simulation/validation/validation.cpp
+    src/datasim/simulation/io/samples.cpp
+    src/datasim/simulation/backend/process.cpp
+    src/datasim/simulation/backend/ngspice.cpp)
+target_include_directories(datasim PUBLIC src)
+if(MSVC)
+    target_compile_options(datasim PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(datasim PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+add_executable(rc_demo apps/rc_demo/main.cpp)
+target_link_libraries(rc_demo PRIVATE datasim)
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(unit_tests tests/unit/main.cpp)
+    target_link_libraries(unit_tests PRIVATE datasim)
+    add_test(NAME unit COMMAND unit_tests)
+    add_executable(backend_fixture tests/unit/backend_fixture.cpp)
+    add_executable(backend_error_tests tests/unit/backend_errors.cpp)
+    target_link_libraries(backend_error_tests PRIVATE datasim)
+    add_test(NAME backend_errors COMMAND backend_error_tests $<TARGET_FILE:backend_fixture>)
+    add_executable(integration_tests tests/integration/main.cpp)
+    target_link_libraries(integration_tests PRIVATE datasim)
+    set(DATASIM_NGSPICE "" CACHE FILEPATH "Optional path to ngspice executable")
+    add_test(NAME ngspice_rc COMMAND integration_tests "${DATASIM_NGSPICE}")
+    set_tests_properties(ngspice_rc PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 45)
+endif()

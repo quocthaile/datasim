@@ -1,0 +1,45 @@
+backend=ngspice
+parameter_origin=manually_configured_ideal_components
+resistance_ohm=1000
+capacitance_F=9.9999999999999995e-07
+source_initial_V=0
+source_final_V=5
+capacitor_initial_V=0
+delay_s=0.001
+rise_s=1.0000000000000001e-09
+fall_s=1.0000000000000001e-09
+width_s=0.01
+period_s=0.02
+step_s=1.0000000000000001e-05
+maximum_step_s=1.0000000000000001e-05
+duration_s=0.0060000000000000001
+reltol=1e-6
+abstol_A=1e-12
+vntol_V=1e-9
+method=trap
+temperature_degC=27
+nominal_temperature_degC=27
+validation_start_s=0.0010000009999999999
+validation_end_s=0.0060000000000000001
+tolerance_V=0.050000000000000003
+output_file=results.csv
+backend_executable=D:/projects/datasim/build/tools/msys2-ngspice/ucrt64/bin/ngspice_con.exe
+backend_version_begin
+******
+** ngspice-47 : Circuit level simulation program
+** Compiled with KLU Direct Linear Solver
+** The U. C. Berkeley CAD Group
+** Copyright 1985-1994, Regents of the University of California.
+** Copyright 2001-2026, The ngspice team.
+** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html
+** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html
+** Creation Date: Mon Sep  7 15:42:04 UTC 2026
+******
+backend_version_end
+sample_count=640
+validation_sample_count=525
+max_absolute_error_V=1.429824283105674e-05
+rmse_V=8.4870048371839017e-06
+normalized_rmse=1.6974009674367804e-06
+simulation_status=SUCCEEDED
+validation_status=PASSED

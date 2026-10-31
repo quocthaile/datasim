@@ -4,6 +4,10 @@ Status: PROPOSED engineering validation program. No extraction benchmark,
 simulation, accuracy experiment, or physical measurement has been run for this
 foundation. Documentation checks do not establish numerical correctness.
 
+Phase 1 update: numerical RC verification and automated tests have now run; see
+[Phase 1 validation](PHASE_1_VALIDATION.md) for exact scope, results and limitations.
+Physical validation and the remaining gates below remain PROPOSED.
+
 ## Gates
 
 | Gate | Proposed checks | Evidence needed to pass |
