@@ -1,0 +1,104 @@
+#include "datasim/simulation/analysis/reference.hpp"
+#include "datasim/simulation/analysis/grid.hpp"
+#include "datasim/simulation/io/report.hpp"
+#include "datasim/simulation/backend/ngspice.hpp"
+#include "datasim/simulation/validation/validation.hpp"
+#include <cmath>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <sstream>
+#include <stdexcept>
+using namespace datasim;
+int checks = 0;
+void require(bool condition) { ++checks; if (!condition) throw std::runtime_error("check failed #" + std::to_string(checks)); }
+void rejects(const std::function<void()>& f) {
+    bool threw = false; try { f(); } catch (const std::exception&) { threw = true; } require(threw);
+}
+int main() {
+    try {
+        RcConfig c;
+        require(std::abs(time_constant(c) - 0.001) < 1e-15);
+        require(analytical_voltage(c, 0) == 0);
+        require(analytical_voltage(c, c.delay_s) == 0);
+        require(std::abs(analytical_voltage(c, 0.002) - 3.1606027941427883) < 1e-12);
+        require(std::abs(analytical_voltage(c, 0.006) - 4.966310265004573) < 1e-12);
+        require(std::abs(analytical_voltage(c, 0.003) - 4.3233235838169365) < 1e-12);
+        require(std::abs(analytical_voltage(c, 0.004) - 4.7510646581606805) < 1e-12);
+        require(std::abs(ramp_voltage(c,c.delay_s+c.rise_s)-2.499999166666875e-6) < 1e-12);
+        require(ramp_voltage(c,0)==c.initial_voltage_V);
+        require(ramp_voltage(c,0.002)<analytical_voltage(c,0.002));
+        for (double bad : {0., -1., std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()}) {
+            auto x = c; x.resistance_ohm = bad; rejects([&]{ check_config(x); });
+            x = c; x.capacitance_F = bad; rejects([&]{ check_config(x); });
+            x = c; x.voltage_V = bad; rejects([&]{ check_config(x); });
+            x = c; x.duration_s = bad; rejects([&]{ check_config(x); });
+            x = c; x.step_s = bad; rejects([&]{ check_config(x); });
+        }
+        for (auto mutate : std::vector<std::function<void(RcConfig&)>>{
+            [](auto& x){ x.initial_voltage_V = 1; }, [](auto& x){ x.duration_s = 0.012; },
+            [](auto& x){ x.step_s = 0.001; }, [](auto& x){ x.rise_s = 0.001; },
+            [](auto& x){ x.period_s = 0.001; }, [](auto& x){ x.duration_s = 0.0005; }}) {
+            auto x = c; mutate(x); rejects([&]{ rc_netlist(x); });
+        }
+        rejects([&]{ analytical_voltage(c, -1); });
+        const auto net = rc_netlist(c);
+        require(net.find("V1 vin 0 PULSE(0 5 ") != std::string::npos);
+        require(net.find("R1 vin vout 1000") != std::string::npos);
+        require(net.find(".ic V(vout)=0") != std::string::npos);
+        require(net.find("wrdata samples.dat v(vin) v(vout)") != std::string::npos);
+        auto other = c; other.resistance_ohm = 2000; other.voltage_V = 3;
+        require(rc_netlist(other).find("R1 vin vout 2000") != std::string::npos);
+        require(rc_netlist(other).find("PULSE(0 3 ") != std::string::npos);
+        Samples samples;
+        for (int i = 0; i <= 600; ++i) {
+            const double t = c.duration_s * i / 600;
+            samples.push_back({t, t <= c.delay_s ? 0. : 5., analytical_voltage(c, t)});
+        }
+        auto exact = validate(c, samples); require(exact.passed); require(exact.max_absolute_error_V == 0);
+        for (auto& s : samples) if (s.time_s >= c.delay_s + c.rise_s) s.vout_V += 0.02;
+        auto report = validate(c, samples);
+        require(report.passed); require(std::abs(report.max_absolute_error_V - 0.02) < 1e-12);
+        require(std::abs(report.rmse_V - 0.02) < 1e-12); require(std::abs(report.normalized_rmse - 0.004) < 1e-12);
+        for (auto& s : samples) if (s.time_s >= c.delay_s + c.rise_s) s.vout_V += 0.05;
+        require(!validate(c, samples).passed);
+        auto short_run = samples; short_run.pop_back(); rejects([&]{ validate(c, short_run); });
+        auto wrong_source = samples; wrong_source.back().vin_V = 0; rejects([&]{ validate(c, wrong_source); });
+        std::ostringstream csv; write_csv(csv, samples); std::istringstream input(csv.str());
+        const auto roundtrip = read_csv(input); require(roundtrip.size() == samples.size());
+        require(roundtrip.back().vout_V == samples.back().vout_V);
+        for (const auto* body : {"", "0,0,0\n0,0,0\n", "-1,0,0\n", "0,nan,0\n", "0,inf,0\n", "0,0\n", "0,0,0,2\n", "0,0,0junk\n", "0,,0 0\n", "0 0,0,\n", "\n"}) {
+            std::istringstream in(std::string("time_s,vin_V,vout_V\n") + body); rejects([&]{ read_csv(in); });
+        }
+        std::istringstream bad_header("time,vin,vout\n0,0,0\n"); rejects([&]{ read_csv(bad_header); });
+        std::istringstream table("time v(vin) v(vout)\n0 0 0\n0.001 5 1\n");
+        require(read_ngspice_table(table).size() == 2);
+        for (const auto* text : {"", "time v(vin) v(vout)\n", "time v(vout) v(vin)\n0 0 0\n", "time v(vin) v(vout)\n0 0 0 extra\n"}) {
+            std::istringstream in(text); rejects([&]{ read_ngspice_table(in); });
+        }
+        Samples nonfinite{{0, 0, std::numeric_limits<double>::infinity()}};
+        rejects([&]{ check_samples(nonfinite); });
+        Samples line{{0,0,1},{1,2,3},{2,4,5}};
+        const auto linear=interpolate(line,{0.,0.25,1.,1.75,2.});
+        require(linear[1].vin_V==0.5 && linear[1].vout_V==1.5 && linear[3].vout_V==4.5);
+        require(linear.front().vout_V==1 && linear.back().vout_V==5);
+        for (const auto& grid : std::vector<std::vector<double>>{{},{-1},{3},{1,1},{1,0},{std::numeric_limits<double>::quiet_NaN()}})
+            rejects([&]{ interpolate(line,grid); });
+        rejects([&]{ interpolate({}, {0}); });
+        const auto grid=validation_grid(c);
+        require(grid.size()==4001 && grid.front()==c.delay_s+c.rise_s && grid.back()==c.duration_s);
+        rejects([&]{ validation_grid(c,0); });
+        rejects([&]{ validate_on_grid(c,samples,{c.delay_s,c.duration_s}); });
+        const auto resampled=validate_on_grid(c,samples,grid);
+        require(!resampled.passed && resampled.errors.size()==grid.size());
+        require(content_id("")=="cbf29ce484222325");
+        require(content_id("hello")=="a430d84680aabd0b");
+        require(json_string("a\"\\\n\t")=="\"a\\\"\\\\\\u000a\\u0009\"");
+        require(config_json(c).find("\"resistance_ohm\":1000")!=std::string::npos);
+        require(config_json(c)==config_json(RcConfig{}));
+        require(config_json(c)!=config_json(other));
+        auto invalid=c; invalid.capacitance_F=0; rejects([&]{ config_json(invalid); });
+        std::cout << "PASS: " << checks << " unit checks\n";
+        return 0;
+    } catch (const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
+}

@@ -1,0 +1,8 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: datasim ngspice runtime initialization check
+
+DATASIM_RUNTIME_READY
+ngspice-47 done

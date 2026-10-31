@@ -1,0 +1,218 @@
+{
+  "status": "PASSED",
+  "run_url": "https://github.com/quocthaile/datasim/actions/runs/41217248663",
+  "head_sha": "86d6666677b98bef8ac4959b7f25fa9bd15cbe9f",
+  "artifact_url": "https://github.com/quocthaile/datasim/actions/runs/41217248663/artifacts/13048542135",
+  "artifact_zip_sha256": "f83f076c72d0b9cdfc0dad82885c43febad269e41c66fbf4c81ab2ab7b1cadab",
+  "job": {
+    "id": 124584253308,
+    "name": "windows-ucrt",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-10-31T15:56:45Z",
+    "completed_at": "2026-10-31T15:58:03Z",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-10-31T15:56:46Z",
+        "completed_at": "2026-10-31T15:56:47Z"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-10-31T15:56:47Z",
+        "completed_at": "2026-10-31T15:56:52Z"
+      },
+      {
+        "name": "Run msys2/setup-msys2@v2",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-10-31T15:56:52Z",
+        "completed_at": "2026-10-31T15:57:36Z"
+      },
+      {
+        "name": "Install pinned ngspice release",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4,
+        "started_at": "2026-10-31T15:57:36Z",
+        "completed_at": "2026-10-31T15:57:40Z"
+      },
+      {
+        "name": "Verify installed code-model paths and runtime initialization",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-10-31T15:57:40Z",
+        "completed_at": "2026-10-31T15:57:42Z"
+      },
+      {
+        "name": "Configure and build clean checkout",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6,
+        "started_at": "2026-10-31T15:57:42Z",
+        "completed_at": "2026-10-31T15:57:54Z"
+      },
+      {
+        "name": "Unit and process tests without backend requirement",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7,
+        "started_at": "2026-10-31T15:57:54Z",
+        "completed_at": "2026-10-31T15:57:55Z"
+      },
+      {
+        "name": "Required real backend integration",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8,
+        "started_at": "2026-10-31T15:57:55Z",
+        "completed_at": "2026-10-31T15:57:56Z"
+      },
+      {
+        "name": "Convergence and repeatability",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9,
+        "started_at": "2026-10-31T15:57:56Z",
+        "completed_at": "2026-10-31T15:57:56Z"
+      },
+      {
+        "name": "Run actions/upload-artifact@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10,
+        "started_at": "2026-10-31T15:57:56Z",
+        "completed_at": "2026-10-31T15:57:58Z"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 20,
+        "started_at": "2026-10-31T15:57:58Z",
+        "completed_at": "2026-10-31T15:58:00Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 21,
+        "started_at": "2026-10-31T15:58:00Z",
+        "completed_at": "2026-10-31T15:58:00Z"
+      }
+    ]
+  },
+  "ctest": {
+    "tests": 3,
+    "failures": 0,
+    "skipped": 0
+  },
+  "path_normalization_tests": 5,
+  "unit_checks": 92,
+  "runtime_initialization_invocations": 2,
+  "code_models_checked_per_invocation": 7,
+  "spinit_unchanged_from_package_install": true,
+  "source_sha256": "7eb377c10b7150080a2c67211ba3016b88baf42865ec9fcc66938aa546877db3",
+  "metadata_git_revision_at_configure": "source-export",
+  "provenance_note": "Hosted metadata fell back to source-export; Actions head_sha and matching normalized C++ source hash establish the tested revision.",
+  "environment": {
+    "os": "Windows Server 2025 Datacenter 10.0.26100",
+    "runner": "2.338.2",
+    "image": "windows-2025-vs2026",
+    "image_version": "20261021.278.1",
+    "gcc_package": "16.2.0-6",
+    "cmake_package": "4.4.5-1",
+    "ninja_package": "1.13.2-1",
+    "ngspice_package": "47-1",
+    "build": "C++20 Release"
+  },
+  "numerical_comparison": "All six CSVs byte-identical to original local run artifacts; report objects and study numerical fields exactly equal.",
+  "runs": [
+    {
+      "directory": "run-0",
+      "maximum_step_s": 1e-05,
+      "sample_count": 640,
+      "common_grid_count": 4001,
+      "checkpoint_count": 5,
+      "independently_recomputed_max_error_V": 6.311056021046646e-05,
+      "independently_recomputed_rmse_V": 1.1339184082192187e-05,
+      "results_sha256": "9c923c4d86a96bdf42fe3bbd84a00cc6ae8519f5ac8ea3858b614c30260f26f9",
+      "errors_sha256": "931b1135a687bb22d01a9163a234e120e3ec912db46c4dc2c5d3d766885ab63d",
+      "configuration_netlist_reports_match_local": true,
+      "waveform_bytes_match_original_local_run": true
+    },
+    {
+      "directory": "run-1",
+      "maximum_step_s": 5e-06,
+      "sample_count": 1240,
+      "common_grid_count": 4001,
+      "checkpoint_count": 5,
+      "independently_recomputed_max_error_V": 1.7892539930938756e-05,
+      "independently_recomputed_rmse_V": 3.291004122308873e-06,
+      "results_sha256": "3c7a2e7a79e11727769169649e87fea305beb6959476d60f8fef7e3bd9957caa",
+      "errors_sha256": "112402025c2441aee40d7b90f51b2ccb84d10e8dd0c76581e055b53ad77a6583",
+      "configuration_netlist_reports_match_local": true,
+      "waveform_bytes_match_original_local_run": true
+    },
+    {
+      "directory": "run-2",
+      "maximum_step_s": 2.5e-06,
+      "sample_count": 2441,
+      "common_grid_count": 4001,
+      "checkpoint_count": 5,
+      "independently_recomputed_max_error_V": 6.002912226847623e-06,
+      "independently_recomputed_rmse_V": 1.3429222175794662e-06,
+      "results_sha256": "19e330c7146db0aadc30b3691e36298c5afd38a6cd610b37cd2204eedc7e2c9c",
+      "errors_sha256": "736ecad48f0056bdf47fdaa6eea23a2c300a50b75ebdda143033a10c4904dd43",
+      "configuration_netlist_reports_match_local": true,
+      "waveform_bytes_match_original_local_run": true
+    },
+    {
+      "directory": "run-3",
+      "maximum_step_s": 1.25e-06,
+      "sample_count": 4840,
+      "common_grid_count": 4001,
+      "checkpoint_count": 5,
+      "independently_recomputed_max_error_V": 2.6687290769333155e-06,
+      "independently_recomputed_rmse_V": 7.510514011152829e-07,
+      "results_sha256": "f73c5efc079df59dc9625fac1a957c0a7e9d784e90b4ce0692dc685bdd15fd62",
+      "errors_sha256": "7fcb38a551e58501446fe2424456939502eea250a5409e4dd0f21da357390a87",
+      "configuration_netlist_reports_match_local": true,
+      "waveform_bytes_match_original_local_run": true
+    },
+    {
+      "directory": "run-4",
+      "maximum_step_s": 1e-05,
+      "sample_count": 640,
+      "common_grid_count": 4001,
+      "checkpoint_count": 5,
+      "independently_recomputed_max_error_V": 6.311056021046646e-05,
+      "independently_recomputed_rmse_V": 1.1339184082192187e-05,
+      "results_sha256": "9c923c4d86a96bdf42fe3bbd84a00cc6ae8519f5ac8ea3858b614c30260f26f9",
+      "errors_sha256": "931b1135a687bb22d01a9163a234e120e3ec912db46c4dc2c5d3d766885ab63d",
+      "configuration_netlist_reports_match_local": true,
+      "waveform_bytes_match_original_local_run": true
+    },
+    {
+      "directory": "run-5",
+      "maximum_step_s": 1e-05,
+      "sample_count": 640,
+      "common_grid_count": 4001,
+      "checkpoint_count": 5,
+      "independently_recomputed_max_error_V": 6.311056021046646e-05,
+      "independently_recomputed_rmse_V": 1.1339184082192187e-05,
+      "results_sha256": "9c923c4d86a96bdf42fe3bbd84a00cc6ae8519f5ac8ea3858b614c30260f26f9",
+      "errors_sha256": "931b1135a687bb22d01a9163a234e120e3ec912db46c4dc2c5d3d766885ab63d",
+      "configuration_netlist_reports_match_local": true,
+      "waveform_bytes_match_original_local_run": true
+    }
+  ]
+}

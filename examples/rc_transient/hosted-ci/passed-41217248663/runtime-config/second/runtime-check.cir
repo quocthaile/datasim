@@ -1,0 +1,6 @@
+Datasim ngspice runtime initialization check
+.control
+echo DATASIM_RUNTIME_READY
+quit
+.endc
+.end

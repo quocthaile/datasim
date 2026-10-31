@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="mercury"
+	time="2"
+	timestamp="2026-10-31T22:40:09"
+	>
+	<testcase name="unit" classname="unit" time="0.0572396" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>PASS: 92 unit checks
+</system-out>
+	</testcase>
+	<testcase name="backend_errors" classname="backend_errors" time="1.62293" status="run">
+		<properties>
+			<property name="cmake_labels" value="unit"/>
+		</properties>
+		<system-out>exit: rejected: ngspice exit status 9; see ngspice.log
+missing: rejected: missing ngspice result file samples.dat
+warning: rejected: ngspice diagnostic requires review; see ngspice.log
+empty: rejected: empty ngspice output
+malformed: rejected: malformed ngspice numerical row
+nonfinite: rejected: malformed ngspice numerical row
+signal: rejected: unexpected ngspice table header
+PASS: backend faults, missing signal, timeout termination, concurrent workspaces, literal argv, cwd, retained logs, input gate and user data protection
+</system-out>
+	</testcase>
+	<testcase name="ngspice_rc" classname="ngspice_rc" time="0.467734" status="run">
+		<properties>
+			<property name="cmake_labels" value="integration"/>
+		</properties>
+		<system-out>******
+** ngspice-47 : Circuit level simulation program
+** Compiled with KLU Direct Linear Solver
+** The U. C. Berkeley CAD Group
+** Copyright 1985-1994, Regents of the University of California.
+** Copyright 2001-2026, The ngspice team.
+** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html
+** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html
+** Creation Date: Mon Sep  7 15:42:04 UTC 2026
+******
+PASS: real invalid netlist rejected with exit 1
+PASS: samples=640 max_error_V=1.42982e-05 rmse_V=8.487e-06 artifacts=D:\projects\datasim\build\phase15-clean-checkout\build\clean\integration run 86465822063200
+</system-out>
+	</testcase>
+</testsuite>

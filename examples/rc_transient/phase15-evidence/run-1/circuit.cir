@@ -1,0 +1,16 @@
+Datasim manually configured ideal RC transient
+V1 vin 0 PULSE(0 5 0.001 1.0000000000000001e-09 1.0000000000000001e-09 0.01 0.02)
+R1 vin vout 1000
+C1 vout 0 9.9999999999999995e-07 IC=0
+.ic V(vout)=0
+.options reltol=1e-6 abstol=1e-12 vntol=1e-9 method=trap temp=27 tnom=27
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+set numdgt=16
+tran 5.0000000000000004e-06 0.0060000000000000001 0 5.0000000000000004e-06
+wrdata samples.dat v(vin) v(vout)
+quit
+.endc
+.end
