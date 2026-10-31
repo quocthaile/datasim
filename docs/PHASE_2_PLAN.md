@@ -1,8 +1,10 @@
 # Phase 2 plan: Component domain model and knowledge contracts
 
-Status: PLANNED work authorized on `feat/phase-2-component-model`, branched from
-`origin/main` at `86b924b4b49d69c70c1688a8748cb1c2893adc34` (after PR #1 merged
-Phase 1 and Phase 1.5).
+Status: **IMPLEMENTED and VERIFIED** on `feat/phase-2-component-model`, branched
+from `origin/main` at `86b924b4b49d69c70c1688a8748cb1c2893adc34` (after PR #1 merged
+Phase 1 and Phase 1.5). See [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md) and
+[Phase 2 validation](PHASE_2_VALIDATION.md) for actual deliverables and test
+outcomes.
 
 ## Objective
 
@@ -105,7 +107,7 @@ rationale, alternatives considered, and compatibility guarantees.
 | --- | --- | --- |
 | WP1: Documentation reconciliation | Align `AGENTS.md`, `docs/AGENTS.md`, `README.md`, `PROJECT_CHARTER.md`, `ROADMAP.md`, `PHASE_1_ARCHITECTURE_REVIEW.md` with PR #1 merge state; record `PHASE_2_PLAN.md` and `ADR-0003`. | Relative link and status consistency review. |
 | WP2: C++20 domain types and lifecycle | Implement `identity/`, `evidence/`, `observation/`, `knowledge/`, `model/`, and `validation/` under `src/datasim/component/`; build `datasim_component` with `-Wall -Wextra -Wpedantic`. | Clean CMake/Ninja compilation without warnings or third-party dependencies. |
-| WP3: Synthetic fixtures and unit tests | Build synthetic Resistor and Capacitor bundles and unit tests covering all positive, negative, lifecycle, conflict, and referential-integrity cases. | `ctest` passes `component_model` alongside existing `unit`, `backend_errors`, and real `ngspice_rc` tests with zero skips. |
+| WP3: Synthetic fixtures and unit tests | Build synthetic Resistor and Capacitor bundles and unit tests covering all positive, negative, lifecycle, conflict, and referential-integrity cases. | `ctest` passes `component_model` (231 checks) alongside existing `unit`, `backend_errors`, and real `ngspice_rc` tests with zero skips. |
 | WP4: Phase 2 documentation and CI | Record `PHASE_2_IMPLEMENTATION.md` and `PHASE_2_VALIDATION.md`; update `COMPONENT_DATA_MODEL.md`, `ARCHITECTURE.md`, `VALIDATION_STRATEGY.md`, `ROADMAP.md`, `PROJECT_CHARTER.md`, `README.md`; verify hosted Windows CI and open PR against `main`. | Local CTest 4/4 pass (zero skips) and hosted GitHub Actions pass. |
 
 ## Exit criteria

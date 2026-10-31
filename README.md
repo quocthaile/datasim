@@ -2,35 +2,40 @@
 
 **Datasheet-driven electronic component modeling, simulation, and visualization.**
 
-Datasim has a **VERIFIED Phase 1 feasibility spike** for an ideal RC transient:
-C++20 orchestration, ngspice batch execution, CSV export, and independent analytical
-validation. This is not a production simulator.
+Datasim currently comprises two isolated, **VERIFIED** C++20 foundational modules on
+Windows x64 (MSYS2 UCRT GCC 16.2.0):
 
-See [build/run instructions](docs/PHASE_1_IMPLEMENTATION.md) and
-[actual validation evidence](docs/PHASE_1_VALIDATION.md). A C++20 compiler and
-CMake build the application; an external ngspice executable runs integration tests.
+1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
+   configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
+   convergence/repeatability validation, and process fault hardening, merged into
+   `main` via PR #1 (`86b924b4b49d69c70c1688a8748cb1c2893adc34`) and verified
+   locally and in [hosted Windows CI](https://github.com/quocthaile/datasim/actions/runs/41217248663).
+   See [Phase 1 implementation](docs/PHASE_1_IMPLEMENTATION.md),
+   [Phase 1/1.5 validation](docs/PHASE_1_VALIDATION.md),
+   [reproducibility](docs/PHASE_1_REPRODUCIBILITY.md), and the
+   [architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md).
+2. **Phase 2 component domain model & knowledge contracts (`datasim_component`)**:
+   dependency-free in-memory C++20 representations for component identity, source
+   documents, evidence locations, single-qualifier parameter observations,
+   operating conditions, deterministic human-gated review lifecycle, versioned
+   component knowledge with visible conflicts, model artifact descriptors,
+   independent model validation records, and referential integrity rules, verified
+   on synthetic Resistor and Capacitor fixtures (231 domain unit checks). See
+   [Phase 2 plan](docs/PHASE_2_PLAN.md),
+   [Phase 2 implementation](docs/PHASE_2_IMPLEMENTATION.md),
+   [Phase 2 validation](docs/PHASE_2_VALIDATION.md), and
+   [ADR-0003](docs/decisions/ADR-0003-component-domain-model.md).
 
-Phase 1.5 hardening adds common-grid convergence/checkpoint validation, repeat-run
-evidence, JSON reports and timeout/concurrency tests. Local verification and
-[hosted Windows CI](https://github.com/quocthaile/datasim/actions/runs/41217248663)
-passed on Windows x64 (MSYS2 UCRT GCC / ngspice-47), including real ngspice
-integration and all six study runs, and merged into `main` via PR #1
-(`86b924b4b49d69c70c1688a8748cb1c2893adc34`). See
-[reproducibility](docs/PHASE_1_REPRODUCIBILITY.md) and the
-[architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md) for verification scope
-and remaining limitations.
-
-Phase 2 is **PLANNED** and authorized on `feat/phase-2-component-model` exclusively
-for the in-memory C++20 Component Domain Model and Knowledge Contracts; see
-[Phase 2 plan](docs/PHASE_2_PLAN.md) and
-[ADR-0003](docs/decisions/ADR-0003-component-domain-model.md). PDF/OCR ingestion,
-persistent storage, LLM assistance, semiconductor simulation, and interactive
-visualization remain **PROPOSED**.
+This is not yet an end-to-end simulator or datasheet processor. PDF/OCR ingestion,
+persistent storage, general-purpose JSON serialization, automatic unit conversion,
+LLM integration, knowledge-to-simulation coupling, semiconductor models, and
+interactive visualization remain **PROPOSED**.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet
 parameter is not automatically a complete mathematical model. Local LLMs may
-assist document work and explanations; they are never the numerical authority.
+assist document work and explanations in future phases; they are never the
+numerical or review authority.
 
 ## Documentation
 
@@ -39,7 +44,8 @@ assist document work and explanations; they are never the numerical authority.
 - [Component data model](docs/COMPONENT_DATA_MODEL.md)
 - [Validation strategy](docs/VALIDATION_STRATEGY.md)
 - [Roadmap and open questions](docs/ROADMAP.md)
-- [Phase 2 plan](docs/PHASE_2_PLAN.md)
+- [Phase 1 implementation](docs/PHASE_1_IMPLEMENTATION.md), [validation](docs/PHASE_1_VALIDATION.md), [reproducibility](docs/PHASE_1_REPRODUCIBILITY.md), and [architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md)
+- [Phase 2 plan](docs/PHASE_2_PLAN.md), [implementation](docs/PHASE_2_IMPLEMENTATION.md), and [validation](docs/PHASE_2_VALIDATION.md)
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)
@@ -49,11 +55,12 @@ assist document work and explanations; they are never the numerical authority.
 
 ## Contributing at this stage
 
-Keep changes scoped to the current phase. Preserve evidence, units, operating conditions,
-and review history. Record technology choices in decision records before adopting
-them. Phase 1 selects C++20, CMake/CTest and ngspice executable integration; Phase 2
-uses standard-library C++20 only for in-memory domain contracts.
-UI toolkit, graphics stack, storage, and LLM runtime remain undecided.
+Keep changes scoped to the authorized phase. Preserve evidence, units, operating
+conditions, exact part suffixes, and review history. Record technology choices in
+decision records before adopting them. Phase 1 selects C++20, CMake/CTest and
+ngspice executable integration; Phase 2 uses standard-library C++20 only for
+in-memory domain contracts. UI toolkit, graphics stack, storage, and LLM runtime
+remain undecided.
 
 The original `.gitignore` is unchanged; generated runs and local tools belong under `build/`.
 No license file is present. Project licensing remains an owner decision; do not

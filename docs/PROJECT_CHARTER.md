@@ -18,13 +18,17 @@ Windows x64 (MSYS2 UCRT GCC / ngspice-47), and merged into `main` via PR #1
 choices; [validation evidence](PHASE_1_VALIDATION.md) and
 [reproducibility](PHASE_1_REPRODUCIBILITY.md) cover only that ideal-RC scope.
 
-Phase 2 update: the user has authorized an in-memory C++20 Component Domain Model
-and Knowledge Contracts module on `feat/phase-2-component-model`, scoped strictly
-to [PHASE_2_PLAN.md](PHASE_2_PLAN.md) and
-[ADR-0003](decisions/ADR-0003-component-domain-model.md). It remains independent of
-the ngspice simulation backend and excludes PDF/OCR parsing, persistent storage,
-automatic unit conversion, LLM integration, semiconductor models, and UI. The
-following paragraphs preserve the original initialization scope record.
+Phase 2 update: the user has authorized and `feat/phase-2-component-model`
+implements the in-memory C++20 Component Domain Model and Knowledge Contracts
+module (`datasim_component`), scoped strictly to [PHASE_2_PLAN.md](PHASE_2_PLAN.md)
+and [ADR-0003](decisions/ADR-0003-component-domain-model.md). Local verification on
+Windows x64 (MSYS2 UCRT GCC 16.2.0) is recorded in
+[Phase 2 implementation](PHASE_2_IMPLEMENTATION.md) and
+[Phase 2 validation](PHASE_2_VALIDATION.md). It remains independent of the ngspice
+simulation backend and excludes PDF/OCR parsing, persistent storage, general-purpose
+JSON serialization, automatic unit conversion, LLM integration, semiconductor
+models, and UI. The following paragraphs preserve the original initialization scope
+record.
 
 PROPOSED capabilities include document processing, evidence-linked parameter
 extraction, engineering review, component knowledge management, model association,
@@ -51,7 +55,8 @@ These labels apply to a named capability or claim, not blanket project maturity.
 
 MEASURED is an evidence category, not an automatic upgrade over VERIFIED.
 Simulation and digitized datasheet curves are not new physical measurements.
-Review states for extracted data are separate from these project statuses.
+Review states (`candidate`, `needs_review`, `approved`, `rejected`, `superseded`)
+for extracted component data are separate from these project statuses.
 
 ## Principles and success criteria
 
@@ -62,15 +67,17 @@ source statements, modeled behavior, and assumptions. Missing information stays
 missing rather than being invented.
 
 Foundation acceptance requires consistent documents, resolving relative links,
-valid Mermaid syntax, original research references, no source/dependency additions,
-and no undocumented technology choices. See [validation](VALIDATION_STRATEGY.md).
+valid Mermaid syntax, original research references, no unauthorized source/dependency
+additions, and no undocumented technology choices. See
+[validation](VALIDATION_STRATEGY.md).
 
-## Current baseline
+## Historical initialization baseline
 
-On 2026-10-31 the local checkout had a clean `main`, tracking `origin/main`, with
-one commit (`e48c97d`, Initial commit) and only `.gitignore`. The local remote HEAD
-identified `main` as default. There was no README, AGENTS.md, license, source code,
-build configuration, or separate supplied project-foundation document. The task
-instructions are the baseline for these documents. Remote state could not be
-confirmed during initialization; the GitHub connector returned 404 and the Git
-HTTPS check could not connect.
+On 2026-10-31 the initial local checkout had a clean `main`, tracking `origin/main`,
+with one commit (`e48c97d`, Initial commit) and only `.gitignore`. The local remote
+HEAD identified `main` as default. There was no README, AGENTS.md, license, source
+code, build configuration, or separate supplied project-foundation document. The
+task instructions were the baseline for the initial foundation documents (`b319636`).
+Subsequent Phase 1 (`021513c`) and Phase 1.5 (`99fad81`) work merged into `main` via
+PR #1 at `86b924b4b49d69c70c1688a8748cb1c2893adc34`, which forms the verified
+baseline for Phase 2 (`feat/phase-2-component-model`).

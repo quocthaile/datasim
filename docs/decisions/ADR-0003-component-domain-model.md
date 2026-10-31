@@ -2,9 +2,10 @@
 
 Date: 2026-10-31
 
-Status: SELECTED for Phase 2 implementation on `feat/phase-2-component-model`;
-verification scope will be recorded in [Phase 2 validation](../PHASE_2_VALIDATION.md)
-after automated checks execute.
+Status: SELECTED and IMPLEMENTED for Phase 2 on `feat/phase-2-component-model`;
+verification evidence is recorded in
+[Phase 2 validation](../PHASE_2_VALIDATION.md) and
+[Phase 2 implementation](../PHASE_2_IMPLEMENTATION.md).
 
 ## Context and requirement
 
@@ -12,7 +13,7 @@ With Phase 1 and Phase 1.5 merged into `main` (`86b924b4b49d69c70c1688a8748cb1c2
 Datasim has a verified ideal-RC/ngspice execution slice using manually configured
 numbers, while the conceptual data contracts in
 [COMPONENT_DATA_MODEL.md](../COMPONENT_DATA_MODEL.md) and
-[ARCHITECTURE.md](../ARCHITECTURE.md) remain prose specifications. Before any
+[ARCHITECTURE.md](../ARCHITECTURE.md) remained prose specifications. Before any
 datasheet ingestion, storage schema, assisted extraction, or datasheet-backed
 simulation coupling can be built safely, Datasim needs executable C++20 domain
 types and deterministic validation rules that enforce provenance, unit/qualifier
@@ -97,6 +98,8 @@ serialization, automatic unit conversion, LLM runtimes, and GUI frameworks.
   ADRs.
 
 Related: [Phase 2 plan](../PHASE_2_PLAN.md),
+[Phase 2 implementation](../PHASE_2_IMPLEMENTATION.md),
+[Phase 2 validation](../PHASE_2_VALIDATION.md),
 [component data model](../COMPONENT_DATA_MODEL.md),
 [architecture](../ARCHITECTURE.md),
 [ADR-0001](ADR-0001-simulation-backend-boundary.md),

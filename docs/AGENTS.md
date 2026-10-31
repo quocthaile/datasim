@@ -9,7 +9,8 @@ and Phase 1.5 numerical/process/CI hardening are completed and merged into `main
 at `86b924b4b49d69c70c1688a8748cb1c2893adc34` (PR #1).
 
 Phase 2 authorizes only the in-memory C++20 Component Domain Model and Knowledge
-Contracts defined in [PHASE_2_PLAN.md](PHASE_2_PLAN.md) and
+Contracts defined in [PHASE_2_PLAN.md](PHASE_2_PLAN.md),
+[PHASE_2_IMPLEMENTATION.md](PHASE_2_IMPLEMENTATION.md), and
 [ADR-0003](decisions/ADR-0003-component-domain-model.md) on branch
 `feat/phase-2-component-model`. Keep Phase 2 independent of the existing ngspice
 simulation implementation. Do not implement PDF parsing, OCR, datasheet ingestion,
@@ -51,5 +52,6 @@ custom SPICE solver; ngspice executable integration is selected only for Phase 1
 Check relative links, Mermaid syntax, citation identifiers, status language, and
 agreement between the charter, architecture, model, roadmap, and ADR. Confirm the
 diff contains only authorized changes and existing user work is preserved.
-Run the CMake build and CTest suite documented in [Phase 1](PHASE_1_IMPLEMENTATION.md).
+Run the CMake build and CTest suite documented in
+[Phase 1](PHASE_1_IMPLEMENTATION.md) and [Phase 2](PHASE_2_IMPLEMENTATION.md).
 Report unavailable tools or remote access honestly; skipped integration tests are not passes.

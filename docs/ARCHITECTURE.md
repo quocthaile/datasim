@@ -1,37 +1,50 @@
 # Architecture
 
-Status: PROPOSED application architecture. These are conceptual boundaries, not
-implemented services or a commitment to deployment topology or language.
+Status: PROPOSED end-to-end application architecture, with two isolated slices now
+**IMPLEMENTED and VERIFIED** on Windows x64 (MSYS2 UCRT GCC 16.2.0):
 
-Phase 1 implements a narrow slice using manually configured ideal RC components,
-the ngspice executable adapter, generic samples, and independent validation.
-See [ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md). No document-to-knowledge
-pipeline or general backend/plugin framework is implemented. The discussion below
-is the wider target architecture; its original candidate status is refined by ADR-0002.
+1. **Phase 1 / 1.5 simulation slice (`datasim`)**: manually configured ideal RC
+   components, shell-free ngspice-47 batch adapter, common-grid analytical
+   validation, and CSV/JSON run reporting ([ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md)).
+2. **Phase 2 component domain slice (`datasim_component`)**: dependency-free
+   in-memory C++20 component identity, source/evidence provenance, parameter
+   observations, deterministic human-gated review lifecycle, normalized component
+   knowledge with visible conflicts, model artifact descriptors, independent model
+   validation records, and referential integrity checks tested on synthetic
+   Resistor and Capacitor fixtures ([ADR-0003](decisions/ADR-0003-component-domain-model.md),
+   [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md)).
+
+These two slices remain intentionally decoupled in Phase 2: no PDF/OCR ingestion
+pipeline, persistent database, LLM runtime, knowledge-to-simulator translator, or
+interactive GUI is implemented.
 
 ```mermaid
 flowchart TD
-    DS["Datasheet"] --> DP["Document Processing"]
-    DP --> CE["Candidate Extracted Data"]
-    CE --> VR["Validation and Engineering Review"]
-    VR --> CK["Component Knowledge"]
-    CK --> MM["Mathematical / Vendor Model"]
-    MM --> SIM["Deterministic Simulation"]
-    SIM --> VIS["Interactive Visualization"]
+    DS["Datasheet"] --> DP["Document Processing (PROPOSED)"]
+    DP --> CE["Candidate Extracted Data (C++20 Observation Contract VERIFIED)"]
+    CE --> VR["Validation and Engineering Review (C++20 Lifecycle VERIFIED)"]
+    VR --> CK["Component Knowledge (C++20 Contract VERIFIED)"]
+    CK --> MM["Mathematical / Vendor Model (C++20 Metadata Contract VERIFIED)"]
+    MM --> SIM["Deterministic Simulation (Ideal-RC ngspice Slice VERIFIED; Coupling PROPOSED)"]
+    SIM --> VIS["Interactive Visualization (PROPOSED)"]
 ```
 
 ## Responsibilities and trust
 
 Document processing preserves source identity and evidence locations while
 producing candidate observations. OCR, tables, curves, manual entry, and LLM
-assistance may disagree. Validation checks structure and physical meaning;
-engineering review resolves applicability and ambiguity before promotion.
-Rejected or unresolved observations remain visible with their history.
+assistance may disagree. Validation checks structure, units, finite numbers, and
+referential integrity; engineering review resolves applicability and ambiguity
+before promotion. Rejected, superseded, or unresolved observations remain visible
+with their history and cannot enter `ComponentKnowledge`.
 
-Component knowledge normalizes reviewed facts without erasing original values.
-Model selection or calibration is a separate engineering activity: parameters
-alone do not determine a complete model. A model requires equations or a vendor
-artifact, pin mapping, assumptions, supported analyses, and a validity envelope.
+Component knowledge normalizes reviewed facts without erasing original values,
+units, qualifiers, or rating categories. Model selection or calibration is a
+separate engineering activity: parameters alone do not determine a complete model,
+and absolute maximum stress limits cannot be bound as behavioral model parameters.
+A model requires equations or a vendor artifact, ordered terminal-to-pin mapping,
+assumptions, supported analyses, limitations, and a validity envelope, plus
+independent `ModelValidationRecord` evidence.
 
 Circuit and simulation configuration specify topology, stimuli, conditions,
 analysis, and solver controls. Deterministic backends compute results; failures,
@@ -41,27 +54,29 @@ extrapolation. Presentation transforms must remain traceable to raw results.
 
 ## Seven distinct entities
 
-| Entity | Responsibility |
-| --- | --- |
-| Raw source document and evidence | Immutable document identity, revision, rights, and locations. |
-| Extracted parameter observation | A candidate reading, with conditions, notation, method, and review history. |
-| Normalized component knowledge | Reviewed, versioned facts connected to their observations. |
-| Mathematical or vendor model artifact | Explicit model semantics, provenance, parameter mapping, and applicability. |
-| Circuit and simulation configuration | Topology, model versions, stimuli, analyses, and reproducibility settings. |
-| Simulation result | Computed arrays, diagnostics, run manifest, and completion status. |
-| Visualization and explanation | Views and source-grounded explanations referencing evidence and results. |
+| Entity | Responsibility | Current implementation boundary |
+| --- | --- | --- |
+| Raw source document and evidence | Immutable document identity, revision, rights, and locations. | `datasim::component::SourceDocument`, `EvidenceLocation` (in-memory C++20). |
+| Extracted parameter observation | A candidate reading, with conditions, notation, method, and review history. | `datasim::component::ParameterObservation`, `OperatingCondition`, `ReviewDecision` (in-memory C++20). |
+| Normalized component knowledge | Reviewed, versioned facts connected to their observations and conflicts. | `datasim::component::NormalizedParameter`, `ParameterConflict`, `ComponentKnowledge` (in-memory C++20). |
+| Mathematical or vendor model artifact | Explicit model semantics, provenance, parameter mapping, applicability, and independent validation status. | `datasim::component::ModelArtifactDescriptor`, `ModelValidityEnvelope`, `ModelValidationRecord` (metadata only). |
+| Circuit and simulation configuration | Topology, model versions, stimuli, analyses, and reproducibility settings. | `datasim::RcConfig` (manual ideal-RC spike only). |
+| Simulation result | Computed arrays, diagnostics, run manifest, and completion status. | `datasim::Samples`, `RunResult`, CSV/JSON artifacts (ideal-RC spike only). |
+| Visualization and explanation | Views and source-grounded explanations referencing evidence and results. | Not implemented (`PROPOSED`). |
 
-See the [data model](COMPONENT_DATA_MODEL.md) for the conceptual contracts.
+See the [data model](COMPONENT_DATA_MODEL.md) for the entity contracts.
 
 ## AI boundary
 
 A local LLM may assist classification, parameter extraction, terminology
-normalization, source-grounded retrieval, and engineering explanation. Its output
-remains untrusted candidate content. Structured output alone is not validation;
-confidence alone is not engineering review. Document text is data, not executable
-instructions. No LLM may approve its own extraction or supply authoritative
-simulation numbers. Generated model suggestions require independent review and
-model validation before use. Ollama is a research reference, not a selected runtime.
+normalization, source-grounded retrieval, and engineering explanation in future
+stages. Its output remains untrusted candidate content. Structured output alone is
+not validation; confidence alone is not engineering review. Document text is data,
+not executable instructions. No LLM or automatic parser may approve its own
+extraction (`ActorKind::llm_assistant` and `ActorKind::automatic_parser` are
+deterministically rejected by `validate_review_decision` and
+`validate_model_validation_record`) or supply authoritative simulation numbers.
+Ollama remains a research reference, not a selected runtime.
 
 ## Simulation boundary
 
@@ -71,8 +86,8 @@ and returns normalized results and diagnostics. Backend-specific details remain
 explicit inside the adapter and run manifest. Unsupported models or analyses must
 fail visibly rather than be silently approximated.
 
-ngspice is the first integration candidate. Evaluate Xyce and existing simulation
-workflows before introducing a custom solver. Selection, process versus library
-integration, licensing, platform support, and numerical acceptance criteria need
-evaluation. See [ADR-0001](decisions/ADR-0001-simulation-backend-boundary.md).
-No commitment to Qt, OpenGL, Python, SQLite, or another implementation stack is made.
+ngspice executable integration is verified only for the Phase 1/1.5 ideal-RC
+transient spike ([ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md)).
+Evaluate Xyce and existing simulation workflows before introducing a custom solver;
+see [ADR-0001](decisions/ADR-0001-simulation-backend-boundary.md). No commitment to
+Qt, OpenGL, Python, SQLite, or another application stack is made.
