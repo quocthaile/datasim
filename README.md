@@ -27,12 +27,16 @@ Datasim currently comprises three **VERIFIED** C++20 modules on Windows x64
    [ADR-0003](docs/decisions/ADR-0003-component-domain-model.md).
 3. **Phase 3 deterministic component-to-simulation vertical slice (`datasim_vertical`)**:
    application-level multi-bundle `CircuitAssembly`, SI parameter resolution
-   (`resolve_rc_parameters`), model/backend compatibility and `ExecutionPolicy` gate
-   (`evaluate_rc_model_compatibility`), ideal-RC simulation adapter
-   (`adapt_vertical_rc_simulation`), and traceable `provenance_metadata.json` run
-   reporting (`execute_vertical_rc_run`), verified on `feat/phase-3-vertical-slice`
-   (1392 unit checks plus byte-identical real `ngspice-47` integration against manual
-   `RcConfig`). See [Phase 3 plan](docs/PHASE_3_PLAN.md),
+   (`resolve_rc_parameters`), fail-closed model/backend compatibility and
+   `ExecutionPolicy` metadata gate (`evaluate_rc_model_compatibility`), ideal-RC
+   simulation adapter (`adapt_vertical_rc_simulation`), and traceable
+   `provenance_metadata.json` run reporting (`execute_vertical_rc_run`), merged into
+   `main` at `6516a629c75662b83f48704bfd7978bcc299ff78` (verified in
+   [hosted Windows CI run 41284202716](https://github.com/quocthaile/datasim/actions/runs/41284202716)
+   with 1392 unit checks, real `ngspice-47` integration, and six-run study) and
+   hardened on `fix/phase3-validation-hardening` (1483 vertical-slice unit checks plus
+   byte-identical real `ngspice-47` integration against manual `RcConfig`). See
+   [Phase 3 plan](docs/PHASE_3_PLAN.md),
    [Phase 3 implementation](docs/PHASE_3_IMPLEMENTATION.md),
    [Phase 3 validation](docs/PHASE_3_VALIDATION.md), and
    [ADR-0004](docs/decisions/ADR-0004-phase-3-vertical-slice.md).
