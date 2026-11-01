@@ -1,14 +1,15 @@
 # Validation strategy
 
 Status: Engineering validation program with **Phase 1/1.5 ideal-RC numerical
-verification** and **Phase 2 in-memory domain-contract verification** completed on
-Windows x64 (MSYS2 UCRT GCC 16.2.0 / ngspice-47). Extraction benchmarks on real
-datasheets, physical hardware measurements (`MEASURED`), and presentation-layer
-checks remain **PROPOSED**.
+verification**, **Phase 2 in-memory domain-contract verification**, and **Phase 3
+deterministic vertical-slice verification** completed on Windows x64 (MSYS2 UCRT GCC
+16.2.0 / ngspice-47). Extraction benchmarks on real datasheets, physical hardware
+measurements (`MEASURED`), and presentation-layer checks remain **PROPOSED**.
 
 See [Phase 1 and 1.5 validation](PHASE_1_VALIDATION.md),
-[Phase 1.5 reproducibility](PHASE_1_REPRODUCIBILITY.md), and
-[Phase 2 validation](PHASE_2_VALIDATION.md) for exact scope, commands, outcomes,
+[Phase 1.5 reproducibility](PHASE_1_REPRODUCIBILITY.md),
+[Phase 2 validation](PHASE_2_VALIDATION.md), and
+[Phase 3 validation](PHASE_3_VALIDATION.md) for exact scope, commands, outcomes,
 and limitations.
 
 ## Gates
@@ -18,8 +19,8 @@ and limitations.
 | Source integrity | Identity, revision, hash, readable location, rights and footnotes; PDF index distinct from printed page label. | Traceable source manifest and permitted evidence access. | **VERIFIED** in memory on synthetic fixtures (`validate_source_document`, `validate_evidence_location`). Real document ingestion remains PROPOSED. |
 | Extraction structure | Required fields, finite numeric values, explicit units, distinct qualifiers, explicit categories, conditions with units, and resolving source references. | Machine-check results; ambiguous/missing values remain `std::nullopt` and blocked from approval. | **VERIFIED** in memory (`validate_parameter_observation`, `validate_domain_bundle`). Automated parsers remain PROPOSED. |
 | Engineering review | Compare original source; assess plausibility, conflicts, operating envelope and intended use; enforce transition graph. | Named `human_engineer` reviewer, decision, ISO-8601 date and rationale; deterministic rejection of LLM/parser self-approval. | **VERIFIED** in memory (`apply_review_decision`, `validate_review_decision`, `ParameterConflict` checks). |
-| Model suitability | Equations/artifact URI, 1..N ordered pins, parameter mapping, validity envelope ranges, license, limitations, and independent validation records. | Independent model review and documented limitations; block `absolute_maximum_rating` as behavioral model parameter. | **VERIFIED** for metadata contracts (`validate_model_artifact_descriptor`, `effective_model_validation_status`). Model loading/execution remains PROPOSED. |
-| Numerical verification | Analytic cases, reference simulations, common-grid convergence, repeatability and process-fault checks. | Reproducible inputs, versions, settings, tolerances and actual outcomes. | **VERIFIED** for Phase 1/1.5 manual ideal-RC transient (`0.05 V` tolerance, 4 refinements, 2 repeats, Windows local + hosted CI). Other circuits remain PROPOSED. |
+| Model suitability | Equations/artifact URI, 1..N ordered pins, parameter mapping, validity envelope ranges, license, limitations, and independent validation records. | Independent model review and documented limitations; block `absolute_maximum_rating` as behavioral model parameter; reject unsupported formats/subcircuits and out-of-envelope conditions. | **VERIFIED** for metadata and ideal-RC compatibility gate (`validate_model_artifact_descriptor`, `effective_model_validation_status`, `evaluate_rc_model_compatibility`). External subcircuit loading remains PROPOSED. |
+| Numerical verification | Analytic cases, reference simulations, common-grid convergence, repeatability and process-fault checks. | Reproducible inputs, versions, settings, tolerances and actual outcomes. | **VERIFIED** for manual and knowledge-driven ideal-RC transient (`0.05 V` tolerance, 4 refinements, 2 repeats, byte-identical waveform equivalence, `provenance_metadata.json`). Other circuits remain PROPOSED. |
 | Physical validation | Compare predictions against controlled physical observations. | Instrument/setup/calibration, raw observations, conditions and uncertainty. | **PROPOSED** (no physical measurements acquired). |
 | Presentation integrity | Axis units/scales, transformations, missing data, warnings and explanation citations. | Comparison against raw results and evidence. | **PROPOSED** (no UI/visualization implemented). |
 

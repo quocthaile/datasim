@@ -2,8 +2,8 @@
 
 **Datasheet-driven electronic component modeling, simulation, and visualization.**
 
-Datasim currently comprises two isolated, **VERIFIED** C++20 foundational modules on
-Windows x64 (MSYS2 UCRT GCC 16.2.0):
+Datasim currently comprises three **VERIFIED** C++20 modules on Windows x64
+(MSYS2 UCRT GCC 16.2.0):
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
@@ -19,17 +19,28 @@ Windows x64 (MSYS2 UCRT GCC 16.2.0):
    documents, evidence locations, single-qualifier parameter observations,
    operating conditions, deterministic human-gated review lifecycle, versioned
    component knowledge with visible conflicts, model artifact descriptors,
-   independent model validation records, and referential integrity rules, verified
-   on synthetic Resistor and Capacitor fixtures (231 domain unit checks). See
+   independent model validation records, and referential integrity rules, merged into
+   `main` via PR #2 (`b2f73d5`, 270 domain unit checks). See
    [Phase 2 plan](docs/PHASE_2_PLAN.md),
    [Phase 2 implementation](docs/PHASE_2_IMPLEMENTATION.md),
    [Phase 2 validation](docs/PHASE_2_VALIDATION.md), and
    [ADR-0003](docs/decisions/ADR-0003-component-domain-model.md).
+3. **Phase 3 deterministic component-to-simulation vertical slice (`datasim_vertical`)**:
+   application-level multi-bundle `CircuitAssembly`, SI parameter resolution
+   (`resolve_rc_parameters`), model/backend compatibility and `ExecutionPolicy` gate
+   (`evaluate_rc_model_compatibility`), ideal-RC simulation adapter
+   (`adapt_vertical_rc_simulation`), and traceable `provenance_metadata.json` run
+   reporting (`execute_vertical_rc_run`), verified on `feat/phase-3-vertical-slice`
+   (1392 unit checks plus byte-identical real `ngspice-47` integration against manual
+   `RcConfig`). See [Phase 3 plan](docs/PHASE_3_PLAN.md),
+   [Phase 3 implementation](docs/PHASE_3_IMPLEMENTATION.md),
+   [Phase 3 validation](docs/PHASE_3_VALIDATION.md), and
+   [ADR-0004](docs/decisions/ADR-0004-phase-3-vertical-slice.md).
 
-This is not yet an end-to-end simulator or datasheet processor. PDF/OCR ingestion,
-persistent storage, general-purpose JSON serialization, automatic unit conversion,
-LLM integration, knowledge-to-simulation coupling, semiconductor models, and
-interactive visualization remain **PROPOSED**.
+This is not yet a general-purpose circuit simulator or datasheet processor. PDF/OCR
+ingestion, persistent storage, general-purpose JSON serialization, automatic unit
+conversion, LLM integration, external SPICE subcircuit loading, semiconductor models,
+and interactive visualization remain **PROPOSED**.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet
@@ -46,11 +57,13 @@ numerical or review authority.
 - [Roadmap and open questions](docs/ROADMAP.md)
 - [Phase 1 implementation](docs/PHASE_1_IMPLEMENTATION.md), [validation](docs/PHASE_1_VALIDATION.md), [reproducibility](docs/PHASE_1_REPRODUCIBILITY.md), and [architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md)
 - [Phase 2 plan](docs/PHASE_2_PLAN.md), [implementation](docs/PHASE_2_IMPLEMENTATION.md), and [validation](docs/PHASE_2_VALIDATION.md)
+- [Phase 3 plan](docs/PHASE_3_PLAN.md), [implementation](docs/PHASE_3_IMPLEMENTATION.md), and [validation](docs/PHASE_3_VALIDATION.md)
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)
 - [ADR-0002: Phase 1 executable integration](docs/decisions/ADR-0002-phase-1-ngspice-executable.md)
 - [ADR-0003: Phase 2 component domain model](docs/decisions/ADR-0003-component-domain-model.md)
+- [ADR-0004: Phase 3 vertical slice](docs/decisions/ADR-0004-phase-3-vertical-slice.md)
 - [Agent instructions](AGENTS.md) and [repository initialization prompt](docs/AGENT_INIT_REPOSITORY.md)
 
 ## Contributing at this stage

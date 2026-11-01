@@ -15,16 +15,25 @@ builds remain unverified. See [implementation](PHASE_1_IMPLEMENTATION.md),
 and [architecture review](PHASE_1_ARCHITECTURE_REVIEW.md).
 
 Phase 2 (**Component Domain Model & Knowledge Contracts**, implementing the
-in-memory C++20 contracts of Stage 3 below) is **IMPLEMENTED and VERIFIED** on
-`feat/phase-2-component-model` on Windows x64 (MSYS2 UCRT GCC 16.2.0): 4/4 CTest
-suites passed with zero skips, including 231 component domain checks on synthetic
+in-memory C++20 contracts of Stage 3 below) is completed, merged into `main` via
+PR #2 (`b2f73d5`), and **VERIFIED** on Windows x64 (MSYS2 UCRT GCC 16.2.0): 4/4 CTest
+suites passed with zero skips, including 270 component domain checks on synthetic
 Resistor and Capacitor fixtures alongside unchanged Phase 1/1.5 unit, fault, and
 real ngspice-47 integration tests. See [Phase 2 plan](PHASE_2_PLAN.md),
 [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md),
 [Phase 2 validation](PHASE_2_VALIDATION.md), and
-[ADR-0003](decisions/ADR-0003-component-domain-model.md). Persistent storage,
-serialization, datasheet parsing, LLM integration, and Stage 4+ remain
-unauthorized/PROPOSED.
+[ADR-0003](decisions/ADR-0003-component-domain-model.md).
+
+Phase 3 (**Deterministic Component-to-Simulation Vertical Slice**, implementing the
+ideal-RC slice of Stage 4 below) is **IMPLEMENTED and VERIFIED** on
+`feat/phase-3-vertical-slice` on Windows x64 (MSYS2 UCRT GCC 16.2.0 / ngspice-47):
+5/5 CTest suites passed with zero skips, including 1392 vertical-slice unit checks
+and byte-identical real `ngspice-47` integration against manual `RcConfig`. See
+[Phase 3 plan](PHASE_3_PLAN.md), [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md),
+[Phase 3 validation](PHASE_3_VALIDATION.md), and
+[ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md). Persistent storage,
+serialization, datasheet parsing, LLM integration, external SPICE subcircuits, and
+Stage 5+ remain unauthorized/PROPOSED.
 
 | Stage | Status | Scope and exit criteria |
 | --- | --- | --- |
@@ -32,7 +41,7 @@ unauthorized/PROPOSED.
 | 1: Engineering scope | PROPOSED | Select an initial component family, analyses, licensed fixtures, and review responsibilities; define acceptance tolerances. (Phase 1/1.5 verified only manual ideal-RC transient feasibility.) |
 | 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. (ADR-0002 selected ngspice executable integration for Phase 1 ideal RC only.) |
 | 3: Knowledge contracts | VERIFIED (in-memory C++20; persistence PROPOSED) | In-memory C++20 evidence, observation, deterministic review lifecycle, component knowledge, conflict visibility, and model metadata/validation contracts verified on synthetic Resistor and Capacitor fixtures ([Phase 2 validation](PHASE_2_VALIDATION.md)). Persistent storage, interchange serialization, and curve series remain PROPOSED. |
-| 4: Deterministic vertical slice | PROPOSED | Implement only after separate authorization: connect approved `ComponentKnowledge` and explicit model descriptors to run configuration, backend adapter, and traceable results with numerical checks. |
+| 4: Deterministic vertical slice | VERIFIED (ideal-RC transient slice; general multi-analysis/subcircuit PROPOSED) | Approved `ComponentKnowledge` and explicitly selected `ModelArtifactDescriptor` instances connected via `CircuitAssembly`, SI parameter resolution, model/backend compatibility gate, `RcConfig` adapter, and `provenance_metadata.json` ([Phase 3 validation](PHASE_3_VALIDATION.md)). External subcircuits and nonlinear device models remain PROPOSED. |
 | 5: Assisted extraction | PROPOSED | Evaluate document processing and optional local LLM assistance against reviewed fixtures; prove the review gate blocks invalid inputs. |
 | 6: Visualization and validation | PROPOSED | Present results and evidence with units, warnings and assumptions; conduct separately scoped physical validation if equipment/data are available. |
 

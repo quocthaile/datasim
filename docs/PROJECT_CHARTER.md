@@ -18,17 +18,22 @@ Windows x64 (MSYS2 UCRT GCC / ngspice-47), and merged into `main` via PR #1
 choices; [validation evidence](PHASE_1_VALIDATION.md) and
 [reproducibility](PHASE_1_REPRODUCIBILITY.md) cover only that ideal-RC scope.
 
-Phase 2 update: the user has authorized and `feat/phase-2-component-model`
-implements the in-memory C++20 Component Domain Model and Knowledge Contracts
-module (`datasim_component`), scoped strictly to [PHASE_2_PLAN.md](PHASE_2_PLAN.md)
-and [ADR-0003](decisions/ADR-0003-component-domain-model.md). Local verification on
-Windows x64 (MSYS2 UCRT GCC 16.2.0) is recorded in
-[Phase 2 implementation](PHASE_2_IMPLEMENTATION.md) and
-[Phase 2 validation](PHASE_2_VALIDATION.md). It remains independent of the ngspice
-simulation backend and excludes PDF/OCR parsing, persistent storage, general-purpose
-JSON serialization, automatic unit conversion, LLM integration, semiconductor
-models, and UI. The following paragraphs preserve the original initialization scope
-record.
+Phase 2 update: the in-memory C++20 Component Domain Model and Knowledge Contracts
+module (`datasim_component`), scoped to [PHASE_2_PLAN.md](PHASE_2_PLAN.md) and
+[ADR-0003](decisions/ADR-0003-component-domain-model.md), is completed, VERIFIED on
+Windows x64 (MSYS2 UCRT GCC 16.2.0), and merged into `main` via PR #2 (`b2f73d5`).
+See [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md) and
+[Phase 2 validation](PHASE_2_VALIDATION.md).
+
+Phase 3 update: the deterministic component-to-simulation vertical slice
+(`datasim_vertical`), scoped to [PHASE_3_PLAN.md](PHASE_3_PLAN.md) and
+[ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md), is implemented and
+VERIFIED on `feat/phase-3-vertical-slice` on Windows x64 (MSYS2 UCRT GCC 16.2.0 /
+ngspice-47). See [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md) and
+[Phase 3 validation](PHASE_3_VALIDATION.md). It excludes PDF/OCR parsing, persistent
+storage, general-purpose JSON serialization, automatic unit conversion, LLM
+integration, external SPICE subcircuits, semiconductor models, and UI. The following
+paragraphs preserve the original initialization scope record.
 
 PROPOSED capabilities include document processing, evidence-linked parameter
 extraction, engineering review, component knowledge management, model association,

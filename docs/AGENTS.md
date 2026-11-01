@@ -8,21 +8,26 @@ Phase 1 C++20/CMake RC feasibility spike ([ADR-0002](decisions/ADR-0002-phase-1-
 and Phase 1.5 numerical/process/CI hardening are completed and merged into `main`
 at `86b924b4b49d69c70c1688a8748cb1c2893adc34` (PR #1).
 
-Phase 2 authorizes only the in-memory C++20 Component Domain Model and Knowledge
-Contracts defined in [PHASE_2_PLAN.md](PHASE_2_PLAN.md),
-[PHASE_2_IMPLEMENTATION.md](PHASE_2_IMPLEMENTATION.md), and
-[ADR-0003](decisions/ADR-0003-component-domain-model.md) on branch
-`feat/phase-2-component-model`. Keep Phase 2 independent of the existing ngspice
-simulation implementation. Do not implement PDF parsing, OCR, datasheet ingestion,
-UI, database/persistent storage, general-purpose JSON serialization, automatic unit
-conversion, LLM/Ollama integration, semiconductor simulation, or a custom solver;
-do not start Phase 3.
+Phase 2 ([PHASE_2_PLAN.md](PHASE_2_PLAN.md),
+[PHASE_2_IMPLEMENTATION.md](PHASE_2_IMPLEMENTATION.md),
+[ADR-0003](decisions/ADR-0003-component-domain-model.md)) is completed and merged
+into `main` at `b2f73d5` (PR #2).
+
+Phase 3 authorizes the deterministic component-to-simulation vertical slice
+(`datasim_vertical`) defined in [PHASE_3_PLAN.md](PHASE_3_PLAN.md),
+[PHASE_3_IMPLEMENTATION.md](PHASE_3_IMPLEMENTATION.md), and
+[ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md) on branch
+`feat/phase-3-vertical-slice`. Keep `datasim_component`'s single-component boundary
+and `datasim`'s ideal-RC solver behavior unchanged. Do not implement PDF parsing, OCR,
+datasheet ingestion, UI, database/persistent storage, general-purpose JSON
+serialization, automatic unit conversion, LLM/Ollama integration, semiconductor
+simulation, or a custom solver.
 
 ## Working practices
 
 - Inspect Git status, branches, recent commits, and existing files before editing.
 - Preserve user changes and historical branches/evidence. Use
-  `feat/phase-2-component-model` branched from `origin/main` for Phase 2; do not
+  `feat/phase-3-vertical-slice` branched from `origin/main` for Phase 3; do not
   commit directly to `main` or merge pull requests.
 - Keep documentation links relative within the repository. Use stable original
   URLs and identifiers for research, with matching BibTeX keys.

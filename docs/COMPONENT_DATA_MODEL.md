@@ -1,28 +1,31 @@
 # Component data model
 
 Status: Conceptual contracts across all seven entities below; **Phase 2 in-memory
-C++20 contracts (`datasim_component`) are IMPLEMENTED and VERIFIED** on Windows x64
-(MSYS2 UCRT GCC 16.2.0) for entities 1–4 (`SourceDocument`/`EvidenceLocation`,
-`ParameterObservation`/`ReviewDecision`, `NormalizedParameter`/`ComponentKnowledge`,
-and `ModelArtifactDescriptor`/`ModelValidationRecord`) using synthetic Resistor and
-Capacitor fixtures. See [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md),
-[Phase 2 validation](PHASE_2_VALIDATION.md), and
-[ADR-0003](decisions/ADR-0003-component-domain-model.md).
+C++20 contracts (`datasim_component`)** and the **Phase 3 deterministic ideal-RC
+vertical slice (`datasim_vertical`)** are **IMPLEMENTED and VERIFIED** on Windows x64
+(MSYS2 UCRT GCC 16.2.0 / ngspice-47) for entities 1–6 using synthetic and
+engineering-reviewed Resistor and Capacitor fixtures. See
+[Phase 2 implementation](PHASE_2_IMPLEMENTATION.md),
+[Phase 2 validation](PHASE_2_VALIDATION.md),
+[ADR-0003](decisions/ADR-0003-component-domain-model.md),
+[Phase 3 implementation](PHASE_3_IMPLEMENTATION.md),
+[Phase 3 validation](PHASE_3_VALIDATION.md), and
+[ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md).
 
 Persistent database schemas, general-purpose JSON serialization, digitized curve
-series, automatic unit conversion, and coupling of `ComponentKnowledge` to circuit
-run configurations remain **PROPOSED** (deferred).
+series, automatic unit conversion, external SPICE subcircuit loading, and
+visualization (entity 7) remain **PROPOSED** (deferred).
 
 ## Entity contracts
 
-| Entity | Required conceptual information | Phase 2 C++20 status (`datasim::component`) |
+| Entity | Required conceptual information | C++20 status (`datasim::component` / `datasim::vertical`) |
 | --- | --- | --- |
 | Source document / evidence | Stable ID, publisher, part identity, document title and revision, original URL, retrieval date, content hash where available, rights restrictions; page index and printed page label, section, table/figure, cell or region and relevant footnotes. | **VERIFIED** in memory: `SourceDocument`, `DocumentUsageRights`, `EvidenceLocation` (`pdf_page_index` kept distinct from `printed_page_label`). |
 | Parameter observation | ID, source/evidence references, original parameter name and notation, original value and units, minimum/typical/maximum qualifier or explicitly unspecified, conditions, rating category, extraction method/version, extraction time, uncertainty, and review status/history. | **VERIFIED** in memory for scalar/symbolic readings: `ParameterObservation`, `OperatingCondition`, `ValueQualifier`, `ParameterCategory`, `ExtractionMethod`, `ReviewDecision`. Digitized curve sample arrays remain PROPOSED. |
 | Component knowledge | Component identity including manufacturer, part suffix and package; versioned normalized facts, canonical quantity/unit, explicit conversion, observation references, applicable conditions, conflicts, reviewer and decision rationale. | **VERIFIED** in memory: `ComponentIdentity`, `NormalizedParameter`, `ParameterConflict`, `KnowledgeRevisionEntry`, `ComponentKnowledge`. Automatic unit algebra remains PROPOSED. |
-| Model artifact | ID/version/hash, format or equations, vendor/author, source and license, terminals/pin mapping, parameters and knowledge references, calibration/validation evidence, assumptions, supported analyses/backends, validity envelope and limitations. | **VERIFIED** metadata contracts in memory: `ModelArtifactDescriptor`, `TerminalDescriptor`, `ModelParameterMapping`, `ModelValidityEnvelope`, `ModelValidationRecord`. No external model loader/executor is implemented. |
-| Circuit / run configuration | Topology, node and pin mappings, exact model versions/hashes, component values, stimuli, temperature, initial conditions, analysis and sweep settings, solver tolerances/options, backend/version, platform and random seeds if relevant. | Narrow manual ideal-RC slice (`datasim::RcConfig`) **VERIFIED** in Phase 1/1.5; general knowledge-linked circuit configuration remains **PROPOSED**. |
-| Simulation result | Run/configuration reference, execution manifest, completion status, independent axes and units, dependent arrays and units, diagnostics, convergence warnings, timestamps, backend output reference/hash, and provenance. | Narrow ideal-RC CSV/JSON artifacts **VERIFIED** in Phase 1/1.5; general multi-analysis result model remains **PROPOSED**. |
+| Model artifact | ID/version/hash, format or equations, vendor/author, source and license, terminals/pin mapping, parameters and knowledge references, calibration/validation evidence, assumptions, supported analyses/backends, validity envelope and limitations. | **VERIFIED** metadata and ideal-RC compatibility gate (`ModelArtifactDescriptor`, `ModelValidityEnvelope`, `ModelValidationRecord`, `evaluate_rc_model_compatibility`). External subcircuit loading remains PROPOSED. |
+| Circuit / run configuration | Topology, node and pin mappings, exact model versions/hashes, component values, stimuli, temperature, initial conditions, analysis and sweep settings, solver tolerances/options, backend/version, platform and random seeds if relevant. | **VERIFIED** for ideal-RC vertical slice (`CircuitAssembly`, `CircuitComponentInstance`, `TerminalNodeBinding`, `RcRunInputSpecification`, `AdaptedRcSimulation`, `RcConfig`). Arbitrary topologies remain PROPOSED. |
+| Simulation result | Run/configuration reference, execution manifest, completion status, independent axes and units, dependent arrays and units, diagnostics, convergence warnings, timestamps, backend output reference/hash, and provenance. | **VERIFIED** for ideal-RC vertical slice (`VerticalRcRunResult`, `VerticalSliceProvenanceManifest`, `provenance_metadata.json`, `run_metadata.json`, `validation_report.json`, CSVs). General multi-analysis result model remains PROPOSED. |
 | Visualization / explanation | Result and evidence references, view configuration, units, transformations/interpolation, annotations, assumptions, generation method/version, and review history where applicable. | **PROPOSED** (not implemented). |
 
 ## Preservation and normalization

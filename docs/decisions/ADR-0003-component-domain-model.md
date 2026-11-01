@@ -2,8 +2,8 @@
 
 Date: 2026-10-31
 
-Status: SELECTED and IMPLEMENTED for Phase 2 on `feat/phase-2-component-model`;
-verification evidence is recorded in
+Status: SELECTED and IMPLEMENTED for Phase 2 (`feat/phase-2-component-model`), merged
+into `main` via PR #2 (`b2f73d5`); verification evidence is recorded in
 [Phase 2 validation](../PHASE_2_VALIDATION.md) and
 [Phase 2 implementation](../PHASE_2_IMPLEMENTATION.md).
 

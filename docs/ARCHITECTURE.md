@@ -1,6 +1,6 @@
 # Architecture
 
-Status: PROPOSED end-to-end application architecture, with two isolated slices now
+Status: PROPOSED end-to-end application architecture, with three slices now
 **IMPLEMENTED and VERIFIED** on Windows x64 (MSYS2 UCRT GCC 16.2.0):
 
 1. **Phase 1 / 1.5 simulation slice (`datasim`)**: manually configured ideal RC
@@ -13,10 +13,14 @@ Status: PROPOSED end-to-end application architecture, with two isolated slices n
    validation records, and referential integrity checks tested on synthetic
    Resistor and Capacitor fixtures ([ADR-0003](decisions/ADR-0003-component-domain-model.md),
    [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md)).
+3. **Phase 3 deterministic vertical slice (`datasim_vertical`)**: multi-bundle
+   `CircuitAssembly`, SI parameter resolution, model/backend compatibility and
+   `ExecutionPolicy` gate, ideal-RC simulation adapter, and traceable
+   `provenance_metadata.json` run reporting ([ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md),
+   [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md)).
 
-These two slices remain intentionally decoupled in Phase 2: no PDF/OCR ingestion
-pipeline, persistent database, LLM runtime, knowledge-to-simulator translator, or
-interactive GUI is implemented.
+No PDF/OCR ingestion pipeline, persistent database, LLM runtime, external SPICE
+subcircuit loader, semiconductor device solver, or interactive GUI is implemented.
 
 ```mermaid
 flowchart TD
@@ -24,8 +28,8 @@ flowchart TD
     DP --> CE["Candidate Extracted Data (C++20 Observation Contract VERIFIED)"]
     CE --> VR["Validation and Engineering Review (C++20 Lifecycle VERIFIED)"]
     VR --> CK["Component Knowledge (C++20 Contract VERIFIED)"]
-    CK --> MM["Mathematical / Vendor Model (C++20 Metadata Contract VERIFIED)"]
-    MM --> SIM["Deterministic Simulation (Ideal-RC ngspice Slice VERIFIED; Coupling PROPOSED)"]
+    CK --> MM["Mathematical / Vendor Model (C++20 Metadata + Compatibility Gate VERIFIED)"]
+    MM --> SIM["Deterministic Simulation (Ideal-RC Vertical Slice + Provenance VERIFIED)"]
     SIM --> VIS["Interactive Visualization (PROPOSED)"]
 ```
 
@@ -60,8 +64,8 @@ extrapolation. Presentation transforms must remain traceable to raw results.
 | Extracted parameter observation | A candidate reading, with conditions, notation, method, and review history. | `datasim::component::ParameterObservation`, `OperatingCondition`, `ReviewDecision` (in-memory C++20). |
 | Normalized component knowledge | Reviewed, versioned facts connected to their observations and conflicts. | `datasim::component::NormalizedParameter`, `ParameterConflict`, `ComponentKnowledge` (in-memory C++20). |
 | Mathematical or vendor model artifact | Explicit model semantics, provenance, parameter mapping, applicability, and independent validation status. | `datasim::component::ModelArtifactDescriptor`, `ModelValidityEnvelope`, `ModelValidationRecord` (metadata only). |
-| Circuit and simulation configuration | Topology, model versions, stimuli, analyses, and reproducibility settings. | `datasim::RcConfig` (manual ideal-RC spike only). |
-| Simulation result | Computed arrays, diagnostics, run manifest, and completion status. | `datasim::Samples`, `RunResult`, CSV/JSON artifacts (ideal-RC spike only). |
+| Circuit and simulation configuration | Topology, model versions, stimuli, analyses, and reproducibility settings. | `datasim::vertical::CircuitAssembly`, `RcRunInputSpecification`, `AdaptedRcSimulation`, `datasim::RcConfig` (ideal-RC vertical slice). |
+| Simulation result | Computed arrays, diagnostics, run manifest, and completion status. | `datasim::Samples`, `RunResult`, `datasim::vertical::VerticalRcRunResult`, `VerticalSliceProvenanceManifest`, CSV/JSON artifacts (ideal-RC vertical slice). |
 | Visualization and explanation | Views and source-grounded explanations referencing evidence and results. | Not implemented (`PROPOSED`). |
 
 See the [data model](COMPONENT_DATA_MODEL.md) for the entity contracts.
