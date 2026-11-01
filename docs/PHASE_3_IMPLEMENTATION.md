@@ -60,3 +60,4 @@ ctest --test-dir build/phase3-wp6 --output-on-failure -V
 Related: [Phase 3 plan](PHASE_3_PLAN.md),
 [Phase 3 validation](PHASE_3_VALIDATION.md),
 [ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md).
+

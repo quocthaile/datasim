@@ -155,3 +155,4 @@ RcRunInputSpecification make_synthetic_test_run_inputs() {
 }
 
 } // namespace datasim::vertical::testing
+

@@ -360,3 +360,4 @@ ParameterResolutionResult resolve_rc_parameters(const CircuitAssembly& assembly)
 }
 
 } // namespace datasim::vertical
+

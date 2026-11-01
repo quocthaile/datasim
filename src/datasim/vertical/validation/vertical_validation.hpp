@@ -98,3 +98,4 @@ inline void ensure_vertical_valid(const VerticalValidationReport& report) {
 }
 
 } // namespace datasim::vertical
+

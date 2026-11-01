@@ -387,3 +387,4 @@ VerticalRcRunResult execute_vertical_rc_run(
 }
 
 } // namespace datasim::vertical
+

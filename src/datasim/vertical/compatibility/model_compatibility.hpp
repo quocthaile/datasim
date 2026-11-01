@@ -64,3 +64,4 @@ struct ModelCompatibilityReport {
     ExecutionPolicy policy = ExecutionPolicy::engineering_approved_only);
 
 } // namespace datasim::vertical
+

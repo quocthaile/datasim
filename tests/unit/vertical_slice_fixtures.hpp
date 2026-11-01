@@ -18,3 +18,4 @@ CircuitAssembly make_engineering_approved_rc_assembly();
 RcRunInputSpecification make_synthetic_test_run_inputs();
 
 } // namespace datasim::vertical::testing
+

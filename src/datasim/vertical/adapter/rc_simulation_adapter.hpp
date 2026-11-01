@@ -83,3 +83,4 @@ struct RcAdapterPreparationResult {
     const RcRunInputSpecification& run_inputs);
 
 } // namespace datasim::vertical
+

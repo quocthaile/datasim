@@ -95,3 +95,4 @@ VerticalRcRunResult execute_vertical_rc_run(
     const std::filesystem::path& new_directory);
 
 } // namespace datasim::vertical
+

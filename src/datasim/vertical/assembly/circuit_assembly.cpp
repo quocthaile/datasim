@@ -356,3 +356,4 @@ VerticalValidationReport validate_circuit_assembly(const CircuitAssembly& assemb
 }
 
 } // namespace datasim::vertical
+

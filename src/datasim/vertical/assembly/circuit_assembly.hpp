@@ -83,3 +83,4 @@ struct CircuitAssembly {
 [[nodiscard]] VerticalValidationReport validate_circuit_assembly(const CircuitAssembly& assembly);
 
 } // namespace datasim::vertical
+

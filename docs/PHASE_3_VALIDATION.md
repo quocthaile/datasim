@@ -68,3 +68,4 @@ Additional Phase 1.5 non-regression checks run after Phase 3 implementation:
   `AnalysisType::transient`) is supported; external SPICE subcircuits, nonlinear
   semiconductor models, real vendor datasheet extraction, and physical hardware
   measurements (`MEASURED`) are not implemented.
+

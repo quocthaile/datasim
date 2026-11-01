@@ -110,3 +110,4 @@ AdaptedRcSimulation adapt_vertical_rc_simulation(
 }
 
 } // namespace datasim::vertical
+
