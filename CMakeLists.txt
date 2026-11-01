@@ -35,10 +35,18 @@ add_library(datasim
     src/datasim/simulation/backend/process.cpp
     src/datasim/simulation/backend/ngspice.cpp)
 target_include_directories(datasim PUBLIC src PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+add_library(datasim_component
+    src/datasim/component/observation/review.cpp
+    src/datasim/component/knowledge/component_knowledge.cpp
+    src/datasim/component/model/model_validation.cpp
+    src/datasim/component/validation/domain_validation.cpp)
+target_include_directories(datasim_component PUBLIC src)
 if(MSVC)
     target_compile_options(datasim PRIVATE /W4 /permissive-)
+    target_compile_options(datasim_component PRIVATE /W4 /permissive-)
 else()
     target_compile_options(datasim PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(datasim_component PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 add_executable(rc_demo apps/rc_demo/main.cpp)
 target_link_libraries(rc_demo PRIVATE datasim)
@@ -49,6 +57,16 @@ if(BUILD_TESTING)
     add_executable(unit_tests tests/unit/main.cpp)
     target_link_libraries(unit_tests PRIVATE datasim)
     add_test(NAME unit COMMAND unit_tests)
+    add_executable(component_tests
+        tests/unit/component_fixtures.cpp
+        tests/unit/component_domain_tests.cpp)
+    target_link_libraries(component_tests PRIVATE datasim_component)
+    if(MSVC)
+        target_compile_options(component_tests PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(component_tests PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    add_test(NAME component_model COMMAND component_tests)
     add_executable(backend_fixture tests/unit/backend_fixture.cpp)
     add_executable(backend_error_tests tests/unit/backend_errors.cpp)
     target_link_libraries(backend_error_tests PRIVATE datasim)
@@ -58,6 +76,6 @@ if(BUILD_TESTING)
     set(DATASIM_NGSPICE "" CACHE FILEPATH "Optional path to ngspice executable")
     add_test(NAME ngspice_rc COMMAND integration_tests "${DATASIM_NGSPICE}")
     set_tests_properties(ngspice_rc PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 45)
-    set_tests_properties(unit backend_errors PROPERTIES LABELS unit TIMEOUT 15)
+    set_tests_properties(unit component_model backend_errors PROPERTIES LABELS unit TIMEOUT 15)
     set_tests_properties(ngspice_rc PROPERTIES LABELS integration)
 endif()
