@@ -57,7 +57,9 @@ enum class ValidationRuleCode {
     invalid_validity_envelope,
     empty_supported_analyses,
     empty_model_limitations,
-    invalid_model_validation_record
+    invalid_model_validation_record,
+    incompatible_parameter_units,
+    incompatible_source_document_part_number
 };
 
 struct ValidationIssue {
@@ -103,6 +105,15 @@ struct ComponentDomainBundle {
 [[nodiscard]] bool is_valid_sha256_hex(std::string_view digest) noexcept;
 [[nodiscard]] bool is_valid_iso8601_date_or_timestamp(std::string_view text) noexcept;
 
+[[nodiscard]] bool are_parameter_units_compatible(
+    std::string_view expected_unit,
+    const NormalizedParameter& param,
+    std::optional<std::string_view> mapping_expression = std::nullopt) noexcept;
+
+[[nodiscard]] bool is_source_document_applicable(
+    const SourceDocument& document,
+    const ComponentIdentity& component) noexcept;
+
 [[nodiscard]] ValidationReport validate_component_identity(const ComponentIdentity& identity);
 [[nodiscard]] ValidationReport validate_source_document(const SourceDocument& document);
 [[nodiscard]] ValidationReport validate_evidence_location(const EvidenceLocation& location);
@@ -115,6 +126,10 @@ struct ComponentDomainBundle {
 [[nodiscard]] ValidationReport validate_parameter_observation(const ParameterObservation& observation);
 [[nodiscard]] ValidationReport validate_normalized_parameter(const NormalizedParameter& parameter);
 [[nodiscard]] ValidationReport validate_component_knowledge(const ComponentKnowledge& knowledge);
+[[nodiscard]] ValidationReport validate_model_parameter_mapping(
+    const ModelParameterMapping& mapping,
+    const NormalizedParameter* resolved_param = nullptr,
+    std::string_view path_prefix = "parameter_mapping");
 [[nodiscard]] ValidationReport validate_model_artifact_descriptor(const ModelArtifactDescriptor& descriptor);
 [[nodiscard]] ValidationReport validate_model_validation_record(const ModelValidationRecord& record);
 

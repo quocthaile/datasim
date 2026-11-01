@@ -269,6 +269,122 @@ bool is_valid_iso8601_date_or_timestamp(std::string_view text) noexcept {
     return false;
 }
 
+
+enum class PhysicalDimension {
+    unknown,
+    unitless,
+    resistance,
+    capacitance,
+    inductance,
+    voltage,
+    current,
+    power,
+    frequency,
+    time,
+    temperature,
+    conductance,
+    temperature_coefficient
+};
+
+PhysicalDimension classify_unit_dimension(std::string_view unit) noexcept {
+    if (unit == "1" || unit == "unitless" || unit == "dimensionless" || unit == "-") {
+        return PhysicalDimension::unitless;
+    }
+    // Resistance
+    if (unit == "ohm" || unit == "Ohm" || unit == "mohm" || unit == "mOhm" ||
+        unit == "kohm" || unit == "kOhm" || unit == "Mohm" || unit == "MOhm" ||
+        unit == "Gohm" || unit == "GOhm" || unit == "Ω" || unit == "mΩ" ||
+        unit == "kΩ" || unit == "MΩ" || unit == "GΩ") {
+        return PhysicalDimension::resistance;
+    }
+    // Capacitance
+    if (unit == "F" || unit == "fF" || unit == "pF" || unit == "nF" ||
+        unit == "uF" || unit == "µF" || unit == "mF") {
+        return PhysicalDimension::capacitance;
+    }
+    // Inductance
+    if (unit == "H" || unit == "pH" || unit == "nH" || unit == "uH" ||
+        unit == "µH" || unit == "mH") {
+        return PhysicalDimension::inductance;
+    }
+    // Voltage
+    if (unit == "V" || unit == "nV" || unit == "uV" || unit == "µV" ||
+        unit == "mV" || unit == "kV" || unit == "MV") {
+        return PhysicalDimension::voltage;
+    }
+    // Current
+    if (unit == "A" || unit == "pA" || unit == "nA" || unit == "uA" ||
+        unit == "µA" || unit == "mA" || unit == "kA") {
+        return PhysicalDimension::current;
+    }
+    // Power
+    if (unit == "W" || unit == "nW" || unit == "uW" || unit == "µW" ||
+        unit == "mW" || unit == "kW" || unit == "MW") {
+        return PhysicalDimension::power;
+    }
+    // Frequency
+    if (unit == "Hz" || unit == "kHz" || unit == "MHz" || unit == "GHz" || unit == "THz") {
+        return PhysicalDimension::frequency;
+    }
+    // Time
+    if (unit == "s" || unit == "ms" || unit == "us" || unit == "µs" ||
+        unit == "ns" || unit == "ps" || unit == "fs") {
+        return PhysicalDimension::time;
+    }
+    // Temperature
+    if (unit == "K" || unit == "degC" || unit == "°C") {
+        return PhysicalDimension::temperature;
+    }
+    // Conductance
+    if (unit == "S" || unit == "mS" || unit == "uS" || unit == "µS") {
+        return PhysicalDimension::conductance;
+    }
+    // Temperature coefficient / inverse temperature
+    if (unit == "1/K" || unit == "ppm/K" || unit == "ppm/degC" || unit == "1/degC") {
+        return PhysicalDimension::temperature_coefficient;
+    }
+    return PhysicalDimension::unknown;
+}
+
+bool are_parameter_units_compatible(
+    std::string_view expected_unit,
+    const NormalizedParameter& param,
+    std::optional<std::string_view> mapping_expression) noexcept {
+    if (expected_unit.empty()) {
+        return false;
+    }
+    if (param.unitless) {
+        return classify_unit_dimension(expected_unit) == PhysicalDimension::unitless;
+    }
+    if (!param.normalized_si_unit.has_value() || param.normalized_si_unit->empty()) {
+        return false;
+    }
+    const std::string_view param_unit = *param.normalized_si_unit;
+    if (expected_unit == param_unit) {
+        return true;
+    }
+    const PhysicalDimension exp_dim = classify_unit_dimension(expected_unit);
+    const PhysicalDimension param_dim = classify_unit_dimension(param_unit);
+    if (exp_dim != PhysicalDimension::unknown && exp_dim == param_dim) {
+        return mapping_expression.has_value() && !mapping_expression->empty();
+    }
+    return false;
+}
+
+bool is_source_document_applicable(
+    const SourceDocument& document,
+    const ComponentIdentity& component) noexcept {
+    if (component.part_number.empty()) {
+        return false;
+    }
+    for (const auto& apn : document.associated_part_numbers) {
+        if (apn == component.part_number) {
+            return true;
+        }
+    }
+    return false;
+}
+
 ValidationReport validate_component_identity(const ComponentIdentity& identity) {
     ValidationReport report;
     check_id_token(report, identity.id.value, "component.id", "ComponentId");
@@ -339,13 +455,23 @@ ValidationReport validate_source_document(const SourceDocument& document) {
             base + ".associated_part_numbers",
             "at least one associated part number is required");
     } else {
+        std::set<std::string> seen_part_numbers;
         for (std::size_t i = 0; i < document.associated_part_numbers.size(); ++i) {
-            if (!is_non_blank_single_line(document.associated_part_numbers[i])) {
+            const auto& apn = document.associated_part_numbers[i];
+            const std::string apath =
+                base + ".associated_part_numbers[" + std::to_string(i) + "]";
+            if (!is_non_blank_single_line(apn)) {
                 add_issue(
                     report,
                     ValidationRuleCode::empty_required_field,
-                    base + ".associated_part_numbers[" + std::to_string(i) + "]",
+                    apath,
                     "associated part number must not be blank");
+            } else if (!seen_part_numbers.insert(apn).second) {
+                add_issue(
+                    report,
+                    ValidationRuleCode::duplicate_identifier,
+                    apath,
+                    "duplicate associated part number in source document");
             }
         }
     }
@@ -1332,6 +1458,81 @@ ValidationReport validate_component_knowledge(const ComponentKnowledge& knowledg
     return report;
 }
 
+ValidationReport validate_model_parameter_mapping(
+    const ModelParameterMapping& mapping,
+    const NormalizedParameter* resolved_param,
+    std::string_view path_prefix) {
+    ValidationReport report;
+    const std::string base(path_prefix);
+
+    if (!is_non_blank_single_line(mapping.model_parameter_name)) {
+        add_issue(
+            report,
+            ValidationRuleCode::invalid_parameter_mapping,
+            base + ".model_parameter_name",
+            "model_parameter_name must not be empty");
+    }
+
+    if (!is_non_blank_single_line(mapping.expected_unit)) {
+        add_issue(
+            report,
+            ValidationRuleCode::missing_required_unit,
+            base + ".expected_unit",
+            "model parameter mapping requires an explicit expected_unit");
+    }
+
+    if (mapping.knowledge_param_id.has_value() == mapping.fixed_value.has_value()) {
+        add_issue(
+            report,
+            ValidationRuleCode::invalid_parameter_mapping,
+            base,
+            "parameter mapping must specify either knowledge_param_id or fixed_value (exclusively)");
+    }
+
+    if (mapping.knowledge_param_id.has_value()) {
+        check_id_token(
+            report,
+            mapping.knowledge_param_id->value,
+            base + ".knowledge_param_id",
+            "NormalizedParameterId");
+    }
+
+    if (mapping.fixed_value.has_value() && !std::isfinite(*mapping.fixed_value)) {
+        add_issue(
+            report,
+            ValidationRuleCode::non_finite_numeric_value,
+            base + ".fixed_value",
+            "parameter mapping fixed_value must be finite");
+    }
+
+    if (mapping.mapping_expression.has_value() && !is_non_blank_single_line(*mapping.mapping_expression)) {
+        add_issue(
+            report,
+            ValidationRuleCode::invalid_parameter_mapping,
+            base + ".mapping_expression",
+            "present mapping_expression must not be blank");
+    }
+
+    if (resolved_param != nullptr) {
+        if (!are_parameter_units_compatible(
+                mapping.expected_unit,
+                *resolved_param,
+                mapping.mapping_expression)) {
+            const std::string resolved_unit_str = resolved_param->unitless
+                ? std::string("unitless")
+                : resolved_param->normalized_si_unit.value_or(std::string("<none>"));
+            add_issue(
+                report,
+                ValidationRuleCode::incompatible_parameter_units,
+                base + ".expected_unit",
+                "expected_unit '" + mapping.expected_unit + "' is incompatible with normalized parameter unit '" +
+                    resolved_unit_str + "'");
+        }
+    }
+
+    return report;
+}
+
 ValidationReport validate_model_artifact_descriptor(const ModelArtifactDescriptor& descriptor) {
     ValidationReport report;
     const std::string base = "model_artifact[" + descriptor.id.value + "]";
@@ -1459,60 +1660,20 @@ ValidationReport validate_model_artifact_descriptor(const ModelArtifactDescripto
     for (std::size_t i = 0; i < descriptor.parameter_mappings.size(); ++i) {
         const auto& pm = descriptor.parameter_mappings[i];
         const std::string ppath = base + ".parameter_mappings[" + std::to_string(i) + "]";
-        if (!is_non_blank_single_line(pm.model_parameter_name)) {
-            add_issue(
-                report,
-                ValidationRuleCode::invalid_parameter_mapping,
-                ppath + ".model_parameter_name",
-                "model_parameter_name must not be empty");
-        } else if (!mapped_names.insert(pm.model_parameter_name).second) {
+        append_report(report, validate_model_parameter_mapping(pm, nullptr, ppath));
+        if (!pm.model_parameter_name.empty() && !mapped_names.insert(pm.model_parameter_name).second) {
             add_issue(
                 report,
                 ValidationRuleCode::invalid_parameter_mapping,
                 ppath + ".model_parameter_name",
                 "duplicate model_parameter_name in parameter_mappings");
         }
-        if (!is_non_blank_single_line(pm.expected_unit)) {
-            add_issue(
-                report,
-                ValidationRuleCode::missing_required_unit,
-                ppath + ".expected_unit",
-                "model parameter mapping requires an explicit expected_unit");
-        }
-        if (pm.knowledge_param_id.has_value() == pm.fixed_value.has_value()) {
+        if (pm.knowledge_param_id.has_value() && !descriptor.component_knowledge_id.has_value()) {
             add_issue(
                 report,
                 ValidationRuleCode::invalid_parameter_mapping,
-                ppath,
-                "parameter mapping must specify either knowledge_param_id or fixed_value (exclusively)");
-        }
-        if (pm.knowledge_param_id.has_value()) {
-            check_id_token(
-                report,
-                pm.knowledge_param_id->value,
                 ppath + ".knowledge_param_id",
-                "NormalizedParameterId");
-            if (!descriptor.component_knowledge_id.has_value()) {
-                add_issue(
-                    report,
-                    ValidationRuleCode::invalid_parameter_mapping,
-                    ppath + ".knowledge_param_id",
-                    "knowledge-backed parameter mapping requires descriptor.component_knowledge_id");
-            }
-        }
-        if (pm.fixed_value.has_value() && !std::isfinite(*pm.fixed_value)) {
-            add_issue(
-                report,
-                ValidationRuleCode::non_finite_numeric_value,
-                ppath + ".fixed_value",
-                "parameter mapping fixed_value must be finite");
-        }
-        if (pm.mapping_expression.has_value() && !is_non_blank_single_line(*pm.mapping_expression)) {
-            add_issue(
-                report,
-                ValidationRuleCode::invalid_parameter_mapping,
-                ppath + ".mapping_expression",
-                "present mapping_expression must not be blank");
+                "knowledge-backed parameter mapping requires descriptor.component_knowledge_id");
         }
     }
 
@@ -1790,6 +1951,13 @@ ValidationReport validate_domain_bundle(const ComponentDomainBundle& bundle) {
                 ValidationRuleCode::duplicate_identifier,
                 "documents[" + std::to_string(i) + "].id",
                 "duplicate SourceDocumentId in bundle");
+        }
+        if (!is_source_document_applicable(doc, bundle.component)) {
+            add_issue(
+                report,
+                ValidationRuleCode::incompatible_source_document_part_number,
+                "documents[" + std::to_string(i) + "].associated_part_numbers",
+                "source document is not applicable to component part number: " + bundle.component.part_number);
         }
     }
 
@@ -2149,12 +2317,25 @@ ValidationReport validate_domain_bundle(const ComponentDomainBundle& bundle) {
                     ValidationRuleCode::unresolved_reference,
                     mbase + ".parameter_mappings[" + std::to_string(j) + "].knowledge_param_id",
                     "parameter mapping references unknown NormalizedParameterId");
-            } else if (nit->second->category == ParameterCategory::absolute_maximum_rating) {
-                add_issue(
-                    report,
-                    ValidationRuleCode::absolute_maximum_misused_as_model_parameter,
-                    mbase + ".parameter_mappings[" + std::to_string(j) + "].knowledge_param_id",
-                    "absolute_maximum_rating cannot be bound as a behavioral model parameter");
+            } else {
+                if (nit->second->category == ParameterCategory::absolute_maximum_rating) {
+                    add_issue(
+                        report,
+                        ValidationRuleCode::absolute_maximum_misused_as_model_parameter,
+                        mbase + ".parameter_mappings[" + std::to_string(j) + "].knowledge_param_id",
+                        "absolute_maximum_rating cannot be bound as a behavioral model parameter");
+                }
+                if (!are_parameter_units_compatible(pm.expected_unit, *nit->second, pm.mapping_expression)) {
+                    const std::string resolved_unit_str = nit->second->unitless
+                        ? std::string("unitless")
+                        : nit->second->normalized_si_unit.value_or(std::string("<none>"));
+                    add_issue(
+                        report,
+                        ValidationRuleCode::incompatible_parameter_units,
+                        mbase + ".parameter_mappings[" + std::to_string(j) + "].expected_unit",
+                        "expected_unit '" + pm.expected_unit + "' is incompatible with normalized parameter unit '" +
+                            resolved_unit_str + "'");
+                }
             }
         }
         for (std::size_t j = 0; j < model.validation_record_refs.size(); ++j) {

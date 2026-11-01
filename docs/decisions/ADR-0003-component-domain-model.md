@@ -64,7 +64,11 @@ serialization, automatic unit conversion, LLM runtimes, and GUI frameworks.
    Return ordered `ValidationIssue` entries carrying stable `ValidationRuleCode`
    enumerators and entity paths for both per-entity validation and cross-entity
    `ComponentDomainBundle` referential integrity checks, paired with `ensure_valid`
-   for fail-fast callers.
+   for fail-fast callers. Enforce physical dimensional compatibility for model parameter
+   mappings (requiring explicit conversion contracts for differing units within the same
+   dimension while prohibiting automatic conversion or cross-dimension mapping), and
+   enforce exact component part number applicability for source documents (preserving
+   suffixes, prohibiting prefix-only matching, and supporting multi-part family documents).
 
 ## Alternatives considered
 

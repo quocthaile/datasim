@@ -23,8 +23,10 @@ Capacitor fixtures.
    preserved part-number suffix, package identifier, component family/subtype, and
    explicit synthetic provenance flag.
 2. **Source document and evidence location**: immutable document metadata, publisher,
-   revision, part-number associations, optional URL, retrieval date, optional
-   SHA-256 content digest, usage/redistribution rights, zero-based PDF page index,
+   revision, exact part-number associations (verifying applicability against exact
+   component part numbers, preserving suffixes, prohibiting prefix matching, and
+   supporting multi-part family documents without duplicates), optional URL, retrieval date,
+   optional SHA-256 content digest, usage/redistribution rights, zero-based PDF page index,
    independent printed page label, section, table/figure ID, cell/region, and
    footnotes.
 3. **Parameter observations, qualifiers, categories, and operating conditions**:
@@ -45,13 +47,15 @@ Capacitor fixtures.
    converter), preserved original text/unit and observation links, version history,
    visible conflicting-observation records (never silently averaged or overwritten),
    and knowledge-level engineering review decision.
-6. **Model artifact descriptor and independent model validation metadata**: model ID,
-   version, format (`analytical_equation`, `spice_model_card`, `spice_subcircuit`,
+6. **Model artifact descriptor, parameter unit consistency, and independent model validation metadata**:
+   model ID, version, format (`analytical_equation`, `spice_model_card`, `spice_subcircuit`,
    `lookup_table`, `vendor_specific_artifact`), source/vendor, external URI and
    optional SHA-256, license/usage restrictions, ordered terminal-to-pin mapping,
    parameter mappings (blocking misuse of absolute maximum ratings as behavioral
-   model parameters), validity envelope ranges, supported analyses, limitations, and
-   separate `ModelValidationRecord` tracking.
+   model parameters, verifying dimensional compatibility between `expected_unit` and
+   `NormalizedParameter::normalized_si_unit`, and requiring an explicit `mapping_expression`
+   conversion contract for intra-dimension differences), validity envelope ranges,
+   supported analyses, limitations, and separate `ModelValidationRecord` tracking.
 7. **Referential integrity and synthetic passive fixtures**: bundle-wide ID
    uniqueness and cross-entity resolution checks, unit-tested exclusively with
    synthetic Resistor and Capacitor fixtures marked as synthetic.

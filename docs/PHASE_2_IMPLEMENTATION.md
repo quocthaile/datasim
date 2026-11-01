@@ -33,7 +33,7 @@ or ngspice:
 | `src/datasim/component/knowledge/component_knowledge.hpp`, `.cpp` | `ConflictResolutionStatus`, `ParameterConflict`, `KnowledgeRevisionEntry`, `ComponentKnowledge`, `promote_parameter_to_knowledge`, `create_next_knowledge_revision` | Versioned reviewed component facts, visible competing-observation records, silent-overwrite prevention, and sequential revision lineage. |
 | `src/datasim/component/model/model_artifact.hpp` | `ModelFormat`, `AnalysisType`, `TerminalDescriptor`, `ModelParameterMapping`, `NumericRangeConstraint`, `ModelValidityEnvelope`, `ModelLicenseMetadata`, `ModelArtifactDescriptor` | Model metadata contracts: version, format, vendor/license, external URI/SHA-256, 1..N ordered pin mapping, parameter bindings, validity envelope, supported analyses, and limitations. |
 | `src/datasim/component/model/model_validation.hpp`, `.cpp` | `ModelValidationStatus`, `ModelValidationKind`, `ModelValidationRecord`, `effective_model_validation_status` | Model validation records evaluated independently of observation approval, knowledge approval, and model registration. |
-| `src/datasim/component/validation/domain_validation.hpp`, `.cpp` | `ValidationRuleCode`, `ValidationIssue`, `ValidationReport`, `ComponentDomainBundle`, `validate_*`, `validate_domain_bundle`, `ensure_valid` | Deterministic per-entity structural checks and cross-entity referential integrity rules. |
+| `src/datasim/component/validation/domain_validation.hpp`, `.cpp` | `ValidationRuleCode`, `ValidationIssue`, `ValidationReport`, `ComponentDomainBundle`, `validate_*`, `validate_domain_bundle`, `ensure_valid`, `are_parameter_units_compatible`, `is_source_document_applicable`, `validate_model_parameter_mapping` | Deterministic per-entity structural checks, exact source document applicability, model parameter unit compatibility contracts, and cross-entity referential integrity rules. |
 
 ## Separation of conceptual, implemented, and deferred scope
 
@@ -41,7 +41,7 @@ or ngspice:
 | --- | --- | --- |
 | Domain entities & strong IDs | IMPLEMENTED & VERIFIED | In-memory C++20 value structs and `StrongId<Tag>` types for scalar/symbolic observations, knowledge, and model descriptors. |
 | Engineering review lifecycle | IMPLEMENTED & VERIFIED | Deterministic transitions `candidate -> needs_review -> approved \| rejected` and `approved -> superseded`; human-engineer gate and self-approval block. |
-| Structural & referential validation | IMPLEMENTED & VERIFIED | 40 `ValidationRuleCode` diagnostics covering required fields, finite numbers, mandatory units, resolving IDs, conflict visibility, pin order, validity ranges, and 4-way trust separation. |
+| Structural & referential validation | IMPLEMENTED & VERIFIED | 42 `ValidationRuleCode` diagnostics covering required fields, finite numbers, mandatory units, resolving IDs, conflict visibility, pin order, validity ranges, 4-way trust separation, parameter unit consistency, and exact source document part number applicability. |
 | Synthetic passive fixtures | IMPLEMENTED & VERIFIED | Synthetic Resistor (`SYN-TF0603-1K00-LF`) and Capacitor (`SYN-C0G0805-1U0-J50NT`) bundles in `tests/unit/component_fixtures.*`. |
 | Digitized curve series | PROPOSED (deferred) | Conceptual requirements remain in [COMPONENT_DATA_MODEL.md](COMPONENT_DATA_MODEL.md); figure locators exist in `EvidenceLocation`, but curve sample arrays are not yet modeled. |
 | Unit conversion algebra | PROPOSED (deferred) | `NormalizedParameter` records explicit `conversion_rule` text; no automatic unit parser or dimensional solver is implemented. |
@@ -64,6 +64,40 @@ Unit tests alone (requiring no external `ngspice` binary):
 ```powershell
 ctest --test-dir build/phase2 -L unit --output-on-failure -V
 ```
+
+
+## Domain validation hardening (pre-PR)
+
+Before finalizing Phase 2, two domain validation mechanisms were hardened:
+
+1. **Model parameter unit consistency**:
+   - `are_parameter_units_compatible(expected_unit, param, mapping_expression)` validates unit
+     compatibility whenever a model parameter mapping binds a `knowledge_param_id`.
+   - Exact unit matches (`ohm` vs `ohm`, `F` vs `F`) are always accepted.
+   - For `unitless` parameters (`param.unitless = true`), only unitless tokens (`1`, `unitless`,
+     `dimensionless`, `-`) are accepted.
+   - For differing units within the same physical dimension (e.g., `kohm` vs `ohm`, `degC` vs `K`),
+     an explicit conversion contract in `mapping_expression` is required (e.g. `R / 1000.0`).
+     Unspecified or automatic conversions without explicit contract are rejected.
+   - Incompatible physical dimensions (e.g. resistance `ohm` vs capacitance `F`, voltage `V` vs
+     current `A`) are strictly rejected with `ValidationRuleCode::incompatible_parameter_units`.
+   - General-purpose algebraic unit conversion engines remain out of scope; original notation
+     and `conversion_rule` remain fully preserved.
+
+2. **Source document component association**:
+   - `is_source_document_applicable(document, component)` verifies that every source document
+     in a bundle is directly applicable to `ComponentIdentity::part_number`.
+   - Exact part number matching is required: manufacturer part-number suffixes (e.g. `-LF`, `-J50NT`)
+     are strictly preserved. Suffix-stripped or truncated part numbers are rejected.
+   - Prefix matching is strictly prohibited: series-only prefixes (e.g. `SYN-TF0603` matching
+     `SYN-TF0603-1K00-LF`) are not accepted.
+   - Multi-part family documents (datasheets covering an entire product series with multiple
+     associated part numbers) are explicitly supported: the document is applicable if and only if
+     the component's exact MPN matches at least one entry in `associated_part_numbers`.
+   - `validate_source_document` additionally detects and rejects duplicate entries in
+     `associated_part_numbers` with `ValidationRuleCode::duplicate_identifier`.
+   - Documents in a bundle not applicable to the bundle component trigger
+     `ValidationRuleCode::incompatible_source_document_part_number`.
 
 ## Design limitations discovered during implementation
 

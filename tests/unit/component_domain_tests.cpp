@@ -1061,6 +1061,167 @@ void test_model_artifact_and_validation_rules() {
     }
 }
 
+
+void test_parameter_unit_consistency_rules() {
+    // 1. are_parameter_units_compatible positive and negative checks
+    NormalizedParameter norm_r;
+    norm_r.id = NormalizedParameterId{"np.test.r"};
+    norm_r.canonical_name = "resistance";
+    norm_r.normalized_numeric_value = 1000.0;
+    norm_r.normalized_si_unit = "ohm";
+    norm_r.unitless = false;
+
+    // Exact unit match
+    require(are_parameter_units_compatible("ohm", norm_r), "exact unit match compatible");
+    require(are_parameter_units_compatible("ohm", norm_r, "identity"), "exact unit match with expression compatible");
+
+    // Same dimension (resistance) with explicit conversion contract
+    require(are_parameter_units_compatible("kohm", norm_r, "R / 1000.0"), "same dimension with contract compatible");
+    require(are_parameter_units_compatible("mohm", norm_r, "R * 1000.0"), "same dimension with contract compatible");
+
+    // Same dimension WITHOUT explicit conversion contract -> rejected (no auto conversion)
+    require(!are_parameter_units_compatible("kohm", norm_r, std::nullopt), "same dimension without contract rejected");
+    require(!are_parameter_units_compatible("kohm", norm_r, ""), "same dimension with empty contract rejected");
+
+    // Incompatible dimension (resistance vs capacitance, voltage, current) -> rejected even with contract
+    require(!are_parameter_units_compatible("F", norm_r, "1.0 / (2*pi*f*R)"), "incompatible dimension F vs ohm rejected");
+    require(!are_parameter_units_compatible("V", norm_r, "R * I"), "incompatible dimension V vs ohm rejected");
+    require(!are_parameter_units_compatible("A", norm_r), "incompatible dimension A vs ohm rejected");
+
+    // Unitless parameter compatibility
+    NormalizedParameter norm_unitless;
+    norm_unitless.id = NormalizedParameterId{"np.test.gain"};
+    norm_unitless.canonical_name = "gain";
+    norm_unitless.normalized_numeric_value = 10.0;
+    norm_unitless.unitless = true;
+
+    require(are_parameter_units_compatible("1", norm_unitless), "unitless '1' compatible");
+    require(are_parameter_units_compatible("unitless", norm_unitless), "unitless 'unitless' compatible");
+    require(are_parameter_units_compatible("dimensionless", norm_unitless), "unitless 'dimensionless' compatible");
+    require(are_parameter_units_compatible("-", norm_unitless), "unitless '-' compatible");
+    require(!are_parameter_units_compatible("ohm", norm_unitless), "unitless mapped to dimensional unit rejected");
+
+    // Dimensional parameter mapped to unitless expected unit -> rejected
+    require(!are_parameter_units_compatible("1", norm_r), "dimensional mapped to unitless expected unit rejected");
+    require(!are_parameter_units_compatible("unitless", norm_r), "dimensional mapped to 'unitless' rejected");
+
+    // Empty expected unit -> rejected
+    require(!are_parameter_units_compatible("", norm_r), "empty expected unit rejected");
+
+    // 2. validate_model_parameter_mapping standalone
+    ModelParameterMapping pm_ok;
+    pm_ok.model_parameter_name = "R1";
+    pm_ok.knowledge_param_id = norm_r.id;
+    pm_ok.expected_unit = "ohm";
+    require(validate_model_parameter_mapping(pm_ok, &norm_r).valid(), "compatible mapping is valid");
+
+    ModelParameterMapping pm_mismatch = pm_ok;
+    pm_mismatch.expected_unit = "F";
+    require_invalid_with_code(
+        validate_model_parameter_mapping(pm_mismatch, &norm_r),
+        ValidationRuleCode::incompatible_parameter_units,
+        "mismatched unit in mapping rejected with incompatible_parameter_units");
+
+    // 3. Bundle-level parameter mapping unit verification
+    {
+        auto bundle = make_synthetic_resistor_bundle();
+        require(validate_domain_bundle(bundle).valid(), "baseline bundle is valid");
+
+        // Mutate model parameter expected_unit to incompatible Farads
+        bundle.models.front().parameter_mappings.front().expected_unit = "F";
+        require_invalid_with_code(
+            validate_domain_bundle(bundle),
+            ValidationRuleCode::incompatible_parameter_units,
+            "bundle with incompatible parameter unit rejected");
+    }
+
+    // Bundle with same dimension but lacking conversion contract
+    {
+        auto bundle = make_synthetic_resistor_bundle();
+        bundle.models.front().parameter_mappings.front().expected_unit = "kohm";
+        bundle.models.front().parameter_mappings.front().mapping_expression = std::nullopt;
+        require_invalid_with_code(
+            validate_domain_bundle(bundle),
+            ValidationRuleCode::incompatible_parameter_units,
+            "bundle with differing unit in same dimension lacking mapping contract rejected");
+
+        // Supplying explicit conversion contract restores validity
+        bundle.models.front().parameter_mappings.front().mapping_expression = "R_kohm = R_ohm / 1000.0";
+        require(validate_domain_bundle(bundle).valid(), "bundle with explicit conversion contract accepted");
+    }
+}
+
+void test_source_document_component_association_rules() {
+    ComponentIdentity comp;
+    comp.id = ComponentId{"comp.test"};
+    comp.manufacturer = "VendorCorp";
+    comp.part_number = "PART-100-XYZ";
+    comp.part_number_suffix = "XYZ";
+    comp.package_id = "SOIC-8";
+    comp.family = ComponentFamily::resistor;
+
+    SourceDocument doc;
+    doc.id = SourceDocumentId{"doc.test"};
+    doc.publisher = "VendorCorp";
+    doc.title = "Part 100 Datasheet";
+    doc.revision = "REV-1";
+
+    // 1. Exact match
+    doc.associated_part_numbers = {"PART-100-XYZ"};
+    require(is_source_document_applicable(doc, comp), "exact part number matches");
+
+    // 2. Multi-part family document containing exact match
+    doc.associated_part_numbers = {"PART-100-ABC", "PART-100-XYZ", "PART-100-DEF"};
+    require(is_source_document_applicable(doc, comp), "family document containing part number matches");
+
+    // 3. Prohibit inferring applicability merely from shared prefixes
+    doc.associated_part_numbers = {"PART-100"};
+    require(!is_source_document_applicable(doc, comp), "shared prefix without suffix is not applicable");
+
+    doc.associated_part_numbers = {"PART"};
+    require(!is_source_document_applicable(doc, comp), "series prefix is not applicable");
+
+    // 4. Suffix mismatch
+    doc.associated_part_numbers = {"PART-100-XY"};
+    require(!is_source_document_applicable(doc, comp), "truncated suffix is not applicable");
+
+    // 5. Duplicate associated part numbers in document
+    SourceDocument dup_doc = doc;
+    dup_doc.associated_part_numbers = {"PART-100-XYZ", "PART-100-XYZ"};
+    require_invalid_with_code(
+        validate_source_document(dup_doc),
+        ValidationRuleCode::duplicate_identifier,
+        "duplicate part numbers in associated_part_numbers rejected");
+
+    // 6. Bundle-level source document applicability enforcement
+    {
+        auto bundle = make_synthetic_resistor_bundle();
+        require(validate_domain_bundle(bundle).valid(), "baseline bundle is valid");
+
+        // Mutate document to have prefix only
+        bundle.documents.front().associated_part_numbers = {"SYN-TF0603"};
+        require_invalid_with_code(
+            validate_domain_bundle(bundle),
+            ValidationRuleCode::incompatible_source_document_part_number,
+            "bundle with prefix-only document rejected");
+
+        // Mutate document to drop suffix
+        bundle.documents.front().associated_part_numbers = {"SYN-TF0603-1K00"};
+        require_invalid_with_code(
+            validate_domain_bundle(bundle),
+            ValidationRuleCode::incompatible_source_document_part_number,
+            "bundle with suffix-stripped document rejected");
+
+        // Family document with multiple parts including exact MPN is valid
+        bundle.documents.front().associated_part_numbers = {
+            "SYN-TF0603-500R-LF",
+            "SYN-TF0603-1K00-LF",
+            "SYN-TF0603-10K0-LF"
+        };
+        require(validate_domain_bundle(bundle).valid(), "bundle with valid family document accepted");
+    }
+}
+
 } // namespace
 
 int main() {
@@ -1072,6 +1233,8 @@ int main() {
         test_review_lifecycle_rules();
         test_component_knowledge_rules();
         test_model_artifact_and_validation_rules();
+        test_parameter_unit_consistency_rules();
+        test_source_document_component_association_rules();
 
         std::cout << "PASS: " << checks << " component domain checks\n";
         return 0;
