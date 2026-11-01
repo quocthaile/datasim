@@ -49,6 +49,21 @@ struct ComponentProvenanceRecord {
     auto operator<=>(const ComponentProvenanceRecord&) const = default;
 };
 
+// Pre-execution and post-execution provenance manifest for a vertical-slice RC run.
+//
+// Content fingerprint audit (FNV-1a-64, non-cryptographic):
+// - configuration_content_id: datasim::content_id(datasim::config_json(rc_config)).
+// - netlist_content_id: datasim::content_id(datasim::rc_netlist(rc_config)).
+// - provenance_content_id: calculated BEFORE backend execution over the canonical JSON payload
+//   containing circuit_id, execution_classification, is_synthetic_test_run, resistor
+//   ComponentProvenanceRecord, capacitor ComponentProvenanceRecord, configuration_content_id,
+//   and netlist_content_id. Post-execution runtime fields (backend_version, backend_executable,
+//   execution_status, validation_status, error) and build/configure identity fields are recorded
+//   in VerticalSliceProvenanceManifest and provenance_metadata.json, but are excluded from
+//   provenance_content_id so identical pre-execution inputs yield identical content identities.
+// - FNV-1a-64 is a fast deterministic content fingerprint for detecting accidental drift only;
+//   it is NOT cryptographic integrity protection, a digital signature, tamper-proof provenance,
+//   or authentication of source documents or reviewer identity.
 struct VerticalSliceProvenanceManifest {
     std::uint32_t schema_version = 1;
     CircuitAssemblyId circuit_id;

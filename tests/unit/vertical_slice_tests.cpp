@@ -346,7 +346,8 @@ void test_wp2_parameter_resolution() {
 void test_wp3_model_compatibility_and_synthetic_policy() {
     const auto synth_assembly = make_validated_synthetic_rc_assembly();
     const auto resolved = *resolve_rc_parameters(synth_assembly).parameters;
-    OperatingEnvironment env;
+    // The synthetic envelopes bound signal_frequency, so the run declares one explicitly.
+    const OperatingEnvironment env = make_documented_rc_operating_environment();
 
     // 1. Synthetic assembly rejected under default ExecutionPolicy::engineering_approved_only.
     {
@@ -374,9 +375,10 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
         require(synth_ok.classification == ExecutionClassification::test_only_synthetic);
     }
 
-    // 3. Engineering-approved assembly accepted under engineering_approved_only and rejected under test_only_synthetic.
+    // 3. Metadata-classified non-synthetic policy-gate fixture accepted under engineering_approved_only
+    //    and rejected under test_only_synthetic (verifies metadata policy-gate branching only).
     {
-        const auto eng_assembly = make_engineering_approved_rc_assembly();
+        const auto eng_assembly = make_non_synthetic_policy_gate_rc_assembly();
         const auto eng_resolved = *resolve_rc_parameters(eng_assembly).parameters;
 
         const auto eng_ok = evaluate_rc_model_compatibility(
@@ -385,7 +387,7 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
             component::AnalysisType::transient,
             env,
             ExecutionPolicy::engineering_approved_only);
-        require(eng_ok.compatible(), "engineering-approved assembly accepted");
+        require(eng_ok.compatible(), "non-synthetic policy-gate fixture accepted");
         require(eng_ok.classification == ExecutionClassification::engineering_approved);
 
         const auto wrong_policy = evaluate_rc_model_compatibility(
@@ -399,7 +401,78 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
             VerticalValidationCode::inconsistent_synthetic_classification));
     }
 
-    // 4. Reject SPICE subcircuit metadata: do not assume external artifact is available!
+    // 4. Mixed synthetic and non-synthetic metadata rejected across component, document,
+    //    observation extraction_method, and model layers.
+    {
+        // 4a. Synthetic resistor + non-synthetic capacitor.
+        auto mixed_comp = make_non_synthetic_policy_gate_rc_assembly();
+        mixed_comp.component_bundles[0] = synth_assembly.component_bundles[0];
+        const auto mixed_comp_res = *resolve_rc_parameters(mixed_comp).parameters;
+        const auto compat_mixed_comp = evaluate_rc_model_compatibility(
+            mixed_comp,
+            mixed_comp_res,
+            component::AnalysisType::transient,
+            env,
+            ExecutionPolicy::engineering_approved_only);
+        require(!compat_mixed_comp.compatible(), "mixed synthetic/non-synthetic components rejected");
+        require(compat_mixed_comp.validation.has_code(
+            VerticalValidationCode::inconsistent_synthetic_classification));
+        require(compat_mixed_comp.validation.has_code(
+            VerticalValidationCode::synthetic_data_prohibited_in_engineering_mode));
+
+        // 4b. Non-synthetic component with synthetic SourceDocument.
+        auto mixed_doc = make_non_synthetic_policy_gate_rc_assembly();
+        mixed_doc.component_bundles[0].documents[0].is_synthetic = true;
+        auto mixed_doc_res = *resolve_rc_parameters(make_non_synthetic_policy_gate_rc_assembly()).parameters;
+        mixed_doc_res.resistor.source_documents[0].is_synthetic = true;
+        const auto compat_mixed_doc = evaluate_rc_model_compatibility(
+            mixed_doc,
+            mixed_doc_res,
+            component::AnalysisType::transient,
+            env,
+            ExecutionPolicy::engineering_approved_only);
+        require(!compat_mixed_doc.compatible(), "synthetic SourceDocument on non-synthetic component rejected");
+        require(compat_mixed_doc.validation.has_code(
+            VerticalValidationCode::inconsistent_synthetic_classification));
+        require(compat_mixed_doc.validation.has_code(
+            VerticalValidationCode::synthetic_data_prohibited_in_engineering_mode));
+
+        // 4c. Non-synthetic component with ExtractionMethod::synthetic_fixture on observation.
+        auto mixed_obs = make_non_synthetic_policy_gate_rc_assembly();
+        for (auto& obs : mixed_obs.component_bundles[0].observations) {
+            obs.extraction_method = component::ExtractionMethod::synthetic_fixture;
+        }
+        const auto mixed_obs_res = *resolve_rc_parameters(mixed_obs).parameters;
+        const auto compat_mixed_obs = evaluate_rc_model_compatibility(
+            mixed_obs,
+            mixed_obs_res,
+            component::AnalysisType::transient,
+            env,
+            ExecutionPolicy::engineering_approved_only);
+        require(!compat_mixed_obs.compatible(), "synthetic_fixture extraction_method rejected in engineering mode");
+        require(compat_mixed_obs.validation.has_code(
+            VerticalValidationCode::inconsistent_synthetic_classification));
+        require(compat_mixed_obs.validation.has_code(
+            VerticalValidationCode::synthetic_data_prohibited_in_engineering_mode));
+
+        // 4d. Non-synthetic component with synthetic ModelArtifactDescriptor.
+        auto mixed_model = make_non_synthetic_policy_gate_rc_assembly();
+        mixed_model.component_bundles[1].models[1].is_synthetic = true;
+        const auto mixed_model_res = *resolve_rc_parameters(mixed_model).parameters;
+        const auto compat_mixed_model = evaluate_rc_model_compatibility(
+            mixed_model,
+            mixed_model_res,
+            component::AnalysisType::transient,
+            env,
+            ExecutionPolicy::engineering_approved_only);
+        require(!compat_mixed_model.compatible(), "synthetic model on non-synthetic component rejected");
+        require(compat_mixed_model.validation.has_code(
+            VerticalValidationCode::inconsistent_synthetic_classification));
+        require(compat_mixed_model.validation.has_code(
+            VerticalValidationCode::synthetic_data_prohibited_in_engineering_mode));
+    }
+
+    // 5. Reject SPICE subcircuit metadata: do not assume external artifact is available!
     {
         auto subckt_assembly = synth_assembly;
         // Select the Phase 2 capacitor spice_subcircuit model (models[0]) instead of ideal-linear (models[1]).
@@ -429,7 +502,7 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
             VerticalValidationCode::external_artifact_unavailable_in_rc_backend));
     }
 
-    // 5. Reject spice_model_card, lookup_table, and vendor_specific_artifact formats.
+    // 6. Reject spice_model_card, lookup_table, and vendor_specific_artifact formats.
     for (auto fmt : {component::ModelFormat::spice_model_card,
                      component::ModelFormat::lookup_table,
                      component::ModelFormat::vendor_specific_artifact}) {
@@ -447,7 +520,7 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
             VerticalValidationCode::external_artifact_unavailable_in_rc_backend));
     }
 
-    // 6. Reject unsupported analyses and models missing transient support.
+    // 7. Reject unsupported analyses and models missing transient support.
     for (auto bad_analysis : {component::AnalysisType::dc_operating_point,
                               component::AnalysisType::dc_sweep,
                               component::AnalysisType::ac_small_signal,
@@ -476,7 +549,8 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
         require(compat.validation.has_code(VerticalValidationCode::analysis_not_supported_by_model));
     }
 
-    // 7. Reject unvalidated, failed_validation, and version-mismatched (out_of_date) models.
+    // 8. Reject unvalidated, failed_validation, version-mismatched (out_of_date), and missing/invalid
+    //    ModelValidationRecords (approved knowledge never automatically implies model validation).
     {
         auto unval = synth_assembly;
         unval.component_bundles[0].models[0].validation_record_refs = {
@@ -487,8 +561,64 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
             component::AnalysisType::transient,
             env,
             ExecutionPolicy::test_only_synthetic);
-        require(!compat_unval.compatible());
+        require(!compat_unval.compatible(), "approved knowledge does not validate an unvalidated model");
         require(compat_unval.validation.has_code(VerticalValidationCode::model_unvalidated));
+
+        // Missing validation_record_refs altogether.
+        auto empty_refs = synth_assembly;
+        empty_refs.component_bundles[0].models[0].validation_record_refs.clear();
+        const auto compat_empty_refs = evaluate_rc_model_compatibility(
+            empty_refs,
+            resolved,
+            component::AnalysisType::transient,
+            env,
+            ExecutionPolicy::test_only_synthetic);
+        require(!compat_empty_refs.compatible());
+        require(compat_empty_refs.validation.has_code(VerticalValidationCode::model_unvalidated));
+
+        // Dangling ModelValidationId in validation_record_refs.
+        auto dangling_ref = synth_assembly;
+        dangling_ref.component_bundles[0].models[0].validation_record_refs = {
+            component::ModelValidationId{"mval.nonexistent.record"}};
+        const auto compat_dangling = evaluate_rc_model_compatibility(
+            dangling_ref,
+            resolved,
+            component::AnalysisType::transient,
+            env,
+            ExecutionPolicy::test_only_synthetic);
+        require(!compat_dangling.compatible());
+        require(compat_dangling.validation.has_code(VerticalValidationCode::invalid_component_bundle));
+        require(compat_dangling.validation.has_code(VerticalValidationCode::model_unvalidated));
+
+        // Invalid ModelValidationRecord with non-human reviewer (llm_assistant / automatic_parser / automated_check).
+        for (auto bad_actor : {component::ActorKind::llm_assistant,
+                               component::ActorKind::automatic_parser,
+                               component::ActorKind::automated_check}) {
+            auto bad_reviewer = synth_assembly;
+            bad_reviewer.component_bundles[0].model_validations.back().reviewer->kind = bad_actor;
+            const auto compat_bad_rev = evaluate_rc_model_compatibility(
+                bad_reviewer,
+                resolved,
+                component::AnalysisType::transient,
+                env,
+                ExecutionPolicy::test_only_synthetic);
+            require(!compat_bad_rev.compatible(), "non-human model validator rejected");
+            require(compat_bad_rev.validation.has_code(VerticalValidationCode::invalid_component_bundle));
+            require(compat_bad_rev.validation.has_code(VerticalValidationCode::model_unvalidated));
+        }
+
+        // Invalid ModelValidationRecord with missing evidence_refs or missing timestamp.
+        auto no_ev_val = synth_assembly;
+        no_ev_val.component_bundles[0].model_validations.back().evidence_refs.clear();
+        const auto compat_no_ev = evaluate_rc_model_compatibility(
+            no_ev_val,
+            resolved,
+            component::AnalysisType::transient,
+            env,
+            ExecutionPolicy::test_only_synthetic);
+        require(!compat_no_ev.compatible());
+        require(compat_no_ev.validation.has_code(VerticalValidationCode::invalid_component_bundle));
+        require(compat_no_ev.validation.has_code(VerticalValidationCode::model_unvalidated));
 
         auto failed_val = synth_assembly;
         failed_val.component_bundles[0].model_validations.back().status =
@@ -522,73 +652,153 @@ void test_wp3_model_compatibility_and_synthetic_policy() {
 void test_wp3_operating_conditions_and_validity_envelope() {
     const auto synth_assembly = make_validated_synthetic_rc_assembly();
     const auto resolved = *resolve_rc_parameters(synth_assembly).parameters;
+    const auto base_env = make_documented_rc_operating_environment();
 
-    // 1. Out-of-envelope ambient temperature (> 125 degC or < -55 degC).
-    for (double bad_temp : {150.0, -60.0}) {
-        OperatingEnvironment env;
-        env.ambient_temperature_degC = bad_temp;
-        const auto compat = evaluate_rc_model_compatibility(
+    // 1. Missing required runtime operating conditions fail closed:
+    //    - Missing ambient temperature condition.
+    //    - Missing terminal voltage information (stimulus_voltage_V or initial_voltage_V).
+    //    - Missing signal_frequency condition.
+    {
+        auto no_temp_env = base_env;
+        no_temp_env.ambient_temperature_degC = std::nullopt;
+        const auto compat_no_temp = evaluate_rc_model_compatibility(
             synth_assembly,
             resolved,
             component::AnalysisType::transient,
-            env,
+            no_temp_env,
             ExecutionPolicy::test_only_synthetic);
-        require(!compat.compatible(), "out-of-envelope temperature rejected");
-        require(compat.validation.has_code(
-            VerticalValidationCode::operating_condition_outside_validity_envelope));
-    }
+        require(!compat_no_temp.compatible(), "missing ambient temperature rejected");
+        require(compat_no_temp.validation.has_code(VerticalValidationCode::invalid_operating_condition));
 
-    // 2. Stimulus voltage exceeding capacitor [-50, 50] V envelope.
-    {
-        OperatingEnvironment env;
-        env.stimulus_voltage_V = 60.0;
-        const auto compat = evaluate_rc_model_compatibility(
+        auto no_stim_v_env = base_env;
+        no_stim_v_env.stimulus_voltage_V = std::nullopt;
+        const auto compat_no_stim = evaluate_rc_model_compatibility(
             synth_assembly,
             resolved,
             component::AnalysisType::transient,
-            env,
+            no_stim_v_env,
             ExecutionPolicy::test_only_synthetic);
-        require(!compat.compatible(), "60 V exceeds 50 V capacitor validity envelope");
-        require(compat.validation.has_code(
-            VerticalValidationCode::operating_condition_outside_validity_envelope));
-    }
+        require(!compat_no_stim.compatible(), "missing stimulus_voltage_V rejected");
+        require(compat_no_stim.validation.has_code(VerticalValidationCode::invalid_operating_condition));
 
-    // 3. Stimulus voltage causing resistor continuous_power V^2/R > 0.050 W (10 V on 1000 ohm = 0.100 W).
-    {
-        OperatingEnvironment env;
-        env.stimulus_voltage_V = 10.0; // Within 50 V capacitor limit, but 0.100 W > 0.050 W resistor envelope!
-        const auto compat = evaluate_rc_model_compatibility(
+        auto no_init_v_env = base_env;
+        no_init_v_env.initial_voltage_V = std::nullopt;
+        const auto compat_no_init = evaluate_rc_model_compatibility(
             synth_assembly,
             resolved,
             component::AnalysisType::transient,
-            env,
+            no_init_v_env,
             ExecutionPolicy::test_only_synthetic);
-        require(!compat.compatible(), "10 V across 1 kOhm exceeds 50 mW resistor validity envelope");
-        require(compat.validation.has_code(
-            VerticalValidationCode::operating_condition_outside_validity_envelope));
-    }
+        require(!compat_no_init.compatible(), "missing initial_voltage_V rejected");
+        require(compat_no_init.validation.has_code(VerticalValidationCode::invalid_operating_condition));
 
-    // 4. Caller-supplied additional operating condition outside signal_frequency envelope.
-    {
-        OperatingEnvironment env;
-        env.additional_conditions.push_back(component::OperatingCondition{
-            "signal_frequency", "5.0e7", "Hz", 5.0e7, "Exceeds 1 MHz resistor model ceiling"});
-        const auto compat = evaluate_rc_model_compatibility(
+        OperatingEnvironment no_freq_env; // additional_conditions is empty -> missing signal_frequency
+        const auto compat_no_freq = evaluate_rc_model_compatibility(
             synth_assembly,
             resolved,
             component::AnalysisType::transient,
-            env,
+            no_freq_env,
             ExecutionPolicy::test_only_synthetic);
-        require(!compat.compatible());
-        require(compat.validation.has_code(
-            VerticalValidationCode::operating_condition_outside_validity_envelope));
+        require(!compat_no_freq.compatible(), "missing signal_frequency condition rejected");
+        require(compat_no_freq.validation.has_code(VerticalValidationCode::invalid_operating_condition));
     }
 
-    // 5. Invalid operating conditions (missing unit, non-finite NaN, incompatible unit for envelope quantity).
+    // 2. Unsupported validity-envelope quantities fail closed.
     {
-        OperatingEnvironment env_no_unit;
-        env_no_unit.additional_conditions.push_back(component::OperatingCondition{
-            "signal_frequency", "1000", "", 1000.0, std::nullopt});
+        require(is_supported_rc_envelope_quantity("ambient_temperature", CircuitElementRole::series_resistor));
+        require(is_supported_rc_envelope_quantity("terminal_dc_voltage", CircuitElementRole::shunt_capacitor));
+        require(is_supported_rc_envelope_quantity("continuous_power", CircuitElementRole::series_resistor));
+        require(!is_supported_rc_envelope_quantity("continuous_power", CircuitElementRole::shunt_capacitor));
+        require(is_supported_rc_envelope_quantity("signal_frequency", CircuitElementRole::series_resistor));
+        require(!is_supported_rc_envelope_quantity("relative_humidity", CircuitElementRole::series_resistor));
+
+        auto unknown_qty_assembly = synth_assembly;
+        unknown_qty_assembly.component_bundles[0].models[0].validity_envelope.operating_ranges.push_back(
+            component::NumericRangeConstraint{"relative_humidity", 10.0, 85.0, "%RH", true, true});
+        const auto compat_unknown = evaluate_rc_model_compatibility(
+            unknown_qty_assembly,
+            resolved,
+            component::AnalysisType::transient,
+            base_env,
+            ExecutionPolicy::test_only_synthetic);
+        require(!compat_unknown.compatible(), "unknown envelope quantity rejected");
+        require(compat_unknown.validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        auto cap_power_assembly = synth_assembly;
+        cap_power_assembly.component_bundles[1].models[1].validity_envelope.operating_ranges.push_back(
+            component::NumericRangeConstraint{"continuous_power", 0.0, 0.100, "W", true, true});
+        const auto compat_cap_power = evaluate_rc_model_compatibility(
+            cap_power_assembly,
+            resolved,
+            component::AnalysisType::transient,
+            base_env,
+            ExecutionPolicy::test_only_synthetic);
+        require(!compat_cap_power.compatible(), "continuous_power on capacitor rejected");
+        require(compat_cap_power.validation.has_code(VerticalValidationCode::invalid_operating_condition));
+    }
+
+    // 3. Missing numeric_value and non-finite numeric values fail closed on both runtime
+    //    additional_conditions and resolved_param.operating_conditions.
+    {
+        OperatingEnvironment env_null_num = base_env;
+        env_null_num.additional_conditions[0].numeric_value = std::nullopt;
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    resolved,
+                    component::AnalysisType::transient,
+                    env_null_num,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        auto resolved_null_cond = resolved;
+        resolved_null_cond.resistor.operating_conditions[0].numeric_value = std::nullopt;
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    resolved_null_cond,
+                    component::AnalysisType::transient,
+                    base_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        for (double non_finite : {std::numeric_limits<double>::quiet_NaN(),
+                                  std::numeric_limits<double>::infinity(),
+                                  -std::numeric_limits<double>::infinity()}) {
+            auto env_nf_temp = base_env;
+            env_nf_temp.ambient_temperature_degC = non_finite;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env_nf_temp,
+                        ExecutionPolicy::test_only_synthetic)
+                        .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+            auto env_nf_stim = base_env;
+            env_nf_stim.stimulus_voltage_V = non_finite;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env_nf_stim,
+                        ExecutionPolicy::test_only_synthetic)
+                        .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+            auto env_nf_freq = base_env;
+            env_nf_freq.additional_conditions[0].numeric_value = non_finite;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env_nf_freq,
+                        ExecutionPolicy::test_only_synthetic)
+                        .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+        }
+    }
+
+    // 4. Unit mismatch tests across runtime conditions, parameter conditions, and envelope constraints.
+    {
+        auto env_no_unit = base_env;
+        env_no_unit.additional_conditions[0].unit_symbol = "";
         require(evaluate_rc_model_compatibility(
                     synth_assembly,
                     resolved,
@@ -597,26 +807,272 @@ void test_wp3_operating_conditions_and_validity_envelope() {
                     ExecutionPolicy::test_only_synthetic)
                     .validation.has_code(VerticalValidationCode::invalid_operating_condition));
 
-        OperatingEnvironment env_nan;
-        env_nan.ambient_temperature_degC = std::numeric_limits<double>::quiet_NaN();
+        auto env_wrong_freq_unit = base_env;
+        env_wrong_freq_unit.additional_conditions[0].unit_symbol = "kHz";
         require(evaluate_rc_model_compatibility(
                     synth_assembly,
                     resolved,
                     component::AnalysisType::transient,
-                    env_nan,
+                    env_wrong_freq_unit,
                     ExecutionPolicy::test_only_synthetic)
                     .validation.has_code(VerticalValidationCode::invalid_operating_condition));
 
-        OperatingEnvironment env_wrong_unit;
-        env_wrong_unit.additional_conditions.push_back(component::OperatingCondition{
-            "signal_frequency", "10", "kHz", 10.0, std::nullopt});
+        auto resolved_wrong_temp_unit = resolved;
+        resolved_wrong_temp_unit.resistor.operating_conditions[0].unit_symbol = "K";
+        resolved_wrong_temp_unit.resistor.operating_conditions[0].numeric_value = 298.15;
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    resolved_wrong_temp_unit,
+                    component::AnalysisType::transient,
+                    base_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        auto bad_env_unit_assembly = synth_assembly;
+        bad_env_unit_assembly.component_bundles[0].models[0].validity_envelope.operating_ranges[0].unit_symbol = "K";
+        require(evaluate_rc_model_compatibility(
+                    bad_env_unit_assembly,
+                    resolved,
+                    component::AnalysisType::transient,
+                    base_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+    }
+
+    // 5. Values below minimum and above maximum for each supported envelope quantity.
+    {
+        // Ambient temperature outside [-55, 125] degC.
+        for (double bad_temp : {-60.0, 150.0}) {
+            auto env = base_env;
+            env.ambient_temperature_degC = bad_temp;
+            const auto compat = evaluate_rc_model_compatibility(
+                synth_assembly,
+                resolved,
+                component::AnalysisType::transient,
+                env,
+                ExecutionPolicy::test_only_synthetic);
+            require(!compat.compatible(), "out-of-envelope temperature rejected");
+            require(compat.validation.has_code(
+                VerticalValidationCode::operating_condition_outside_validity_envelope));
+        }
+
+        // Terminal voltage below minimum (-60 V < -50 V) and above maximum (60 V > 50 V).
+        {
+            auto env_high_v = base_env;
+            env_high_v.stimulus_voltage_V = 60.0;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env_high_v,
+                        ExecutionPolicy::test_only_synthetic)
+                        .validation.has_code(
+                            VerticalValidationCode::operating_condition_outside_validity_envelope));
+
+            auto env_low_v = base_env;
+            env_low_v.initial_voltage_V = -60.0;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env_low_v,
+                        ExecutionPolicy::test_only_synthetic)
+                        .validation.has_code(
+                            VerticalValidationCode::operating_condition_outside_validity_envelope));
+        }
+
+        // Signal frequency below minimum (-1 Hz < 0 Hz) and above maximum (5e7 Hz > 1e6 Hz).
+        for (double bad_freq : {-1.0, 5.0e7}) {
+            auto env = base_env;
+            env.additional_conditions[0].numeric_value = bad_freq;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env,
+                        ExecutionPolicy::test_only_synthetic)
+                        .validation.has_code(
+                            VerticalValidationCode::operating_condition_outside_validity_envelope));
+        }
+    }
+
+    // 6. Boundary values with inclusive and exclusive limits.
+    {
+        // Inclusive boundaries on [-55, 125] degC, [-50, 50] V (initial), [0, 1e6] Hz.
+        for (double bound_temp : {-55.0, 125.0}) {
+            auto env = base_env;
+            env.ambient_temperature_degC = bound_temp;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env,
+                        ExecutionPolicy::test_only_synthetic)
+                        .compatible(),
+                    "inclusive temperature boundary accepted");
+        }
+        for (double bound_freq : {0.0, 1.0e6}) {
+            auto env = base_env;
+            env.additional_conditions[0].numeric_value = bound_freq;
+            require(evaluate_rc_model_compatibility(
+                        synth_assembly,
+                        resolved,
+                        component::AnalysisType::transient,
+                        env,
+                        ExecutionPolicy::test_only_synthetic)
+                        .compatible(),
+                    "inclusive frequency boundary accepted");
+        }
+
+        // Exclusive boundaries on (-55, 125) degC and (0, 1e6) Hz reject exact boundary values.
+        auto excl_assembly = synth_assembly;
+        for (auto& range : excl_assembly.component_bundles[0].models[0].validity_envelope.operating_ranges) {
+            range.min_inclusive = false;
+            range.max_inclusive = false;
+        }
+        for (double excl_temp : {-55.0, 125.0}) {
+            auto env = base_env;
+            env.ambient_temperature_degC = excl_temp;
+            const auto compat = evaluate_rc_model_compatibility(
+                excl_assembly,
+                resolved,
+                component::AnalysisType::transient,
+                env,
+                ExecutionPolicy::test_only_synthetic);
+            require(!compat.compatible(), "exclusive temperature boundary rejected");
+            require(compat.validation.has_code(
+                VerticalValidationCode::operating_condition_outside_validity_envelope));
+        }
+        for (double excl_freq : {0.0, 1.0e6}) {
+            auto env = base_env;
+            env.additional_conditions[0].numeric_value = excl_freq;
+            const auto compat = evaluate_rc_model_compatibility(
+                excl_assembly,
+                resolved,
+                component::AnalysisType::transient,
+                env,
+                ExecutionPolicy::test_only_synthetic);
+            require(!compat.compatible(), "exclusive frequency boundary rejected");
+            require(compat.validation.has_code(
+                VerticalValidationCode::operating_condition_outside_validity_envelope));
+        }
+    }
+
+    // 7. Duplicate and conflicting operating conditions:
+    //    - Consistent duplicates accepted.
+    //    - Conflicting duplicates in additional_conditions rejected.
+    //    - Conflicting additional_conditions against primary OperatingEnvironment fields rejected.
+    //    - Conflicting duplicate conditions in resolved_param.operating_conditions rejected.
+    {
+        auto consistent_dup_env = base_env;
+        consistent_dup_env.additional_conditions.push_back(component::OperatingCondition{
+            "f_signal", "50", "Hz", 50.0, "Consistent alias for signal_frequency"});
+        consistent_dup_env.additional_conditions.push_back(component::OperatingCondition{
+            "T_A", "27", "degC", 27.0, "Consistent ambient temperature"});
+        consistent_dup_env.additional_conditions.push_back(component::OperatingCondition{
+            "V_DC", "5", "V", 5.0, "Consistent stimulus voltage"});
+        consistent_dup_env.additional_conditions.push_back(component::OperatingCondition{
+            "P_load", "0.025", "W", 0.025, "Consistent conservative peak power"});
         require(evaluate_rc_model_compatibility(
                     synth_assembly,
                     resolved,
                     component::AnalysisType::transient,
-                    env_wrong_unit,
+                    consistent_dup_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .compatible(),
+                "consistent duplicate conditions accepted");
+
+        auto conflict_freq_env = base_env;
+        conflict_freq_env.additional_conditions.push_back(component::OperatingCondition{
+            "f_signal", "1000", "Hz", 1000.0, "Disagrees with 50 Hz signal_frequency"});
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    resolved,
+                    component::AnalysisType::transient,
+                    conflict_freq_env,
                     ExecutionPolicy::test_only_synthetic)
                     .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        auto conflict_temp_env = base_env;
+        conflict_temp_env.additional_conditions.push_back(component::OperatingCondition{
+            "T_A", "40", "degC", 40.0, "Disagrees with 27 degC ambient_temperature_degC"});
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    resolved,
+                    component::AnalysisType::transient,
+                    conflict_temp_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        auto conflict_volt_env = base_env;
+        conflict_volt_env.additional_conditions.push_back(component::OperatingCondition{
+            "V_DC", "12", "V", 12.0, "Disagrees with 5 V stimulus_voltage_V"});
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    resolved,
+                    component::AnalysisType::transient,
+                    conflict_volt_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        auto conflict_power_env = base_env;
+        conflict_power_env.additional_conditions.push_back(component::OperatingCondition{
+            "P_load", "0.010", "W", 0.010, "Disagrees with 0.025 W conservative peak power"});
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    resolved,
+                    component::AnalysisType::transient,
+                    conflict_power_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+
+        auto conflict_param_conds = resolved;
+        conflict_param_conds.resistor.operating_conditions.push_back(component::OperatingCondition{
+            "T_ambient", "85", "degC", 85.0, "Conflicts with T_A = 25 degC on same parameter"});
+        require(evaluate_rc_model_compatibility(
+                    synth_assembly,
+                    conflict_param_conds,
+                    component::AnalysisType::transient,
+                    base_env,
+                    ExecutionPolicy::test_only_synthetic)
+                    .validation.has_code(VerticalValidationCode::invalid_operating_condition));
+    }
+
+    // 8. Continuous-power conservative peak-power screening semantics.
+    {
+        require(std::abs(conservative_peak_resistor_power_W(5.0, 0.0, 1000.0) - 0.025) < 1e-15);
+        require(std::abs(conservative_peak_resistor_power_W(10.0, 0.0, 1000.0) - 0.100) < 1e-15);
+        require(std::abs(conservative_peak_resistor_power_W(5.0, -5.0, 1000.0) - 0.100) < 1e-15);
+        require(!std::isfinite(conservative_peak_resistor_power_W(5.0, 0.0, 0.0)));
+        require(!std::isfinite(conservative_peak_resistor_power_W(5.0, 0.0, -10.0)));
+
+        // Unipolar 10 V step across 1000 ohm -> 0.100 W > 0.050 W resistor envelope.
+        auto env_10v = base_env;
+        env_10v.stimulus_voltage_V = 10.0;
+        const auto compat_10v = evaluate_rc_model_compatibility(
+            synth_assembly,
+            resolved,
+            component::AnalysisType::transient,
+            env_10v,
+            ExecutionPolicy::test_only_synthetic);
+        require(!compat_10v.compatible(), "10 V across 1 kOhm exceeds 50 mW resistor validity envelope");
+        require(compat_10v.validation.has_code(
+            VerticalValidationCode::operating_condition_outside_validity_envelope));
+
+        // Bipolar step from -5 V initial to +5 V stimulus creates a 10 V step across the resistor
+        // at t = delay_s+ (0.100 W > 0.050 W), even though |V_stim| = 5 V and |V_init| = 5 V.
+        auto env_bipolar = base_env;
+        env_bipolar.stimulus_voltage_V = 5.0;
+        env_bipolar.initial_voltage_V = -5.0;
+        const auto compat_bipolar = evaluate_rc_model_compatibility(
+            synth_assembly,
+            resolved,
+            component::AnalysisType::transient,
+            env_bipolar,
+            ExecutionPolicy::test_only_synthetic);
+        require(!compat_bipolar.compatible(), "bipolar -5 V to +5 V step exceeds 50 mW peak screening bound");
+        require(compat_bipolar.validation.has_code(
+            VerticalValidationCode::operating_condition_outside_validity_envelope));
     }
 }
 
@@ -763,11 +1219,45 @@ void test_wp5_provenance_manifest_and_fail_fast_gate() {
     require(json.find("\"obs.cap.c.typ\"") != std::string::npos);
     require(json.find("\"ev.res.table3.electrical\"") != std::string::npos);
     require(json.find("\"ev.cap.table2.characteristics\"") != std::string::npos);
+    require(json.find("\"provenance_hash_algorithm\":\"FNV-1a-64 (non-cryptographic)\"") != std::string::npos);
 
-    // Verify deterministic repeatability of provenance_content_id.
+    // Verify deterministic repeatability of provenance_content_id and sensitivity to lineage mutations.
     const auto manifest_repeat = build_provenance_manifest(synth_assembly, adapted);
     require(manifest.provenance_content_id == manifest_repeat.provenance_content_id);
     require(provenance_json(manifest) == provenance_json(manifest_repeat));
+
+    {
+        auto alt_circuit = synth_assembly;
+        alt_circuit.id = CircuitAssemblyId{"circuit.synthetic.rc-lowpass-v2"};
+        const auto m_alt_circuit = build_provenance_manifest(alt_circuit, adapted);
+        require(m_alt_circuit.provenance_content_id != manifest.provenance_content_id,
+                "circuit_id participates in provenance_content_id");
+
+        auto alt_adapted = adapted;
+        alt_adapted.resolved_parameters.resistor.conversion_rule =
+            "explicit_scale: modified conversion rule text";
+        const auto m_alt_conv = build_provenance_manifest(synth_assembly, alt_adapted);
+        require(m_alt_conv.provenance_content_id != manifest.provenance_content_id,
+                "conversion_rule participates in provenance_content_id");
+
+        auto alt_model_ver = adapted;
+        alt_model_ver.resolved_parameters.capacitor.model_version = "1.0.1";
+        const auto m_alt_mver = build_provenance_manifest(synth_assembly, alt_model_ver);
+        require(m_alt_mver.provenance_content_id != manifest.provenance_content_id,
+                "model_version participates in provenance_content_id");
+
+        // Post-execution status fields are recorded in provenance_json without altering pre-execution provenance_content_id.
+        auto post_exec = manifest;
+        post_exec.backend_version = "ngspice-47";
+        post_exec.backend_executable = "C:/msys64/ucrt64/bin/ngspice_con.exe";
+        post_exec.execution_status = "SUCCEEDED";
+        post_exec.validation_status = "PASSED";
+        const auto post_json = provenance_json(post_exec);
+        require(post_json.find("\"provenance_content_id\":\"" + manifest.provenance_content_id + "\"") !=
+                std::string::npos);
+        require(post_json.find("\"execution_status\":\"SUCCEEDED\"") != std::string::npos);
+        require(post_json.find("\"validation_status\":\"PASSED\"") != std::string::npos);
+    }
 
     // Verify fail-fast input gate: invalid run inputs must throw BEFORE creating output directory.
     const auto forbidden_dir = std::filesystem::absolute("should_never_be_created_vertical_dir");
@@ -797,4 +1287,3 @@ int main() {
         return 1;
     }
 }
-
