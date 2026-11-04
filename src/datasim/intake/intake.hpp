@@ -32,6 +32,7 @@ enum class IntakeDiagnosticCode {
     invalid_intake_entry,
     ambiguous_numeric_text,
     asserted_ambiguous_numeric_value,
+    raw_numeric_mismatch,
     unsupported_unit_conversion,
     qualifier_text_mismatch,
     category_section_mismatch,

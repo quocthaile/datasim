@@ -32,6 +32,22 @@ the reference for those checks.
 
 No hosted CI result is claimed by this document.
 
+## Hardening coverage
+
+The Release test executables use explicit throwing `require` checks rather than
+`assert`, so checks remain active when `NDEBUG` is defined. The intake suite
+reports 47 executed checks and the handoff suite reports 14 executed checks.
+The intake suite covers P-01/P-02/P-03/P-04/P-05/P-06 and
+the observable portions of N-01/N-02/N-03/N-04/N-05/N-06/N-07/N-08/N-12/
+N-13/N-14/N-16/N-17/N-18/N-20/N-21/N-24/N-33/N-43/N-44. Cases requiring
+unrepresented source-cell provenance, embedded document content, or a
+manufacturer-specific suffix grammar remain BLOCKED/NOT IMPLEMENTED.
+
+The handoff suite covers candidate rejection before normalization/promotion,
+invalid direct approval, valid two-step human review, invalid reviewer kind,
+missing rationale, aggregate evidence-reference failure, normalized-parameter
+preservation, knowledge promotion, domain validation, and synthetic provenance.
+
 ## Reconciled test semantics
 
 - Hard validation errors prevent candidate bundle construction.
