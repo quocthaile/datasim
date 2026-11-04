@@ -25,15 +25,19 @@ real ngspice-47 integration tests. See [Phase 2 plan](PHASE_2_PLAN.md),
 [ADR-0003](decisions/ADR-0003-component-domain-model.md).
 
 Phase 3 (**Deterministic Component-to-Simulation Vertical Slice**, implementing the
-ideal-RC slice of Stage 4 below) is **IMPLEMENTED and VERIFIED** on
-`feat/phase-3-vertical-slice` on Windows x64 (MSYS2 UCRT GCC 16.2.0 / ngspice-47):
-5/5 CTest suites passed with zero skips, including 1392 vertical-slice unit checks
-and byte-identical real `ngspice-47` integration against manual `RcConfig`. See
+ideal-RC slice of Stage 4 below) is **IMPLEMENTED and VERIFIED** on `main` at
+`6516a629c75662b83f48704bfd7978bcc299ff78` in hosted Windows CI
+([run 41284202716](https://github.com/quocthaile/datasim/actions/runs/41284202716):
+5/5 CTest suites with 0 skips, 1392 vertical-slice unit checks, real `ngspice-47`
+integration, and six-run study) and further hardened on
+`fix/phase3-validation-hardening` (1483 vertical-slice unit checks plus byte-identical
+real `ngspice-47` integration against manual `RcConfig`). See
 [Phase 3 plan](PHASE_3_PLAN.md), [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md),
 [Phase 3 validation](PHASE_3_VALIDATION.md), and
 [ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md). Persistent storage,
-serialization, datasheet parsing, LLM integration, external SPICE subcircuits, and
-Stage 5+ remain unauthorized/PROPOSED.
+serialization, datasheet parsing, LLM integration, external SPICE subcircuits,
+nonlinear semiconductor models, physical measurement validation (`MEASURED`), and
+Stage 5+ remain unauthorized/`PROPOSED`.
 
 | Stage | Status | Scope and exit criteria |
 | --- | --- | --- |

@@ -14,13 +14,18 @@ Status: PROPOSED end-to-end application architecture, with three slices now
    Resistor and Capacitor fixtures ([ADR-0003](decisions/ADR-0003-component-domain-model.md),
    [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md)).
 3. **Phase 3 deterministic vertical slice (`datasim_vertical`)**: multi-bundle
-   `CircuitAssembly`, SI parameter resolution, model/backend compatibility and
-   `ExecutionPolicy` gate, ideal-RC simulation adapter, and traceable
-   `provenance_metadata.json` run reporting ([ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md),
-   [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md)).
+   `CircuitAssembly`, SI parameter resolution, fail-closed model/backend compatibility
+   and `ExecutionPolicy` metadata gate, ideal-RC simulation adapter, and traceable
+   `provenance_metadata.json` run reporting, merged into `main` at
+   `6516a629c75662b83f48704bfd7978bcc299ff78` and hardened on
+   `fix/phase3-validation-hardening` ([ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md),
+   [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md),
+   [Phase 3 validation](PHASE_3_VALIDATION.md)).
 
 No PDF/OCR ingestion pipeline, persistent database, LLM runtime, external SPICE
-subcircuit loader, semiconductor device solver, or interactive GUI is implemented.
+subcircuit loader, nonlinear semiconductor device solver, real manufacturer datasheet
+ingestion, physical measurement validation (`MEASURED`), or interactive GUI is
+implemented.
 
 ```mermaid
 flowchart TD
@@ -87,8 +92,21 @@ Ollama remains a research reference, not a selected runtime.
 The application should submit a versioned run specification to an adapter that
 reports capabilities, checks compatibility, maps supported models, executes a run,
 and returns normalized results and diagnostics. Backend-specific details remain
-explicit inside the adapter and run manifest. Unsupported models or analyses must
-fail visibly rather than be silently approximated.
+explicit inside the adapter and run manifest. Unsupported models, unsupported
+validity-envelope constraint quantities, or unresolved runtime operating conditions
+must fail visibly (fail-closed) rather than be silently approximated or skipped.
+
+In Phase 3 (`datasim_vertical`), `ExecutionPolicy` and `ExecutionClassification`
+enforce an explicit metadata gate between synthetic test fixtures (`is_synthetic == true`
+or `ExtractionMethod::synthetic_fixture`) and non-synthetic records, while requiring
+`ReviewState::approved` knowledge and `ModelValidationStatus::validated_within_envelope`
+records authored by `ActorKind::human_engineer`. This gate validates in-memory
+metadata and review records only; it does not authenticate real human reviewer
+identity, manufacturer identity, datasheet authenticity, external data-source
+integrity, or cryptographic signatures. Likewise, `configuration_content_id`,
+`netlist_content_id`, and `provenance_content_id` use 64-bit FNV-1a as a deterministic
+pre-execution content fingerprint, not cryptographic integrity protection or
+tamper-proof authentication.
 
 ngspice executable integration is verified only for the Phase 1/1.5 ideal-RC
 transient spike ([ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md)).

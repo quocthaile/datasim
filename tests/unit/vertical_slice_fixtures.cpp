@@ -122,10 +122,10 @@ CircuitAssembly make_validated_synthetic_rc_assembly() {
     return assembly;
 }
 
-CircuitAssembly make_engineering_approved_rc_assembly() {
+CircuitAssembly make_non_synthetic_policy_gate_rc_assembly() {
     auto assembly = make_validated_synthetic_rc_assembly();
-    assembly.id = CircuitAssemblyId{"circuit.eng.rc-lowpass-v1"};
-    assembly.name = "Engineering-Reviewed First-Order RC Reference Circuit";
+    assembly.id = CircuitAssemblyId{"circuit.policy-gate.non-synthetic-rc-v1"};
+    assembly.name = "Metadata-Classified Non-Synthetic Policy-Gate Test RC Circuit (Unit Test Only)";
 
     for (auto& bundle : assembly.component_bundles) {
         bundle.component.is_synthetic = false;
@@ -147,12 +147,28 @@ CircuitAssembly make_engineering_approved_rc_assembly() {
     return assembly;
 }
 
+OperatingEnvironment make_documented_rc_operating_environment() {
+    OperatingEnvironment env;
+    env.ambient_temperature_degC = 27.0;
+    env.stimulus_voltage_V = 5.0;
+    env.initial_voltage_V = 0.0;
+    env.additional_conditions = {
+        component::OperatingCondition{
+            "signal_frequency",
+            "50",
+            "Hz",
+            50.0,
+            "Explicit fundamental pulse repetition rate (1 / 20 ms period) declared for RC model validity-envelope evaluation"}};
+    return env;
+}
+
 RcRunInputSpecification make_synthetic_test_run_inputs() {
     RcRunInputSpecification inputs;
     inputs.requested_analysis = component::AnalysisType::transient;
     inputs.execution_policy = ExecutionPolicy::test_only_synthetic;
+    inputs.additional_operating_conditions =
+        make_documented_rc_operating_environment().additional_conditions;
     return inputs;
 }
 
 } // namespace datasim::vertical::testing
-

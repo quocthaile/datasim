@@ -15,19 +15,22 @@ into `main` at `b2f73d5` (PR #2).
 
 Phase 3 authorizes the deterministic component-to-simulation vertical slice
 (`datasim_vertical`) defined in [PHASE_3_PLAN.md](PHASE_3_PLAN.md),
-[PHASE_3_IMPLEMENTATION.md](PHASE_3_IMPLEMENTATION.md), and
-[ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md) on branch
-`feat/phase-3-vertical-slice`. Keep `datasim_component`'s single-component boundary
-and `datasim`'s ideal-RC solver behavior unchanged. Do not implement PDF parsing, OCR,
-datasheet ingestion, UI, database/persistent storage, general-purpose JSON
-serialization, automatic unit conversion, LLM/Ollama integration, semiconductor
-simulation, or a custom solver.
+[PHASE_3_IMPLEMENTATION.md](PHASE_3_IMPLEMENTATION.md),
+[PHASE_3_VALIDATION.md](PHASE_3_VALIDATION.md), and
+[ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md), implemented on
+`feat/phase-3-vertical-slice`, merged into `main` at
+`6516a629c75662b83f48704bfd7978bcc299ff78` (hosted Windows CI run `41284202716`), and
+hardened on `fix/phase3-validation-hardening`. Keep `datasim_component`'s
+single-component boundary and `datasim`'s ideal-RC solver behavior unchanged. Do not
+implement PDF parsing, OCR, datasheet ingestion, UI, database/persistent storage,
+general-purpose JSON serialization, automatic unit conversion, LLM/Ollama integration,
+semiconductor simulation, or a custom solver.
 
 ## Working practices
 
 - Inspect Git status, branches, recent commits, and existing files before editing.
-- Preserve user changes and historical branches/evidence. Use
-  `feat/phase-3-vertical-slice` branched from `origin/main` for Phase 3; do not
+- Preserve user changes and historical branches/evidence. Use a feature/fix branch
+  (such as `fix/phase3-validation-hardening`) branched from `origin/main`; do not
   commit directly to `main` or merge pull requests.
 - Keep documentation links relative within the repository. Use stable original
   URLs and identifiers for research, with matching BibTeX keys.
