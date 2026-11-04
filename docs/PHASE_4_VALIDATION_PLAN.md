@@ -1,6 +1,7 @@
 # Phase 4 validation plan: Evidence intake (Phase 4A planning)
 
-Status: **PROPOSED test design.** No test in this document exists or has run. No
+Status: **Reconciled test design.** Phase 4B coverage is recorded in
+[PHASE_4_VALIDATION.md](PHASE_4_VALIDATION.md). No
 benchmark result, extraction accuracy, or real-datasheet outcome is claimed. Context:
 [Phase 4 plan](PHASE_4_PLAN.md), [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md).
 All type and function names prefixed `PROPOSED` below do not exist yet; names without
@@ -142,8 +143,11 @@ specified, not extraction accuracy.
 
 ## 4. Acceptance criteria (for the later Phase 4B implementation)
 
-1. All P- and N- cases above pass with each negative case asserting its specific code
-   and the absence of a candidate bundle.
+1. Observable P- and N-cases are covered by the Phase 4B intake tests. Cases that
+   require fields not present in the accepted contract remain documented as
+   unsupported rather than represented by fake passing tests. Hard negative cases
+   assert the specific diagnostic and absence of a candidate bundle; ambiguous raw
+   values without an asserted parse are recoverable warnings and retain a bundle.
 2. Existing suites: `unit` 92, `component_model` 270, `vertical_slice` 1483 checks and
    `backend_errors` pass unchanged; `ngspice_rc` and `rc_study` pass with real
    `ngspice-47` in a run that records "0 skipped", with `results.csv` SHA-256

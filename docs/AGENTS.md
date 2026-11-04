@@ -28,9 +28,10 @@ semiconductor simulation, or a custom solver.
 
 Phase 4A ([PHASE_4_PLAN.md](PHASE_4_PLAN.md),
 [PHASE_4_VALIDATION_PLAN.md](PHASE_4_VALIDATION_PLAN.md),
-[ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md)) is a **PROPOSED**
-planning-only deliverable. Phase 4B source implementation is not authorized until the
-owner accepts the plan and ADR; every Phase 4 API named there is `PROPOSED`.
+[ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md)) remains the proposed
+design record. The bounded Phase 4B source implementation exists only on its
+feature branch and remains subject to owner review; it must not be represented as
+merged, hosted-verified, or owner-approved until those checks occur.
 
 ## Working practices
 

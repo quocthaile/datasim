@@ -49,14 +49,23 @@ add_library(datasim_vertical
     src/datasim/vertical/provenance/run_provenance.cpp)
 target_include_directories(datasim_vertical PUBLIC src PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(datasim_vertical PUBLIC datasim_component datasim)
+# Phase 4B evidence intake: depends only on datasim_component (no simulation, no vertical slice).
+add_library(datasim_intake
+    src/datasim/intake/numeric/raw_numeric.cpp
+    src/datasim/intake/validation/intake_validation.cpp
+    src/datasim/intake/builder/candidate_bundle.cpp)
+target_include_directories(datasim_intake PUBLIC src)
+target_link_libraries(datasim_intake PUBLIC datasim_component)
 if(MSVC)
     target_compile_options(datasim PRIVATE /W4 /permissive-)
     target_compile_options(datasim_component PRIVATE /W4 /permissive-)
     target_compile_options(datasim_vertical PRIVATE /W4 /permissive-)
+    target_compile_options(datasim_intake PRIVATE /W4 /permissive-)
 else()
     target_compile_options(datasim PRIVATE -Wall -Wextra -Wpedantic)
     target_compile_options(datasim_component PRIVATE -Wall -Wextra -Wpedantic)
     target_compile_options(datasim_vertical PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(datasim_intake PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 add_executable(rc_demo apps/rc_demo/main.cpp)
 target_link_libraries(rc_demo PRIVATE datasim)
@@ -88,6 +97,25 @@ if(BUILD_TESTING)
         target_compile_options(vertical_slice_tests PRIVATE -Wall -Wextra -Wpedantic)
     endif()
     add_test(NAME vertical_slice COMMAND vertical_slice_tests)
+    add_executable(intake_tests
+        tests/unit/intake_fixtures.cpp
+        tests/unit/intake_tests.cpp)
+    target_link_libraries(intake_tests PRIVATE datasim_intake)
+    add_executable(intake_handoff_tests
+        tests/unit/component_fixtures.cpp
+        tests/unit/vertical_slice_fixtures.cpp
+        tests/unit/intake_fixtures.cpp
+        tests/unit/intake_handoff_tests.cpp)
+    target_link_libraries(intake_handoff_tests PRIVATE datasim_intake datasim_vertical)
+    if(MSVC)
+        target_compile_options(intake_tests PRIVATE /W4 /permissive-)
+        target_compile_options(intake_handoff_tests PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(intake_tests PRIVATE -Wall -Wextra -Wpedantic)
+        target_compile_options(intake_handoff_tests PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    add_test(NAME intake COMMAND intake_tests)
+    add_test(NAME intake_handoff COMMAND intake_handoff_tests)
     add_executable(backend_fixture tests/unit/backend_fixture.cpp)
     add_executable(backend_error_tests tests/unit/backend_errors.cpp)
     target_link_libraries(backend_error_tests PRIVATE datasim)
@@ -100,6 +128,6 @@ if(BUILD_TESTING)
     set(DATASIM_NGSPICE "" CACHE FILEPATH "Optional path to ngspice executable")
     add_test(NAME ngspice_rc COMMAND integration_tests "${DATASIM_NGSPICE}")
     set_tests_properties(ngspice_rc PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 45)
-    set_tests_properties(unit component_model vertical_slice backend_errors PROPERTIES LABELS unit TIMEOUT 15)
+    set_tests_properties(unit component_model vertical_slice intake intake_handoff backend_errors PROPERTIES LABELS unit TIMEOUT 15)
     set_tests_properties(ngspice_rc PROPERTIES LABELS integration)
 endif()

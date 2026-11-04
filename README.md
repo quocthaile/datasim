@@ -62,7 +62,8 @@ numerical or review authority.
 - [Phase 1 implementation](docs/PHASE_1_IMPLEMENTATION.md), [validation](docs/PHASE_1_VALIDATION.md), [reproducibility](docs/PHASE_1_REPRODUCIBILITY.md), and [architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md)
 - [Phase 2 plan](docs/PHASE_2_PLAN.md), [implementation](docs/PHASE_2_IMPLEMENTATION.md), and [validation](docs/PHASE_2_VALIDATION.md)
 - [Phase 3 plan](docs/PHASE_3_PLAN.md), [implementation](docs/PHASE_3_IMPLEMENTATION.md), and [validation](docs/PHASE_3_VALIDATION.md)
-- [Phase 4 plan (PROPOSED)](docs/PHASE_4_PLAN.md) and [validation plan (PROPOSED)](docs/PHASE_4_VALIDATION_PLAN.md) for datasheet evidence intake (Phase 4A planning only; nothing implemented)
+- [Phase 4 plan](docs/PHASE_4_PLAN.md) and [validation plan](docs/PHASE_4_VALIDATION_PLAN.md) for the Phase 4A design and reconciled Phase 4B test semantics
+- [Phase 4B implementation](docs/PHASE_4_IMPLEMENTATION.md) and [validation](docs/PHASE_4_VALIDATION.md) for the bounded in-memory candidate intake feature branch
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

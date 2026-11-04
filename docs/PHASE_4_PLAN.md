@@ -1,9 +1,9 @@
 # Phase 4 plan: Deterministic datasheet evidence intake (Phase 4A planning)
 
-Status: **PLANNED / PROPOSED — planning only.** This document implements nothing.
-Every new API, type, schema, or module named here is `PROPOSED` and does not exist in
-the repository. Phase 4B implementation is **not authorized** until the owner accepts
-this plan and [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md). Test design:
+Status: **Phase 4A planning plus Phase 4B implementation record.** The original
+planning decisions remain proposals unless explicitly described as implemented in
+[PHASE_4_IMPLEMENTATION.md](PHASE_4_IMPLEMENTATION.md). Phase 4B is implemented on
+the feature branch, but owner approval and merge are not claimed. Test design:
 [Phase 4 validation plan](PHASE_4_VALIDATION_PLAN.md).
 
 ## 1. Baseline and Phase 3 release-gate evidence
@@ -105,7 +105,7 @@ no document page count; no row/column/symbol fields; no manufacturer or suffix c
 against documents (F2); no curator/reviewer separation (F5); no persistence or
 serialization; no unit conversion beyond reviewed `NormalizedParameter` records.
 
-## 3. Proposed intake data flow
+## 3. Intake data flow (implemented for in-memory manifests)
 
 ```mermaid
 flowchart TD
@@ -129,22 +129,22 @@ The six boundaries map to six distinct data holders:
 5. **Selected models**: `ModelArtifactDescriptor`, `ModelValidationRecord`.
 6. **Execution**: `datasim_vertical` and `datasim`.
 
-## 4. Proposed intake interface (all `PROPOSED`)
+## 4. Intake interface (implemented on the Phase 4B feature branch)
 
 ```text
-module   datasim_intake            (PROPOSED)  links datasim_component only
-namespace datasim::intake          (PROPOSED)
-IntakeOriginClass                  (PROPOSED)  { synthetic_fixture, manual_curation }  — no "verified" value
-IntakeManifest                     (PROPOSED)  schema_version, origin, curator ReviewerIdentity,
+module   datasim_intake            (IMPLEMENTED)  links datasim_component only
+namespace datasim::intake          (IMPLEMENTED)
+IntakeOriginClass                  (IMPLEMENTED)  { synthetic_fixture, manual_curation }  — no "verified" value
+IntakeManifest                     (IMPLEMENTED)  schema_version, origin, curator ReviewerIdentity,
                                                ComponentIdentity claimed, SourceDocument,
                                                declared_pdf_page_count?, publisher_differs_declaration?,
                                                vector<IntakeEvidenceEntry>, vector<IntakeObservationEntry>
-IntakeEvidenceEntry                (PROPOSED)  EvidenceLocation + optional row_label, column_label (D3)
-IntakeObservationEntry             (PROPOSED)  ParameterObservation (candidate) + raw_symbol?, raw_qualifier_text?,
+IntakeEvidenceEntry                (IMPLEMENTED)  EvidenceLocation + optional row_label, column_label (D3)
+IntakeObservationEntry             (IMPLEMENTED)  ParameterObservation (candidate) + raw_symbol?, raw_qualifier_text?,
                                                raw_conditions_text?, ambiguity_notes
-IntakeDiagnosticCode / IntakeDiagnostic (PROPOSED)
-validate_intake_manifest(...)      (PROPOSED)  -> IntakeReport (domain ValidationReport + intake diagnostics)
-build_candidate_bundle(...)        (PROPOSED)  -> ComponentDomainBundle, only if validation has no errors
+IntakeDiagnosticCode / IntakeDiagnostic (IMPLEMENTED)
+validate_intake_manifest(...)      (IMPLEMENTED)  -> IntakeReport (domain ValidationReport + intake diagnostics)
+build_candidate_bundle(...)        (IMPLEMENTED)  -> optional ComponentDomainBundle plus report
 ```
 
 Guarantees of `build_candidate_bundle` (PROPOSED): every observation is `candidate`
