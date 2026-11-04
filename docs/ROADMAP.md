@@ -29,8 +29,8 @@ ideal-RC slice of Stage 4 below) is **IMPLEMENTED and VERIFIED** on `main` at
 `6516a629c75662b83f48704bfd7978bcc299ff78` in hosted Windows CI
 ([run 41284202716](https://github.com/quocthaile/datasim/actions/runs/41284202716):
 5/5 CTest suites with 0 skips, 1392 vertical-slice unit checks, real `ngspice-47`
-integration, and six-run study) and further hardened on
-`fix/phase3-validation-hardening` (1483 vertical-slice unit checks plus byte-identical
+integration, and six-run study) and further hardened via PR #3
+(merge `c142a36`, hosted CI run 41766031217 `success`) (1483 vertical-slice unit checks plus byte-identical
 real `ngspice-47` integration against manual `RcConfig`). See
 [Phase 3 plan](PHASE_3_PLAN.md), [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md),
 [Phase 3 validation](PHASE_3_VALIDATION.md), and
@@ -39,6 +39,12 @@ serialization, datasheet parsing, LLM integration, external SPICE subcircuits,
 nonlinear semiconductor models, physical measurement validation (`MEASURED`), and
 Stage 5+ remain unauthorized/`PROPOSED`.
 
+Phase 4A (**deterministic datasheet evidence intake**, a candidate-only boundary ahead
+of Stage 5) is **PLANNED / PROPOSED, documentation only**: see
+[Phase 4 plan](PHASE_4_PLAN.md), [Phase 4 validation plan](PHASE_4_VALIDATION_PLAN.md),
+and [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md). No intake code exists;
+Phase 4B implementation requires owner acceptance of the plan and ADR.
+
 | Stage | Status | Scope and exit criteria |
 | --- | --- | --- |
 | 0: Foundation | IMPLEMENTED | Foundation committed at b319636; documentation available for review. |
@@ -46,7 +52,7 @@ Stage 5+ remain unauthorized/`PROPOSED`.
 | 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. (ADR-0002 selected ngspice executable integration for Phase 1 ideal RC only.) |
 | 3: Knowledge contracts | VERIFIED (in-memory C++20; persistence PROPOSED) | In-memory C++20 evidence, observation, deterministic review lifecycle, component knowledge, conflict visibility, and model metadata/validation contracts verified on synthetic Resistor and Capacitor fixtures ([Phase 2 validation](PHASE_2_VALIDATION.md)). Persistent storage, interchange serialization, and curve series remain PROPOSED. |
 | 4: Deterministic vertical slice | VERIFIED (ideal-RC transient slice; general multi-analysis/subcircuit PROPOSED) | Approved `ComponentKnowledge` and explicitly selected `ModelArtifactDescriptor` instances connected via `CircuitAssembly`, SI parameter resolution, model/backend compatibility gate, `RcConfig` adapter, and `provenance_metadata.json` ([Phase 3 validation](PHASE_3_VALIDATION.md)). External subcircuits and nonlinear device models remain PROPOSED. |
-| 5: Assisted extraction | PROPOSED | Evaluate document processing and optional local LLM assistance against reviewed fixtures; prove the review gate blocks invalid inputs. |
+| 5: Assisted extraction | PROPOSED (Phase 4A evidence-intake boundary is a PLANNED design only: [plan](PHASE_4_PLAN.md), [validation plan](PHASE_4_VALIDATION_PLAN.md), [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md)) | Evaluate document processing and optional local LLM assistance against reviewed fixtures; prove the review gate blocks invalid inputs. |
 | 6: Visualization and validation | PROPOSED | Present results and evidence with units, warnings and assumptions; conduct separately scoped physical validation if equipment/data are available. |
 
 ## Open technical questions

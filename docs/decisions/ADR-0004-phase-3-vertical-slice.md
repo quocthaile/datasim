@@ -5,7 +5,7 @@ Date: 2026-11-01
 Status: SELECTED, IMPLEMENTED, and VERIFIED on `main`
 (`6516a629c75662b83f48704bfd7978bcc299ff78`, hosted Windows CI
 [run 41284202716](https://github.com/quocthaile/datasim/actions/runs/41284202716)),
-with validation hardening on `fix/phase3-validation-hardening`; verification evidence
+with validation hardening merged via PR #3 (`c142a36`); verification evidence
 is recorded in [Phase 3 validation](../PHASE_3_VALIDATION.md) and
 [Phase 3 implementation](../PHASE_3_IMPLEMENTATION.md).
 

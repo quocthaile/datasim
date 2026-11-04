@@ -17,8 +17,8 @@ Status: PROPOSED end-to-end application architecture, with three slices now
    `CircuitAssembly`, SI parameter resolution, fail-closed model/backend compatibility
    and `ExecutionPolicy` metadata gate, ideal-RC simulation adapter, and traceable
    `provenance_metadata.json` run reporting, merged into `main` at
-   `6516a629c75662b83f48704bfd7978bcc299ff78` and hardened on
-   `fix/phase3-validation-hardening` ([ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md),
+   `6516a629c75662b83f48704bfd7978bcc299ff78` and hardened via PR #3
+   (merge `c142a36`) ([ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md),
    [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md),
    [Phase 3 validation](PHASE_3_VALIDATION.md)).
 

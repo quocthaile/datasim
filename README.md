@@ -34,7 +34,7 @@ Datasim currently comprises three **VERIFIED** C++20 modules on Windows x64
    `main` at `6516a629c75662b83f48704bfd7978bcc299ff78` (verified in
    [hosted Windows CI run 41284202716](https://github.com/quocthaile/datasim/actions/runs/41284202716)
    with 1392 unit checks, real `ngspice-47` integration, and six-run study) and
-   hardened on `fix/phase3-validation-hardening` (1483 vertical-slice unit checks plus
+   hardened via PR #3 (merge `c142a36`, hosted CI run 41766031217 `success`; 1483 vertical-slice unit checks plus
    byte-identical real `ngspice-47` integration against manual `RcConfig`). See
    [Phase 3 plan](docs/PHASE_3_PLAN.md),
    [Phase 3 implementation](docs/PHASE_3_IMPLEMENTATION.md),
@@ -62,12 +62,14 @@ numerical or review authority.
 - [Phase 1 implementation](docs/PHASE_1_IMPLEMENTATION.md), [validation](docs/PHASE_1_VALIDATION.md), [reproducibility](docs/PHASE_1_REPRODUCIBILITY.md), and [architecture review](docs/PHASE_1_ARCHITECTURE_REVIEW.md)
 - [Phase 2 plan](docs/PHASE_2_PLAN.md), [implementation](docs/PHASE_2_IMPLEMENTATION.md), and [validation](docs/PHASE_2_VALIDATION.md)
 - [Phase 3 plan](docs/PHASE_3_PLAN.md), [implementation](docs/PHASE_3_IMPLEMENTATION.md), and [validation](docs/PHASE_3_VALIDATION.md)
+- [Phase 4 plan (PROPOSED)](docs/PHASE_4_PLAN.md) and [validation plan (PROPOSED)](docs/PHASE_4_VALIDATION_PLAN.md) for datasheet evidence intake (Phase 4A planning only; nothing implemented)
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)
 - [ADR-0002: Phase 1 executable integration](docs/decisions/ADR-0002-phase-1-ngspice-executable.md)
 - [ADR-0003: Phase 2 component domain model](docs/decisions/ADR-0003-component-domain-model.md)
 - [ADR-0004: Phase 3 vertical slice](docs/decisions/ADR-0004-phase-3-vertical-slice.md)
+- [ADR-0005: Evidence intake boundary (PROPOSED)](docs/decisions/ADR-0005-evidence-intake-boundary.md)
 - [Agent instructions](AGENTS.md) and [repository initialization prompt](docs/AGENT_INIT_REPOSITORY.md)
 
 ## Contributing at this stage
