@@ -1,7 +1,9 @@
 # Phase 4B validation
 
-Status: **IMPLEMENTED; locally VERIFIED for the checks listed below**. These
-results are for the current working tree on Windows x64 with MSYS2 UCRT GCC
+Status: **IMPLEMENTED; locally VERIFIED for the checks listed below**. P-07 is
+implemented but remains **NOT VERIFIED** locally unless real ngspice executes
+without a CTest skip. These results are for the current working tree on Windows
+x64 with MSYS2 UCRT GCC
 16.1.0, CMake 4.3.2, and the `MinGW Makefiles` generator.
 
 ## Commands and outcomes
@@ -22,7 +24,7 @@ Configure and build completed successfully. CTest passed six tests:
 | `intake` | passed |
 | `intake_handoff` | passed |
 | `backend_errors` | passed |
-| `ngspice_rc` | **skipped; NOT VERIFIED locally** |
+| `ngspice_rc` (including P-07) | **skipped; NOT VERIFIED locally** |
 
 The aggregate CTest result was `100% tests passed, 0 tests failed out of 7`,
 with one explicitly skipped integration test. No `DATASIM_NGSPICE` executable

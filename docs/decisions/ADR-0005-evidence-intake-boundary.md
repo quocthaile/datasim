@@ -137,6 +137,14 @@ no parsed value is asserted and an error when a parsed value is asserted. These
 are implementation details of the feature branch, not claims that the owner has
 accepted every open decision above.
 
+The bounded 4B implementation and its synthetic P-07 test now exist on the
+feature branch. The P-07 result remains **NOT VERIFIED** until real ngspice runs
+without a CTest skip.
+
+Metadata review is an owner decision: the current human review records metadata
+acceptance for a candidate, but does not authenticate a source, hash, reviewer
+identity, or manufacturer relationship.
+
 ## Limitations
 
 Licensing: real vendor datasheets and model files must not be committed; fixtures are

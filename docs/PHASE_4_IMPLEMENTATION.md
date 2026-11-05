@@ -1,8 +1,9 @@
 # Phase 4B implementation: deterministic evidence intake
 
-Status: **IMPLEMENTED** on `feat/phase-4b-evidence-intake`. This document
-describes the bounded in-memory intake implementation; it does not claim
-datasheet extraction accuracy, source authenticity, or physical measurement.
+Status: **IMPLEMENTED** on `feat/phase-4b-evidence-intake`; owner acceptance and
+merge into `main` remain **PROPOSED**. This document describes the bounded
+in-memory intake implementation; it does not claim datasheet extraction
+accuracy, source authenticity, or physical measurement.
 
 ## Scope
 
@@ -61,6 +62,13 @@ duplicate IDs, unresolved evidence, and candidate-only enforcement.
 `intake_handoff` exercises the existing review, normalization, promotion, and
 aggregate-validation APIs. Fixtures use fictional synthetic identities and
 contain no vendor material.
+
+The `ngspice_rc` integration now also constructs a synthetic candidate bundle,
+performs the existing human review and normalization handoff, attaches the
+existing validated synthetic model descriptors, and executes `datasim_vertical`.
+This is an **IMPLEMENTED** release-gate test. Its numerical and byte-level
+results are **VERIFIED** only when a real ngspice run completes without a CTest
+skip; a skipped local integration remains **NOT VERIFIED**.
 
 The row/column labels, raw qualifier/condition text, ambiguity notes, and
 derived-page-index marker are intake-sidecar fields. They are not fields of

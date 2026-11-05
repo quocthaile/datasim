@@ -273,11 +273,11 @@ sources unless D2 explicitly authorizes it.
 
 | ID | Decision | Recommended default |
 | --- | --- | --- |
-| D1 | Convention: does `associated_part_numbers` hold base MPNs or full orderable MPNs including suffix? Exact suffix matching rule. | Full orderable MPN string, compared exactly together with suffix; document in intake. |
+| D1 | Convention: does `associated_part_numbers` hold base MPNs or full orderable MPNs including suffix? Exact suffix matching rule. | **Owner decision pending.** Current 4B behavior requires the full orderable MPN and exact suffix match; it does not establish this as the project-wide policy. |
 | D2 | Where do manufacturer/suffix/page-bound checks live: intake only, or hardening of `datasim_component` (modifies a verified module)? | Intake only for 4B; revisit later. |
 | D3 | Row/column/symbol/raw-qualifier fields: intake sidecar, verbatim in `cell_or_region`, or extend `EvidenceLocation`/`ParameterObservation`? | Sidecar plus verbatim `cell_or_region`; no contract change. |
 | D4 | Add `declared_pdf_page_count` to `SourceDocument` (contract change) or keep in manifest? | Manifest only. |
-| D5 | Require curator ≠ approver (four-eyes) policy? | Record curator; enforce in intake review handoff test only, not domain contract. |
+| D5 | Require curator ≠ approver (four-eyes) policy? | **Owner decision pending.** Current 4B records the curator but does not enforce or claim curator/reviewer separation as approved policy. |
 | D6 | Adopt a repository license and a fixture license identifier. | Owner decision; blocks nothing in 4B-1…4B-4. |
 | D7 | Fix F4 (skip detection in CI) in a separate task? | Yes, separate authorization. |
 | D8 | Root `AGENTS.md` status text (Phase 3 branch wording; Phase 4 authorization). | Owner edit; not changed here. |

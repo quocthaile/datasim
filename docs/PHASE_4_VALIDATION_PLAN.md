@@ -119,7 +119,7 @@ domain rule; `I` = `PROPOSED` intake rule.
 | N-50 | Approved knowledge from synthetic intake run under `ExecutionPolicy::engineering_approved_only` | rejected; `test_only_synthetic` classification only | D (Phase 3) |
 | N-51 | Approved observation lacking a validated model | `unvalidated` rejection | D (Phase 3) |
 | N-52 | Non-SI unit (`kohm`) on `NormalizedParameter` supplied to resolution | rejected (Phase 3 SI gate) | D (Phase 3) |
-| P-07 | End-to-end synthetic: intake → human review → normalized → knowledge → model → ideal-RC run; byte-identical to manual `RcConfig` | pass only with real ngspice; otherwise `NOT VERIFIED` | D (Phase 3) + I |
+| P-07 | End-to-end synthetic: intake → human review → normalized → knowledge → model/validation → `datasim_vertical` → ideal-RC run; compare 4001 points numerically at 0.05 V and report byte identity separately | pass only with real ngspice and no CTest skip; otherwise `NOT VERIFIED` | D (Phase 3) + I |
 
 ## 3. Evaluation metrics (definitions only)
 
@@ -176,7 +176,7 @@ specified, not extraction accuracy.
 | N-34/N-35/N-37/N-40/N-41 | `intake_handoff_tests` review and promotion checks | Passed in Release |
 | N-42/N-46/N-47 | Contract lacks authentication/content fields | BLOCKED/NOT IMPLEMENTED |
 | N-49/N-50/N-51/N-52 | Existing Phase 3 vertical-slice suites | Existing suite passed; intake does not bypass it |
-| P-07 | Real ngspice end-to-end equivalence | NOT VERIFIED locally; integration skipped |
+| P-07 | Real ngspice end-to-end equivalence | IMPLEMENTED in `ngspice_rc`; NOT VERIFIED until a non-skipped run completes |
 
 Sidecar-only source-cell and raw extraction metadata are intentionally not
 asserted as `ComponentDomainBundle` fields; their ownership is documented in
