@@ -28,7 +28,7 @@ See [Phase 2 implementation](PHASE_2_IMPLEMENTATION.md) and
 Phase 3 update: the deterministic component-to-simulation vertical slice
 (`datasim_vertical`), scoped to [PHASE_3_PLAN.md](PHASE_3_PLAN.md) and
 [ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md), is implemented and
-VERIFIED on `feat/phase-3-vertical-slice` on Windows x64 (MSYS2 UCRT GCC 16.2.0 /
+VERIFIED, merged into `main` via PR #3 (`c142a36`), on Windows x64 (MSYS2 UCRT GCC 16.2.0 /
 ngspice-47). See [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md) and
 [Phase 3 validation](PHASE_3_VALIDATION.md). It excludes PDF/OCR parsing, persistent
 storage, general-purpose JSON serialization, automatic unit conversion, LLM

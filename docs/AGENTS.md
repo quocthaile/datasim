@@ -20,11 +20,17 @@ Phase 3 authorizes the deterministic component-to-simulation vertical slice
 [ADR-0004](decisions/ADR-0004-phase-3-vertical-slice.md), implemented on
 `feat/phase-3-vertical-slice`, merged into `main` at
 `6516a629c75662b83f48704bfd7978bcc299ff78` (hosted Windows CI run `41284202716`), and
-hardened on `fix/phase3-validation-hardening`. Keep `datasim_component`'s
+hardened via PR #3 (merge `c142a36`). Keep `datasim_component`'s
 single-component boundary and `datasim`'s ideal-RC solver behavior unchanged. Do not
 implement PDF parsing, OCR, datasheet ingestion, UI, database/persistent storage,
 general-purpose JSON serialization, automatic unit conversion, LLM/Ollama integration,
 semiconductor simulation, or a custom solver.
+
+Phase 4A ([PHASE_4_PLAN.md](PHASE_4_PLAN.md),
+[PHASE_4_VALIDATION_PLAN.md](PHASE_4_VALIDATION_PLAN.md),
+[ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md)) is a **PROPOSED**
+planning-only deliverable. Phase 4B source implementation is not authorized until the
+owner accepts the plan and ADR; every Phase 4 API named there is `PROPOSED`.
 
 ## Working practices
 
