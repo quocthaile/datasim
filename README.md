@@ -111,10 +111,17 @@ candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows
 
 10. **Phase 4H explicit hierarchical context**: source-verified parent headings and
    narrowly bounded merged parameter cells, with exact child selection and separate
-   parent/child provenance. Implemented on `feat/phase-4h-hierarchical-table-context`;
+   parent/child provenance. Merged via PR #12 at `864eb56`, verified by post-merge
+   Windows CI `42058944651`;
    see [implementation](docs/PHASE_4H_IMPLEMENTATION.md),
    [validation](docs/PHASE_4H_VALIDATION.md), and
    [ADR-0009](docs/decisions/ADR-0009-hierarchical-table-context.md).
+
+11. **Phase 4I baseline-aware text reconstruction**: opt-in, source-verified
+   host/subscript/superscript association with original word geometry and separate
+   display provenance. Implemented on `feat/phase-4i-baseline-aware-text`; see
+   [implementation](docs/PHASE_4I_IMPLEMENTATION.md) and
+   [validation](docs/PHASE_4I_VALIDATION.md). Numerical interpretation is unchanged.
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON

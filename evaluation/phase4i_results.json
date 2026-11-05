@@ -1,0 +1,570 @@
+{
+  "baseline_commit": "864eb56c1712470180cc1ecb9d9dbef3b5fd05ff",
+  "scope": "Local bounded corpus comparison; vendor PDFs and annotations remain untracked. No physical measurements or human approval claimed.",
+  "legacy_full_dump_comparisons": 22,
+  "runs": {
+    "baseline15": {
+      "manifest_sha256": "1512a6541869ee224c5de22a862bc5046d5e497974268751056731c1785ce4a3",
+      "annotations_sha256": "20845a11d3b5025d447fcce95b659c241c277c468cb0ac5d5fde7e7cd6d792c3",
+      "section_b_supported_extraction_quality": {
+        "tp": 15,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 15,
+        "precision_denominator": 15,
+        "precision": 1.0,
+        "recall_numerator": 15,
+        "recall_denominator": 15,
+        "recall": 1.0,
+        "f1_numerator": 30,
+        "f1_denominator": 30,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 15,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      }
+    },
+    "disabled15": {
+      "manifest_sha256": "1512a6541869ee224c5de22a862bc5046d5e497974268751056731c1785ce4a3",
+      "annotations_sha256": "20845a11d3b5025d447fcce95b659c241c277c468cb0ac5d5fde7e7cd6d792c3",
+      "section_b_supported_extraction_quality": {
+        "tp": 15,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 15,
+        "precision_denominator": 15,
+        "precision": 1.0,
+        "recall_numerator": 15,
+        "recall_denominator": 15,
+        "recall": 1.0,
+        "f1_numerator": 30,
+        "f1_denominator": 30,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 15,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      }
+    },
+    "enabled15": {
+      "manifest_sha256": "9d70faa5319ca602922c2aca5278cc5345dd4e0137df9dbe43fdf65c46cea96b",
+      "annotations_sha256": "20845a11d3b5025d447fcce95b659c241c277c468cb0ac5d5fde7e7cd6d792c3",
+      "section_b_supported_extraction_quality": {
+        "tp": 15,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 15,
+        "precision_denominator": 15,
+        "precision": 1.0,
+        "recall_numerator": 15,
+        "recall_denominator": 15,
+        "recall": 1.0,
+        "f1_numerator": 30,
+        "f1_denominator": 30,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 15,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      }
+    },
+    "baseline22": {
+      "manifest_sha256": "bc1a8009fcb0edea15386e8803c4297770eae10f4faeed2b9b332353e3fecaa5",
+      "annotations_sha256": "1738c46abbc72d942d5fc06d4ffbedcec923ccf1b0a2c3d66e19351b59cf1a38",
+      "section_b_supported_extraction_quality": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 22,
+        "precision_denominator": 22,
+        "precision": 1.0,
+        "recall_numerator": 22,
+        "recall_denominator": 22,
+        "recall": 1.0,
+        "f1_numerator": 44,
+        "f1_denominator": 44,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 22,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      }
+    },
+    "disabled22": {
+      "manifest_sha256": "bc1a8009fcb0edea15386e8803c4297770eae10f4faeed2b9b332353e3fecaa5",
+      "annotations_sha256": "1738c46abbc72d942d5fc06d4ffbedcec923ccf1b0a2c3d66e19351b59cf1a38",
+      "section_b_supported_extraction_quality": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 22,
+        "precision_denominator": 22,
+        "precision": 1.0,
+        "recall_numerator": 22,
+        "recall_denominator": 22,
+        "recall": 1.0,
+        "f1_numerator": 44,
+        "f1_denominator": 44,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 22,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      }
+    },
+    "enabled22": {
+      "manifest_sha256": "adf7ddcc675827e379e595eb2c5a7785523372f5df4b60bc3e5c5b76d071b180",
+      "annotations_sha256": "1738c46abbc72d942d5fc06d4ffbedcec923ccf1b0a2c3d66e19351b59cf1a38",
+      "section_b_supported_extraction_quality": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 22,
+        "precision_denominator": 22,
+        "precision": 1.0,
+        "recall_numerator": 22,
+        "recall_denominator": 22,
+        "recall": 1.0,
+        "f1_numerator": 44,
+        "f1_denominator": 44,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 22,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      }
+    }
+  },
+  "source_reconstruction": {
+    "mrs_expressions_verified": 3,
+    "expected_expressions": 3,
+    "method": "Exact source selections, role-aware display strings, retained original word boxes, and linked evidence; not a new annotation review."
+  }
+}

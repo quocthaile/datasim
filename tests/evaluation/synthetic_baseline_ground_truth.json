@@ -1,0 +1,91 @@
+{
+  "schema_version": "datasim.phase4e.annotations.v1",
+  "annotation_set_id": "datasim-phase4i-fictional-labels-v1",
+  "annotator_count": 1,
+  "inter_annotator_agreement_claimed": false,
+  "notes": "Expected values from fictional PDF generator; not engineering approval.",
+  "cases": [
+    {
+      "case_id": "SYN-B-SCRIPTS",
+      "document_id": "doc.synthetic.baseline",
+      "expected_sha256": "e1b3fe01a4e9a767d531fdfae7e0c752e9a3a18e92e19fcaef092fd5d02ce902",
+      "pdf_page_index": 0,
+      "printed_page_label": "B-1",
+      "table_id": "BASELINE",
+      "annotation_author": "datasim.synthetic-fixture-specification",
+      "review_status": "fixture_specification",
+      "adjudication_history": [
+        {
+          "action": "fictional_fixture_specification",
+          "notes": "Expected labels specified by make_baseline_pdf.py; no human approval claimed."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "SYN-B-1",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=typ",
+          "parameter_name": "P 70",
+          "original_value_text": "2",
+          "original_unit_symbol": "W",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 2,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "SYN-B-2",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=typ",
+          "parameter_name": "Q 2",
+          "original_value_text": "3",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 3,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "SYN-B-3",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=typ",
+          "parameter_name": "Factor",
+          "original_value_text": "10 -4",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": null,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_unparsed_ambiguous",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "SYN-B-4",
+          "row_index": 4,
+          "cell_or_region": "row=4;column=typ",
+          "parameter_name": "P 1 U 2",
+          "original_value_text": "5",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 5,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        }
+      ]
+    }
+  ]
+}

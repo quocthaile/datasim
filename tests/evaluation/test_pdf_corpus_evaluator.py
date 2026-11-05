@@ -449,6 +449,48 @@ class TestPdfCorpusEvaluator(unittest.TestCase):
             self.assertNotEqual(subprocess.run(bad_cmd, capture_output=True).returncode, 0)
 
 
+    def test_phase4i_baseline_provenance(self) -> None:
+        import subprocess
+        manifest_path = self.repo_root / "tests/evaluation/synthetic_baseline_manifest.json"
+        annotations_path = self.repo_root / "tests/evaluation/synthetic_baseline_ground_truth.json"
+        report = eval_mod.evaluate_corpus(
+            manifest_path=manifest_path, annotations_path=annotations_path, repo_root=self.repo_root,
+            corpus_dir=None, eval_dump_bin=self.eval_dump_bin, pdfinfo_bin=self.pdfinfo_bin,
+            pdftotext_bin=self.pdftotext_bin, repeat_check=True)
+        quality = report["section_b_supported_extraction_quality"]
+        self.assertEqual((quality["tp"], quality["fp"], quality["fn"]), (4, 0, 0))
+        self.assertEqual(quality["field_level_agreement"]["evidence_location"]["matched"], 4)
+        self.assertEqual(report["section_d_reproducibility_and_diagnostics"]["repeat_run_mismatches"], 0)
+        m = json.loads(manifest_path.read_text())
+        case, doc = m["cases"][0], m["documents"][0]
+        cmd = eval_mod.build_dump_command(self.eval_dump_bin, self.pdfinfo_bin, self.pdftotext_bin,
+            self.repo_root / doc["repo_relative_path"], doc, case)
+        dump = json.loads(subprocess.run(cmd, check=True, capture_output=True, encoding="utf-8").stdout)
+        self.assertTrue(eval_mod.baseline_provenance_valid(dump, case))
+        p = dump["baseline_text_provenance"][0]
+        self.assertEqual(p["display_expression"], "P_{70}")
+        self.assertEqual(p["source_text"], "P 70")
+        self.assertEqual(p["host_box"], [25, 116.384, 33.004, 127.484])
+        self.assertEqual(p["scripts"][0]["source_box"], [34, 125.974, 41.784, 132.449])
+        for field, value in [("evidence_id", "missing"), ("raw_host_text", "altered"),
+                             ("host_box", [0, 0, 1, 1]), ("scripts", []),
+                             ("source_text", "P70"), ("display_expression", "P^{70}")]:
+            corrupted = copy.deepcopy(dump)
+            corrupted["baseline_text_provenance"][0][field] = value
+            self.assertFalse(eval_mod.baseline_provenance_valid(corrupted, case), field)
+        corrupted = copy.deepcopy(dump)
+        corrupted["baseline_text_provenance"] = []
+        self.assertFalse(eval_mod.baseline_provenance_valid(corrupted, case))
+        corrupted = copy.deepcopy(dump)
+        corrupted["baseline_text_provenance"].append(copy.deepcopy(p))
+        self.assertFalse(eval_mod.baseline_provenance_valid(corrupted, case))
+        for malformed in ("24,116,34,128|P|above|34,125,42,133|70",
+                          "24x,116,34,128|P|sub|34,125,42,133|70",
+                          "24,116,34,128|P|sub|34,125,42,133|"):
+            bad_cmd = cmd[:cmd.index("--baseline-text")] + ["--baseline-text", malformed]
+            self.assertNotEqual(subprocess.run(bad_cmd, capture_output=True).returncode, 0)
+
+
 if __name__ == "__main__":
     unittest.main()
 

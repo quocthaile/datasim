@@ -1,0 +1,192 @@
+{
+  "schema_version": "datasim.phase4e.corpus.v1",
+  "corpus_id": "datasim-phase4i-synthetic-v1",
+  "description": "Fictional baseline reconstruction",
+  "documents": [
+    {
+      "document_id": "doc.synthetic.baseline",
+      "manufacturer": "Datasim Synthetic",
+      "publisher": "Datasim Synthetic",
+      "part_numbers": [
+        "SYN-B"
+      ],
+      "title": "Fictional baseline reconstruction fixture",
+      "revision": "fixture-rev-1",
+      "source_url": "https://github.com/quocthaile/datasim/blob/main/tests/fixtures/make_synthetic_datasheet_pdf.py",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "e1b3fe01a4e9a767d531fdfae7e0c752e9a3a18e92e19fcaef092fd5d02ce902",
+      "repo_relative_path": "tests/fixtures/synthetic_baseline_datasheet.pdf",
+      "is_synthetic": true,
+      "page_count": 1,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "supported_single_page_table",
+      "annotation_status": "annotated_single_reviewer",
+      "usage_rights": {
+        "license_identifier": "Datasim-Internal-Synthetic-Fixture",
+        "redistribution_permitted": true,
+        "evaluation_permitted": true,
+        "evidence_notes": "Generated in-repo by tests/fixtures/make_synthetic_datasheet_pdf.py; contains no vendor material."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "SYN-B-SCRIPTS",
+      "document_id": "doc.synthetic.baseline",
+      "pdf_page_index": 0,
+      "printed_page_label": "B-1",
+      "table_id": "BASELINE",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.synthetic.b",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SYN-B",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [
+          20,
+          80,
+          690,
+          290
+        ],
+        "row_y_tolerance": 2.0,
+        "header": [
+          80,
+          110
+        ],
+        "parameter_column": [
+          20.0,
+          215.0
+        ],
+        "unit_column": [
+          215.0,
+          285.0
+        ],
+        "minimum_column": [
+          285.0,
+          350.0
+        ],
+        "typical_column": [
+          350.0,
+          420.0
+        ],
+        "maximum_column": [
+          420.0,
+          490.0
+        ],
+        "category": "electrical_characteristic",
+        "baseline_text_bindings": [
+          {
+            "host_box": [
+              24,
+              116,
+              34,
+              128
+            ],
+            "expected_host_text": "P",
+            "scripts": [
+              {
+                "source_box": [
+                  34,
+                  125,
+                  42,
+                  133
+                ],
+                "expected_text": "70",
+                "position": "sub"
+              }
+            ]
+          },
+          {
+            "host_box": [
+              24,
+              166,
+              35,
+              178
+            ],
+            "expected_host_text": "Q",
+            "scripts": [
+              {
+                "source_box": [
+                  36,
+                  163,
+                  40,
+                  171
+                ],
+                "expected_text": "2",
+                "position": "super"
+              }
+            ]
+          },
+          {
+            "host_box": [
+              359,
+              216,
+              374,
+              228
+            ],
+            "expected_host_text": "10",
+            "scripts": [
+              {
+                "source_box": [
+                  375,
+                  213,
+                  382,
+                  221
+                ],
+                "expected_text": "-4",
+                "position": "super"
+              }
+            ]
+          },
+          {
+            "host_box": [
+              24,
+              266,
+              34,
+              278
+            ],
+            "expected_host_text": "P",
+            "scripts": [
+              {
+                "source_box": [
+                  34,
+                  275,
+                  38,
+                  283
+                ],
+                "expected_text": "1",
+                "position": "sub"
+              }
+            ]
+          },
+          {
+            "host_box": [
+              99,
+              266,
+              109,
+              278
+            ],
+            "expected_host_text": "U",
+            "scripts": [
+              {
+                "source_box": [
+                  110,
+                  275,
+                  114,
+                  283
+                ],
+                "expected_text": "2",
+                "position": "sub"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

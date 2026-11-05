@@ -151,3 +151,12 @@ parent/child configuration and a geometry/text provenance sidecar entirely insid
 the candidate bundle; detailed boxes and raw text remain in the extraction result.
 The dependency graph and intake/review/simulation boundaries are unchanged.
 See [implementation](PHASE_4H_IMPLEMENTATION.md) and [validation](PHASE_4H_VALIDATION.md).
+
+## Phase 4I baseline-aware text
+
+[ADR-0010](decisions/ADR-0010-baseline-aware-text-reconstruction.md) adds explicit
+host/script selection in `datasim_pdf`. Original coordinates and source strings
+are retained; only verified row-association anchors change. Separate provenance
+records script roles and display notation. Numeric grammar, global row tolerance,
+and downstream trust boundaries remain unchanged. See
+[implementation](PHASE_4I_IMPLEMENTATION.md) and [validation](PHASE_4I_VALIDATION.md).

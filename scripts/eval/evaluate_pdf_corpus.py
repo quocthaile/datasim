@@ -356,7 +356,65 @@ def build_dump_command(
         if any("|" in field for field in fields):
             raise EvaluationConfigError("Parent context CLI text cannot contain pipes")
         cmd.extend(["--parent-context", "|".join(fields)])
+    for binding in geom.get("baseline_text_bindings", []):
+        fields = [",".join(str(v) for v in binding["host_box"]), binding["expected_host_text"]]
+        for token in binding["scripts"]:
+            fields += [token["position"], ",".join(str(v) for v in token["source_box"]), token["expected_text"]]
+        if any("|" in field for field in fields):
+            raise EvaluationConfigError("Baseline CLI text cannot contain pipes")
+        cmd.extend(["--baseline-text", "|".join(fields)])
     return cmd
+
+
+def baseline_provenance_valid(dump: dict, case: dict) -> bool:
+    """Validate source boxes, roles, text, evidence links and configured coverage."""
+    bindings = case["table_geometry"].get("baseline_text_bindings", [])
+    provenance = dump.get("baseline_text_provenance", [])
+    if not bindings:
+        return not provenance
+    evidence = {e["id"]: e for e in dump.get("evidence", [])}
+    observations = {o["id"]: o for o in dump.get("observations", [])}
+    seen, covered = set(), set()
+
+    def contained(actual: list, selected: list) -> bool:
+        return (len(actual) == 4 and all(isinstance(v, (int, float)) and math.isfinite(v) for v in actual)
+                and selected[0] <= actual[0] < actual[2] <= selected[2]
+                and selected[1] <= actual[1] < actual[3] <= selected[3])
+
+    for p in provenance:
+        candidates = [(i, b) for i, b in enumerate(bindings)
+                      if b["expected_host_text"] == p.get("raw_host_text")
+                      and contained(p.get("host_box", []), b["host_box"])]
+        if len(candidates) != 1:
+            return False
+        index, b = candidates[0]
+        key = (p.get("observation_id"), index)
+        if key in seen:
+            return False
+        seen.add(key)
+        covered.add(index)
+        scripts = p.get("scripts", [])
+        expected = sorted(b["scripts"], key=lambda t: t["source_box"][0])
+        if len(scripts) != len(expected):
+            return False
+        source, display = p["raw_host_text"], p["raw_host_text"]
+        for token, target in zip(scripts, expected):
+            if (token.get("text") != target["expected_text"] or token.get("position") != target["position"]
+                    or not contained(token.get("source_box", []), target["source_box"])):
+                return False
+            source += " " + token["text"]
+            display += ("_{" if token["position"] == "sub" else "^{") + token["text"] + "}"
+        e = evidence.get(p.get("evidence_id"), {})
+        o = observations.get(p.get("observation_id"), {})
+        if (p.get("source_text") != source or p.get("display_expression") != display
+                or e.get("id") not in o.get("evidence_refs", [])
+                or e.get("source_document_id") != case["document_id"]
+                or e.get("pdf_page_index") != case["pdf_page_index"]
+                or e.get("printed_page_label") != case.get("printed_page_label")
+                or e.get("table_or_figure_id") != case["table_id"]
+                or e.get("row_label") != source or e.get("column_label") != "baseline_text"):
+            return False
+    return len(covered) == len(bindings)
 
 
 def context_provenance_matches(dump: dict, obs: dict, case: dict, row_index: int | None) -> bool:
@@ -923,6 +981,7 @@ def evaluate_corpus(
                 and ev.get("cell_or_region") == g.get("cell_or_region")
                 and hdr_ev_ok
                 and context_provenance_matches(dump1, ext_obs, case, g.get("row_index"))
+                and baseline_provenance_valid(dump1, case)
             )
             footnotes_ok = (ev.get("footnote_refs", []) if ev else []) == g.get("footnote_refs", [])
             scalar_ok = floats_equal(ext_obs.get("parsed_numeric_value"), g.get("expected_parsed_numeric_value"))

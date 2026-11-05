@@ -74,3 +74,11 @@ and [ADR-0009](docs/decisions/ADR-0009-hierarchical-table-context.md).
 Preserve explicit parent/child source verification, candidate-only output, and
 legacy extraction with no hierarchy bindings. Phase 4I may start only after Phase
 4H merges and post-merge CI succeeds. Do not merge automatically.
+
+Phase 4H is merged via PR #12 at `864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`
+and hosted-verified by post-merge Windows run `42058944651`. Phase 4I implements
+explicit baseline-aware word association on `feat/phase-4i-baseline-aware-text`;
+see [validation](docs/PHASE_4I_VALIDATION.md) and
+[ADR-0010](docs/decisions/ADR-0010-baseline-aware-text-reconstruction.md).
+Do not change global row tolerance or numeric grammar to interpret typography.
+Phase 4J remains gated on Phase 4I merge and successful hosted post-merge CI.

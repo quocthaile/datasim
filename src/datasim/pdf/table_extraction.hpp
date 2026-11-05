@@ -46,6 +46,32 @@ struct SourceBox {
     auto operator<=>(const SourceBox&) const = default;
 };
 
+enum class ScriptPosition { subscript, superscript };
+
+struct BaselineScriptToken {
+    SourceBox source_box;
+    std::string expected_text;
+    ScriptPosition position = ScriptPosition::subscript;
+    auto operator<=>(const BaselineScriptToken&) const = default;
+};
+
+struct BaselineTextBinding {
+    SourceBox host_box;
+    std::string expected_host_text;
+    std::vector<BaselineScriptToken> scripts;
+};
+
+struct BaselineTextProvenance {
+    component::ObservationId observation_id;
+    component::EvidenceId evidence_id;
+    SourceBox host_box;
+    std::string raw_host_text;
+    std::vector<BaselineScriptToken> scripts;
+    std::string source_text;
+    std::string display_expression;
+    auto operator<=>(const BaselineTextProvenance&) const = default;
+};
+
 struct ParentContextChild {
     std::size_t row_index = 0; // One-based original physical row, including headings.
     std::string expected_parameter_text;
@@ -102,6 +128,7 @@ struct ElectricalTableLayout {
     std::optional<HeaderConditionBinding> header_condition_binding;
     std::vector<InlineValueUnitBinding> inline_value_unit_bindings;
     std::vector<ParentContextBinding> parent_context_bindings;
+    std::vector<BaselineTextBinding> baseline_text_bindings;
 };
 
 struct ExtractionRequest {
@@ -123,6 +150,7 @@ struct ExtractionResult {
     std::vector<std::string> diagnostics;
     std::vector<ValueCellProvenance> value_cell_provenance;
     std::vector<ParameterContextProvenance> parameter_context_provenance;
+    std::vector<BaselineTextProvenance> baseline_text_provenance;
 };
 
 // Extracts only explicitly selected horizontal table bands from selectable PDF text.

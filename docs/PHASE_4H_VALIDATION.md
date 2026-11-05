@@ -1,7 +1,10 @@
 # Phase 4H validation
 
-Status: IMPLEMENTED and locally VERIFIED within the explicitly selected scope.
-Hosted Phase 4H CI: pending PR execution. No Phase 4I or 4J work has started.
+Status: IMPLEMENTED, MERGED, and VERIFIED within the explicitly selected scope.
+Merged through PR #12 at `864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`. Post-merge
+[Windows CI 42058944651](https://github.com/quocthaile/datasim/actions/runs/42058944651)
+passed all steps, including required integration and the RC study. This supersedes
+the original pending-hosted-CI status; the local evidence below is unchanged.
 Branch: `feat/phase-4h-hierarchical-table-context`.
 Date: 2026-11-05.
 
