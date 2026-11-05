@@ -29,8 +29,9 @@ semiconductor simulation, or a custom solver.
 Phase 4A and Phase 4B are merged into `main` by PRs #5 and #6; Phase 4B's P-07
 real-ngspice release gate passed hosted Windows CI run `41995104973`. Phase 4C
 (`PHASE_4C_PLAN.md`, `PHASE_4C_IMPLEMENTATION.md`,
-`PHASE_4C_VALIDATION.md`, and ADR-0006) is implemented on
-`feat/phase-4c-deterministic-extraction` and is not yet hosted-verified or merged.
+`PHASE_4C_VALIDATION.md`, and ADR-0006) is implemented and hosted-verified by run
+`42000652152` on `feat/phase-4c-deterministic-extraction`; PR #7 remains open and
+unmerged.
 Keep the Poppler adapter in `datasim_pdf`, above and depending on `datasim_intake`;
 do not modify existing Phase 2/3/4B public contracts without a demonstrated,
 documented correctness defect. Do not infer licensing rights or commit vendor PDFs.

@@ -1,9 +1,11 @@
 # Phase 4C validation
 
-Status: **Locally VERIFIED for the checks below on the generated synthetic
-fixtures. Hosted Phase 4C verification is NOT YET VERIFIED.** Real ngspice was
-not configured locally and its existing CTest target skipped. The skipped target
-is not a pass.
+Status: **VERIFIED** by local synthetic-fixture checks and hosted Windows CI.
+Hosted run [42000652152](https://github.com/quocthaile/datasim/actions/runs/42000652152)
+completed successfully on the current Phase 4C PR head. Its clean build, unit
+and process tests, required real ngspice integration, and convergence/repeatability
+steps all passed. The local `ngspice_rc` target was skipped because ngspice was
+not configured locally; that local skip is not a pass.
 
 ## Local environment and commands
 
@@ -34,16 +36,17 @@ with no knowledge/model records.
 The Phase 4B `intake`, `intake_handoff`, `unit`, `component_model`,
 `vertical_slice`, and `backend_errors` suites also passed unchanged.
 
-## Hosted verification requirements
+## Hosted verification
 
 The merged Phase 4B main baseline's hosted run
 [41995458137](https://github.com/quocthaile/datasim/actions/runs/41995458137)
 passed all steps, including real ngspice integration and convergence. The Phase
-4C hosted workflow must install and verify Poppler `26.10.0`, regenerate both
-fictional fixtures, and run `pdf_extraction` in the integration CTest label. The
-existing ngspice-47 integration and convergence/repeatability study must also
-pass without skips. Until that workflow completes for the Phase 4C head, hosted
-verification is **NOT VERIFIED**.
+4C hosted run [42000652152](https://github.com/quocthaile/datasim/actions/runs/42000652152)
+also installed and verified Poppler `26.10.0`, regenerated and exercised the
+fictional PDF fixtures through the integration CTest label, and passed the
+required ngspice-47 integration and convergence/repeatability steps. This
+verifies the implementation on that hosted Windows environment; it does not
+establish real-datasheet extraction accuracy.
 
 No vendor PDF, vendor table, or vendor model file is used. The generated fixture
 contains only fictional identities and values. No real-world extraction

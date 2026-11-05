@@ -29,8 +29,9 @@ integration, GUI, semiconductor models, or a custom solver.
 Phase 4A and Phase 4B are merged into `main` by normal-merge PRs #5 and #6;
 Phase 4B baseline is `7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`, verified by
 hosted Windows CI run `41995104973` with a non-skipped P-07 ngspice path.
-Phase 4C is implemented on `feat/phase-4c-deterministic-extraction` and awaits
-hosted verification and review. Preserve the `datasim_intake` APIs and its
+Phase 4C is implemented and verified by hosted Windows CI run `42000652152` on
+`feat/phase-4c-deterministic-extraction`; PR #7 awaits review and remains
+unmerged. Preserve the `datasim_intake` APIs and its
 candidate-only boundary. Keep PDF processing in the isolated `datasim_pdf`
 adapter; do not add OCR, persistence, LLM integration, GUI, semiconductor models,
 or a custom solver. Poppler is a GPL-2.0-or-later executable dependency; do not

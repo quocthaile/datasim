@@ -51,8 +51,9 @@ This is not yet a general-purpose circuit simulator or datasheet processor. PDF/
 OCR ingestion, persistent storage, general-purpose JSON serialization, automatic unit
 conversion, LLM integration, external SPICE subcircuit loading, semiconductor models,
 and interactive visualization remain **PROPOSED**. The bounded Phase 4C local
-selectable-text table adapter is **IMPLEMENTED** on its feature branch and is not yet
-merged or hosted-verified.
+selectable-text table adapter is **IMPLEMENTED and VERIFIED** on its feature branch
+(PR #7, open and unmerged). Hosted Windows CI run
+[42000652152](https://github.com/quocthaile/datasim/actions/runs/42000652152) passed.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet

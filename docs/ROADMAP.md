@@ -47,11 +47,13 @@ The merged main commit is `7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`; its push
 workflow is separately tracked as run
 [41995458137](https://github.com/quocthaile/datasim/actions/runs/41995458137).
 
-Phase 4C's bounded deterministic PDF table adapter is **IMPLEMENTED** on
+Phase 4C's bounded deterministic PDF table adapter is **IMPLEMENTED and VERIFIED** on
 `feat/phase-4c-deterministic-extraction`. It uses Poppler `26.10.0` executables,
 explicit PDF/table selection, candidate-only intake, and fictional fixtures. Local
 Release CTest passed 7/7 non-skipped suites, while real ngspice remained skipped
-locally. Phase 4C hosted verification and PR review are pending. See
+locally. Phase 4C is hosted-verified by Windows CI run
+[42000652152](https://github.com/quocthaile/datasim/actions/runs/42000652152);
+PR #7 remains open for review and unmerged. See
 [Phase 4C plan](PHASE_4C_PLAN.md), [implementation](PHASE_4C_IMPLEMENTATION.md),
 [validation](PHASE_4C_VALIDATION.md), and
 [ADR-0006](decisions/ADR-0006-deterministic-pdf-table-extraction.md).
@@ -63,7 +65,7 @@ locally. Phase 4C hosted verification and PR review are pending. See
 | 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. (ADR-0002 selected ngspice executable integration for Phase 1 ideal RC only.) |
 | 3: Knowledge contracts | VERIFIED (in-memory C++20; persistence PROPOSED) | In-memory C++20 evidence, observation, deterministic review lifecycle, component knowledge, conflict visibility, and model metadata/validation contracts verified on synthetic Resistor and Capacitor fixtures ([Phase 2 validation](PHASE_2_VALIDATION.md)). Persistent storage, interchange serialization, and curve series remain PROPOSED. |
 | 4: Deterministic vertical slice | VERIFIED (ideal-RC transient slice; general multi-analysis/subcircuit PROPOSED) | Approved `ComponentKnowledge` and explicitly selected `ModelArtifactDescriptor` instances connected via `CircuitAssembly`, SI parameter resolution, model/backend compatibility gate, `RcConfig` adapter, and `provenance_metadata.json` ([Phase 3 validation](PHASE_3_VALIDATION.md)). External subcircuits and nonlinear device models remain PROPOSED. |
-| 5: Evidence intake and bounded extraction | Phase 4B VERIFIED; Phase 4C IMPLEMENTED on feature branch | Candidate-only in-memory intake is merged and hosted-verified. The selected-PDF table adapter is under review; OCR, arbitrary layout parsing, LLM assistance, and persistent storage remain PROPOSED. |
+| 5: Evidence intake and bounded extraction | Phase 4B VERIFIED; Phase 4C VERIFIED on feature branch | Candidate-only in-memory intake is merged and hosted-verified. The selected-PDF table adapter is hosted-verified and under PR review; OCR, arbitrary layout parsing, LLM assistance, and persistent storage remain PROPOSED. |
 | 6: Visualization and validation | PROPOSED | Present results and evidence with units, warnings and assumptions; conduct separately scoped physical validation if equipment/data are available. |
 
 ## Phase 4C limits and follow-on decisions
