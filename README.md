@@ -2,8 +2,8 @@
 
 **Datasheet-driven electronic component modeling, simulation, and visualization.**
 
-Datasim currently comprises three **VERIFIED** C++20 modules on Windows x64
-(MSYS2 UCRT GCC 16.2.0):
+Datasim comprises three verified numerical/domain modules and the verified Phase 4B
+candidate intake on Windows x64. Phase 4C is implemented on a feature branch.
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
@@ -40,11 +40,19 @@ Datasim currently comprises three **VERIFIED** C++20 modules on Windows x64
    [Phase 3 implementation](docs/PHASE_3_IMPLEMENTATION.md),
    [Phase 3 validation](docs/PHASE_3_VALIDATION.md), and
    [ADR-0004](docs/decisions/ADR-0004-phase-3-vertical-slice.md).
+4. **Phase 4B deterministic evidence intake (`datasim_intake`)**: candidate-only
+   manifests, strict validation, raw numeric handling and validated handoff to the
+   component model. Merged by PR #6 at
+   `7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`; hosted Windows CI run
+   [41995104973](https://github.com/quocthaile/datasim/actions/runs/41995104973)
+   exercised the non-skipped P-07 real-ngspice path.
 
 This is not yet a general-purpose circuit simulator or datasheet processor. PDF/OCR
-ingestion, persistent storage, general-purpose JSON serialization, automatic unit
+OCR ingestion, persistent storage, general-purpose JSON serialization, automatic unit
 conversion, LLM integration, external SPICE subcircuit loading, semiconductor models,
-and interactive visualization remain **PROPOSED**.
+and interactive visualization remain **PROPOSED**. The bounded Phase 4C local
+selectable-text table adapter is **IMPLEMENTED** on its feature branch and is not yet
+merged or hosted-verified.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet
@@ -63,7 +71,8 @@ numerical or review authority.
 - [Phase 2 plan](docs/PHASE_2_PLAN.md), [implementation](docs/PHASE_2_IMPLEMENTATION.md), and [validation](docs/PHASE_2_VALIDATION.md)
 - [Phase 3 plan](docs/PHASE_3_PLAN.md), [implementation](docs/PHASE_3_IMPLEMENTATION.md), and [validation](docs/PHASE_3_VALIDATION.md)
 - [Phase 4 plan](docs/PHASE_4_PLAN.md) and [validation plan](docs/PHASE_4_VALIDATION_PLAN.md) for the Phase 4A design and reconciled Phase 4B test semantics
-- [Phase 4B implementation](docs/PHASE_4_IMPLEMENTATION.md) and [validation](docs/PHASE_4_VALIDATION.md) for the bounded in-memory candidate intake feature branch
+- [Phase 4B implementation](docs/PHASE_4_IMPLEMENTATION.md) and [validation](docs/PHASE_4_VALIDATION.md) for the merged, hosted-verified in-memory candidate intake
+- [Phase 4C plan](docs/PHASE_4C_PLAN.md), [implementation](docs/PHASE_4C_IMPLEMENTATION.md), [validation](docs/PHASE_4C_VALIDATION.md), and [ADR-0006](docs/decisions/ADR-0006-deterministic-pdf-table-extraction.md) for the bounded local PDF table adapter
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

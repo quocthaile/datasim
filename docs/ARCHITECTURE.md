@@ -22,14 +22,20 @@ Status: PROPOSED end-to-end application architecture, with three slices now
    [Phase 3 implementation](PHASE_3_IMPLEMENTATION.md),
    [Phase 3 validation](PHASE_3_VALIDATION.md)).
 
-No PDF/OCR ingestion pipeline, persistent database, LLM runtime, external SPICE
-subcircuit loader, nonlinear semiconductor device solver, real manufacturer datasheet
-ingestion, physical measurement validation (`MEASURED`), or interactive GUI is
+No OCR pipeline, persistent database, LLM runtime, external SPICE subcircuit
+loader, nonlinear semiconductor device solver, real manufacturer datasheet
+evaluation, physical measurement validation (`MEASURED`), or interactive GUI is
 implemented.
+
+The isolated Phase 4C adapter (`datasim_pdf`) is **IMPLEMENTED** on its feature
+branch. It shells out to local Poppler `pdfinfo` and `pdftotext -bbox-layout`, then
+passes explicitly selected text-cell observations through `datasim_intake`. It does
+not link Poppler into `datasim_intake` or authenticate source identity. Hosted
+verification is pending.
 
 ```mermaid
 flowchart TD
-    DS["Datasheet"] --> DP["Document Processing (PROPOSED)"]
+    DS["Local selectable-text PDF"] --> DP["Explicit Poppler table adapter (Phase 4C IMPLEMENTED; feature branch)"]
     DP --> CE["Candidate Extracted Data (C++20 Observation Contract VERIFIED)"]
     CE --> VR["Validation and Engineering Review (C++20 Lifecycle VERIFIED)"]
     VR --> CK["Component Knowledge (C++20 Contract VERIFIED)"]
@@ -46,6 +52,11 @@ assistance may disagree. Validation checks structure, units, finite numbers, and
 referential integrity; engineering review resolves applicability and ambiguity
 before promotion. Rejected, superseded, or unresolved observations remain visible
 with their history and cannot enter `ComponentKnowledge`.
+
+Phase 4C supports only a selected single-page region with explicit column spans.
+It uses extracted text and coordinates as candidates; document identity, exact MPN,
+rights, printed-page label, table category, and selection coordinates are caller
+configuration. Image-only pages and unsupported layouts fail closed.
 
 Component knowledge normalizes reviewed facts without erasing original values,
 units, qualifiers, or rating categories. Model selection or calibration is a

@@ -26,10 +26,16 @@ full provenance. Preserve user changes, do not commit directly to `main`, do not
 pull requests, and do not implement PDF/OCR/datasheet ingestion, persistence, LLM
 integration, GUI, semiconductor models, or a custom solver.
 
-Phase 4B is implemented on `feat/phase-4b-evidence-intake`, with PR #4 merged
-into that feature branch and hosted CI run `41962956370` successful for its
-existing checks. The P-07 release-gate result still requires a non-skipped
-ngspice run; Phase 4B is not merged into `main` or owner-approved.
+Phase 4A and Phase 4B are merged into `main` by normal-merge PRs #5 and #6;
+Phase 4B baseline is `7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`, verified by
+hosted Windows CI run `41995104973` with a non-skipped P-07 ngspice path.
+Phase 4C is implemented on `feat/phase-4c-deterministic-extraction` and awaits
+hosted verification and review. Preserve the `datasim_intake` APIs and its
+candidate-only boundary. Keep PDF processing in the isolated `datasim_pdf`
+adapter; do not add OCR, persistence, LLM integration, GUI, semiconductor models,
+or a custom solver. Poppler is a GPL-2.0-or-later executable dependency; do not
+bundle it or infer project redistribution rights from this ADR. The repository
+still has no adopted license.
 
 Build and run CTest as documented. Integration skips are not passes. No LLM is a
 numerical authority; manual RC parameters and synthetic fixtures are not
