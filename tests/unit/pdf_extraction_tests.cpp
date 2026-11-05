@@ -133,6 +133,9 @@ int main() {
         require(same_manifest, "repeat extraction produces exactly equivalent provenance");
         require(repeated.diagnostics == first.diagnostics,
                 "repeat extraction produces equivalent diagnostics");
+        require(repeated.report.diagnostics == first.report.diagnostics &&
+                    repeated.report.domain_validation == first.report.domain_validation,
+                "repeat extraction produces equivalent intake and domain validation diagnostics");
 
         auto capacitor_request = request_for(1, "capacitor", "SIM-C-1UF", "doc.synthetic.cap");
         const auto capacitor = pdf::extract_electrical_table(capacitor_request);

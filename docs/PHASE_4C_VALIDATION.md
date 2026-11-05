@@ -19,7 +19,7 @@ ctest --test-dir build/phase4c-clean --output-on-failure
 
 Outcome: build succeeded; CTest ran 8 targets, 7 passed, 0 failed, and
 `ngspice_rc` was skipped because no local ngspice executable was configured.
-The `pdf_extraction` integration target passed with 37 always-active checks. It
+The `pdf_extraction` integration target passed with 38 always-active checks. It
 exercised Poppler against the synthetic PDFs rather than skipping the extraction
 path.
 
