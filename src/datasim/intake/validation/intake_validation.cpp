@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
-#include <map>
 #include <set>
 #include <string>
 #include <utility>
@@ -107,26 +106,19 @@ IntakeReport validate_intake_manifest(const IntakeManifest& manifest) {
     }
     if (manifest.component.part_number_suffix.has_value()) {
         const auto& suffix = *manifest.component.part_number_suffix;
-        if (!ends_with(manifest.component.part_number, suffix) ||
-            (manifest.component.part_number.size() > suffix.size() &&
-             manifest.component.part_number[
-                 manifest.component.part_number.size() - suffix.size() - 1] != '-')) {
+        if (!ends_with(manifest.component.part_number, suffix)) {
             add(report, IntakeDiagnosticCode::part_number_suffix_mismatch,
                 IntakeDiagnosticSeverity::error, "component.part_number_suffix",
                 "part_number_suffix is not the exact suffix of part_number");
         }
-        bool matching_suffix = false;
-        for (const auto& part : manifest.source_document.associated_part_numbers) {
-            if (ends_with(part, suffix) &&
-                part.size() > suffix.size() &&
-                part[part.size() - suffix.size() - 1] == '-') {
-                matching_suffix = true;
-            }
-        }
-        if (!matching_suffix) {
+        if (std::find(
+                manifest.source_document.associated_part_numbers.begin(),
+                manifest.source_document.associated_part_numbers.end(),
+                manifest.component.part_number) ==
+            manifest.source_document.associated_part_numbers.end()) {
             add(report, IntakeDiagnosticCode::part_number_suffix_mismatch,
                 IntakeDiagnosticSeverity::error, "source_document.associated_part_numbers",
-                "source document has no applicable part number with the component suffix");
+                "source document has no exact applicable part number for the component suffix");
         }
     }
 
@@ -166,7 +158,6 @@ IntakeReport validate_intake_manifest(const IntakeManifest& manifest) {
     }
 
     std::set<component::ObservationId> observation_ids;
-    std::map<std::string, std::map<component::ValueQualifier, double>> comparable_values;
     for (std::size_t i = 0; i < manifest.observations.size(); ++i) {
         const auto& entry = manifest.observations[i];
         const auto& observation = entry.observation;
@@ -217,6 +208,15 @@ IntakeReport validate_intake_manifest(const IntakeManifest& manifest) {
                     "raw value is preserved but is not safely parseable");
             }
         }
+        if (observation.original_value_text.has_value() &&
+            observation.parsed_numeric_value.has_value()) {
+            const auto raw_value = parse_unambiguous_scalar(*observation.original_value_text);
+            if (raw_value.has_value() && *raw_value != *observation.parsed_numeric_value) {
+                add(report, IntakeDiagnosticCode::raw_numeric_mismatch,
+                    IntakeDiagnosticSeverity::error, path + ".observation.parsed_numeric_value",
+                    "parsed numeric value does not exactly match the unambiguous raw scalar");
+            }
+        }
         if (entry.raw_qualifier_text.has_value() &&
             !qualifier_matches(*entry.raw_qualifier_text, observation.qualifier)) {
             add(report, IntakeDiagnosticCode::qualifier_text_mismatch,
@@ -242,21 +242,41 @@ IntakeReport validate_intake_manifest(const IntakeManifest& manifest) {
                     "absolute maximum evidence requires absolute_maximum_rating category");
             }
         }
-        if (observation.parsed_numeric_value.has_value()) {
-            comparable_values[observation.parameter_name][observation.qualifier] =
-                *observation.parsed_numeric_value;
-        }
     }
-    for (const auto& [name, values] : comparable_values) {
-        for (const auto& [qualifier, value] : values) {
-            if (qualifier == ValueQualifier::minimum) {
-                const auto max = values.find(ValueQualifier::maximum);
-                if (max != values.end() && value > max->second) {
-                    report.domain_validation.issues.push_back({
-                        component::ValidationRuleCode::reversed_qualifier_bounds,
-                        "observations",
-                        "minimum value exceeds maximum value for parameter " + name});
-                }
+    for (std::size_t left = 0; left < manifest.observations.size(); ++left) {
+        const auto& lhs = manifest.observations[left].observation;
+        if (!lhs.parsed_numeric_value.has_value()) continue;
+        for (std::size_t right = left + 1; right < manifest.observations.size(); ++right) {
+            const auto& rhs = manifest.observations[right].observation;
+            if (lhs.parameter_name != rhs.parameter_name ||
+                lhs.original_unit_symbol != rhs.original_unit_symbol ||
+                lhs.category != rhs.category ||
+                lhs.operating_conditions != rhs.operating_conditions ||
+                !rhs.parsed_numeric_value.has_value()) {
+                continue;
+            }
+            if (lhs.qualifier == rhs.qualifier &&
+                *lhs.parsed_numeric_value != *rhs.parsed_numeric_value) {
+                add(report, IntakeDiagnosticCode::conflict_candidate,
+                    IntakeDiagnosticSeverity::warning,
+                    "observations[" + std::to_string(left) + "]",
+                    "same parameter slot has competing values; both candidates are retained");
+            }
+            if (lhs.qualifier == ValueQualifier::minimum &&
+                rhs.qualifier == ValueQualifier::maximum &&
+                *lhs.parsed_numeric_value > *rhs.parsed_numeric_value) {
+                report.domain_validation.issues.push_back({
+                    component::ValidationRuleCode::reversed_qualifier_bounds,
+                    "observations[" + std::to_string(left) + "]",
+                    "minimum value exceeds maximum value for parameter " + lhs.parameter_name});
+            }
+            if (lhs.qualifier == ValueQualifier::maximum &&
+                rhs.qualifier == ValueQualifier::minimum &&
+                *lhs.parsed_numeric_value < *rhs.parsed_numeric_value) {
+                report.domain_validation.issues.push_back({
+                    component::ValidationRuleCode::reversed_qualifier_bounds,
+                    "observations[" + std::to_string(left) + "]",
+                    "minimum value exceeds maximum value for parameter " + lhs.parameter_name});
             }
         }
     }

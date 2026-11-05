@@ -163,7 +163,26 @@ specified, not extraction accuracy.
 7. Hosted Windows CI passes; local runs without ngspice are reported as `NOT VERIFIED`
    for integration.
 
-## 5. Documentation checks for this Phase 4A branch
+## 5. Phase 4B hardening traceability
+
+| Requirement | Test | Expected/actual status |
+| --- | --- | --- |
+| P-01/P-02/P-03/P-04/P-05/P-06 | `intake_tests` valid fixture and preservation checks | Passed in Release |
+| N-01/N-02/N-03/N-04/N-05/N-06/N-07/N-08 | `intake_tests` reference, identity, suffix, and page checks | Passed in Release |
+| N-12/N-13/N-14/N-16/N-17/N-18 | `intake_tests` raw numeric and unit checks | Passed in Release |
+| N-20/N-21/N-24 | `intake_tests` qualifier, bound, and condition checks | Passed in Release |
+| N-30/N-32 | `intake_tests` conflict visibility checks | Passed in Release |
+| N-33/N-43/N-44 | `intake_tests` candidate and provenance checks | Passed in Release |
+| N-34/N-35/N-37/N-40/N-41 | `intake_handoff_tests` review and promotion checks | Passed in Release |
+| N-42/N-46/N-47 | Contract lacks authentication/content fields | BLOCKED/NOT IMPLEMENTED |
+| N-49/N-50/N-51/N-52 | Existing Phase 3 vertical-slice suites | Existing suite passed; intake does not bypass it |
+| P-07 | Real ngspice end-to-end equivalence | NOT VERIFIED locally; integration skipped |
+
+Sidecar-only source-cell and raw extraction metadata are intentionally not
+asserted as `ComponentDomainBundle` fields; their ownership is documented in
+[PHASE_4_IMPLEMENTATION.md](PHASE_4_IMPLEMENTATION.md).
+
+## 6. Documentation checks for this Phase 4A branch
 
 Relative links resolve, fenced blocks balanced, Mermaid parses, `PROPOSED` markers
 present on all new names, diff limited to documentation. Results are recorded in the
