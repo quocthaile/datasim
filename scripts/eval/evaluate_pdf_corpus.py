@@ -83,6 +83,7 @@ def find_executable(explicit: str | None, name: str) -> Path:
     exe_name = f"{name}.exe" if os.name == "nt" else name
     repo_root = Path(__file__).resolve().parents[2]
     for candidate in (
+        repo_root / "build" / "phase4f" / exe_name,
         repo_root / "build" / "phase4e" / exe_name,
         repo_root / "build" / "ci" / exe_name,
         repo_root / "build" / exe_name,
@@ -329,6 +330,21 @@ def build_dump_command(
     if geom.get("condition_column"):
         cc = geom["condition_column"]
         cmd.extend(["--condition-column", f"{cc[0]},{cc[1]}"])
+    for ub in geom.get("header_unit_bindings", []):
+        box = ub["header_box"]
+        spec = (
+            f"{ub['qualifier']}|{box[0]},{box[1]},{box[2]},{box[3]}|"
+            f"{ub['unit_symbol']}|{ub['expected_header_text']}"
+        )
+        cmd.extend(["--header-unit-binding", spec])
+    if geom.get("header_condition_binding"):
+        cb = geom["header_condition_binding"]
+        box = cb["header_box"]
+        spec = (
+            f"{box[0]},{box[1]},{box[2]},{box[3]}|"
+            f"{cb['parameter_name']}|{cb['unit_symbol']}|{cb['expected_header_text']}"
+        )
+        cmd.extend(["--header-condition-binding", spec])
     return cmd
 
 
@@ -336,11 +352,18 @@ def classify_diagnostic_message(msg: str) -> str:
     lower = msg.lower()
     if "no selectable text; image-only" in lower or "no selectable words" in lower or "ocr" in lower:
         return "missing_selectable_text"
+    if "conflicts with bound header unit" in lower or "header unit" in lower:
+        return "unit_mismatch"
+    if "conflicts with bound condition header" in lower or "header condition" in lower:
+        return "condition_mismatch"
     if (
         "explicit table region contains no selectable text" in lower
         or "only the configured header row" in lower
         or "no supported min/typ/max value cells" in lower
         or "invalid explicit table region" in lower
+        or "header binding text mismatch" in lower
+        or "header binding box" in lower
+        or "header word straddles" in lower
     ):
         return "invalid_table_region"
     if "outside the document" in lower:
@@ -624,7 +647,7 @@ def evaluate_corpus(
             doc=doc,
             case=case,
         )
-        proc1 = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        proc1 = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", check=False)
         if proc1.returncode != 0:
             raise EvaluationConfigError(
                 f"datasheet_eval_dump failed on case {case_id} (exit {proc1.returncode}): {proc1.stderr}"
@@ -634,7 +657,7 @@ def evaluate_corpus(
 
         repeat_identical = True
         if repeat_check:
-            proc2 = subprocess.run(cmd, capture_output=True, text=True, check=False)
+            proc2 = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", check=False)
             if proc2.returncode != 0 or proc2.stdout != raw_json_1:
                 repeat_identical = False
                 repeat_run_mismatches += 1
@@ -808,12 +831,35 @@ def evaluate_corpus(
             raw_cond_ok = (ext_obs.get("raw_conditions_text") or None) == (g.get("raw_conditions_text") or None)
             cond_ok = (expected_conds == actual_conds) and raw_cond_ok
 
+            expected_hdr_regions = g.get("expected_header_evidence_regions")
+            hdr_ev_ok = True
+            if expected_hdr_regions is not None:
+                actual_hdr_regions: list[str] = []
+                for ref_id in ext_obs.get("evidence_refs", []):
+                    ref_ev = evidence_by_id.get(ref_id)
+                    if ref_ev is None:
+                        hdr_ev_ok = False
+                        break
+                    region_str = str(ref_ev.get("cell_or_region") or "")
+                    if region_str.startswith("header_"):
+                        if (
+                            ref_ev.get("pdf_page_index") != case["pdf_page_index"]
+                            or ref_ev.get("printed_page_label") != case.get("printed_page_label")
+                            or ref_ev.get("table_or_figure_id") != case["table_id"]
+                        ):
+                            hdr_ev_ok = False
+                            break
+                        actual_hdr_regions.append(region_str)
+                if sorted(actual_hdr_regions) != sorted(expected_hdr_regions):
+                    hdr_ev_ok = False
+
             ev_loc_ok = (
                 ev is not None
                 and ev.get("pdf_page_index") == case["pdf_page_index"]
                 and ev.get("printed_page_label") == case.get("printed_page_label")
                 and ev.get("table_or_figure_id") == case["table_id"]
                 and ev.get("cell_or_region") == g.get("cell_or_region")
+                and hdr_ev_ok
             )
             footnotes_ok = (ev.get("footnote_refs", []) if ev else []) == g.get("footnote_refs", [])
             scalar_ok = floats_equal(ext_obs.get("parsed_numeric_value"), g.get("expected_parsed_numeric_value"))

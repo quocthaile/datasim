@@ -1,0 +1,243 @@
+{
+  "schema_version": "datasim.phase4e.corpus.v1",
+  "corpus_id": "datasim-phase4f-synthetic-header-binding-v1",
+  "description": "Synthetic regression corpus for Phase 4F explicit header unit and condition bindings (Cases A-H and Unicode preservation).",
+  "documents": [
+    {
+      "document_id": "doc.synthetic.hb",
+      "manufacturer": "Datasim Synthetic",
+      "publisher": "Datasim Synthetic",
+      "part_numbers": ["SIM-HB-CAP"],
+      "title": "Fictional header-binding electrical characteristics",
+      "revision": "fixture-rev-1",
+      "source_url": "https://github.com/quocthaile/datasim/blob/main/tests/fixtures/make_synthetic_datasheet_pdf.py",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "505ca09bc45072b639b28ef1002a96cb63224302f9e23994355057609cfa9470",
+      "repo_relative_path": "tests/fixtures/synthetic_header_binding_datasheet.pdf",
+      "is_synthetic": true,
+      "page_count": 2,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "supported_single_page_table",
+      "annotation_status": "annotated_single_reviewer",
+      "usage_rights": {
+        "license_identifier": "Datasim-Internal-Synthetic-Fixture",
+        "redistribution_permitted": true,
+        "evaluation_permitted": true,
+        "evidence_notes": "Generated in-repo by tests/fixtures/make_synthetic_datasheet_pdf.py; contains no vendor material."
+      }
+    },
+    {
+      "document_id": "doc.synthetic.rc",
+      "manufacturer": "Datasim Synthetic",
+      "publisher": "Datasim Synthetic",
+      "part_numbers": ["SIM-R-10K", "SIM-C-1UF"],
+      "title": "Fictional electrical characteristics",
+      "revision": "fixture-rev-1",
+      "source_url": "https://github.com/quocthaile/datasim/blob/main/tests/fixtures/make_synthetic_datasheet_pdf.py",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "7133e861225318b47982dbf25ee2bb68a55ee5c11aa054675214515ab769cbb8",
+      "repo_relative_path": "tests/fixtures/synthetic_datasheet.pdf",
+      "is_synthetic": true,
+      "page_count": 2,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "supported_single_page_table",
+      "annotation_status": "annotated_single_reviewer",
+      "usage_rights": {
+        "license_identifier": "Datasim-Internal-Synthetic-Fixture",
+        "redistribution_permitted": true,
+        "evaluation_permitted": true,
+        "evidence_notes": "Generated in-repo by tests/fixtures/make_synthetic_datasheet_pdf.py; contains no vendor material."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "SYN-HB-CASE-01-BAND1-BOUND",
+      "document_id": "doc.synthetic.hb",
+      "pdf_page_index": 0,
+      "printed_page_label": "HB-1",
+      "table_id": "TABLE_HB_BAND1",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.hb.cap",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-HB-CAP",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 85.0, 650.0, 165.0],
+        "row_y_tolerance": 2.0,
+        "header": [85.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 280.0],
+        "minimum_column": [280.0, 340.0],
+        "typical_column": [340.0, 425.0],
+        "maximum_column": [425.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "header_unit_bindings": [
+          {
+            "qualifier": "typical",
+            "header_box": [340.0, 90.0, 425.0, 105.0],
+            "unit_symbol": "uF",
+            "expected_header_text": "Capacitance (uF)"
+          },
+          {
+            "qualifier": "maximum",
+            "header_box": [425.0, 90.0, 505.0, 105.0],
+            "unit_symbol": "uA",
+            "expected_header_text": "Leakage (uA)"
+          }
+        ],
+        "header_condition_binding": {
+          "header_box": [510.0, 90.0, 585.0, 105.0],
+          "parameter_name": "VOLTAGE",
+          "unit_symbol": "V",
+          "expected_header_text": "VOLTAGE (V)"
+        }
+      }
+    },
+    {
+      "case_id": "SYN-HB-CASE-02-UNICODE-UF",
+      "document_id": "doc.synthetic.hb",
+      "pdf_page_index": 1,
+      "printed_page_label": "HB-2",
+      "table_id": "TABLE_HB_UNICODE",
+      "layout_category": "partially_supported_ambiguous",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.hb.cap",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-HB-CAP",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 85.0, 650.0, 165.0],
+        "row_y_tolerance": 2.0,
+        "header": [85.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 280.0],
+        "minimum_column": [280.0, 340.0],
+        "typical_column": [340.0, 445.0],
+        "maximum_column": [445.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "header_unit_bindings": [
+          {
+            "qualifier": "typical",
+            "header_box": [340.0, 90.0, 440.0, 105.0],
+            "unit_symbol": "\u00b5F",
+            "expected_header_text": "CAPACITANCE (\u00b5F)"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-HB-CASE-03-UNIT-CONFLICT",
+      "document_id": "doc.synthetic.hb",
+      "pdf_page_index": 0,
+      "printed_page_label": "HB-1",
+      "table_id": "TABLE_HB_BAND2",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["conflicts with bound header unit"],
+      "component": {
+        "component_id": "cmp.fixture.hb.cap",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-HB-CAP",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 285.0, 650.0, 340.0],
+        "row_y_tolerance": 2.0,
+        "header": [285.0, 310.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 280.0],
+        "minimum_column": [280.0, 340.0],
+        "typical_column": [340.0, 425.0],
+        "maximum_column": [425.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "header_unit_bindings": [
+          {
+            "qualifier": "typical",
+            "header_box": [340.0, 290.0, 425.0, 305.0],
+            "unit_symbol": "uF",
+            "expected_header_text": "Capacitance (uF)"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-HB-CASE-04-HEADER-TEXT-MISMATCH",
+      "document_id": "doc.synthetic.hb",
+      "pdf_page_index": 0,
+      "printed_page_label": "HB-1",
+      "table_id": "TABLE_HB_MISMATCH",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["header binding text mismatch"],
+      "component": {
+        "component_id": "cmp.fixture.hb.cap",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-HB-CAP",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 85.0, 650.0, 165.0],
+        "row_y_tolerance": 2.0,
+        "header": [85.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 280.0],
+        "minimum_column": [280.0, 340.0],
+        "typical_column": [340.0, 425.0],
+        "maximum_column": [425.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "header_unit_bindings": [
+          {
+            "qualifier": "typical",
+            "header_box": [340.0, 90.0, 425.0, 105.0],
+            "unit_symbol": "pF",
+            "expected_header_text": "Capacitance (pF)"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-HB-CASE-05-UNBOUND-PHASE4C-TABLE",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_R",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.resistor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-10K",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 690.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    }
+  ]
+}

@@ -12,6 +12,14 @@
 #include <string_view>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <shellapi.h>
+#endif
+
 namespace {
 
 using datasim::component::ActorKind;
@@ -23,7 +31,71 @@ using datasim::component::ValidationRuleCode;
 using datasim::component::ValueQualifier;
 using datasim::intake::IntakeDiagnosticCode;
 using datasim::intake::IntakeDiagnosticSeverity;
+using datasim::pdf::HeaderConditionBinding;
+using datasim::pdf::HeaderUnitBinding;
 using datasim::pdf::HorizontalSpan;
+
+std::vector<std::string> get_utf8_args(int argc, char** argv) {
+#ifdef _WIN32
+    (void)argc;
+    (void)argv;
+    int wargc = 0;
+    LPWSTR* wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
+    if (wargv == nullptr) {
+        throw std::runtime_error("CommandLineToArgvW failed");
+    }
+    std::vector<std::string> result;
+    result.reserve(static_cast<std::size_t>(wargc));
+    for (int i = 0; i < wargc; ++i) {
+        const std::wstring_view warg(wargv[i]);
+        if (warg.empty()) {
+            result.emplace_back();
+            continue;
+        }
+        const int size = WideCharToMultiByte(
+            CP_UTF8, 0, warg.data(), static_cast<int>(warg.size()), nullptr, 0, nullptr, nullptr);
+        if (size <= 0) {
+            LocalFree(wargv);
+            throw std::runtime_error("WideCharToMultiByte failed");
+        }
+        std::string utf8(static_cast<std::size_t>(size), '\0');
+        WideCharToMultiByte(
+            CP_UTF8, 0, warg.data(), static_cast<int>(warg.size()), utf8.data(), size, nullptr, nullptr);
+        result.push_back(std::move(utf8));
+    }
+    LocalFree(wargv);
+    return result;
+#else
+    std::vector<std::string> result;
+    result.reserve(static_cast<std::size_t>(argc));
+    for (int i = 0; i < argc; ++i) {
+        result.emplace_back(argv[i]);
+    }
+    return result;
+#endif
+}
+
+ValueQualifier parse_qualifier(const std::string& text) {
+    if (text == "minimum" || text == "min") return ValueQualifier::minimum;
+    if (text == "typical" || text == "typ") return ValueQualifier::typical;
+    if (text == "maximum" || text == "max") return ValueQualifier::maximum;
+    throw std::invalid_argument("invalid header unit binding qualifier: " + text);
+}
+
+std::vector<std::string> split_pipe_fields(const std::string& spec, std::size_t count) {
+    std::vector<std::string> parts;
+    std::size_t start = 0;
+    for (std::size_t i = 0; i + 1U < count; ++i) {
+        const auto bar = spec.find('|', start);
+        if (bar == std::string::npos) {
+            throw std::invalid_argument("invalid pipe-delimited binding specification: " + spec);
+        }
+        parts.push_back(spec.substr(start, bar - start));
+        start = bar + 1U;
+    }
+    parts.push_back(spec.substr(start));
+    return parts;
+}
 
 std::string json_escape(std::string_view input) {
     std::ostringstream out;
@@ -567,13 +639,14 @@ int main(int argc, char** argv) {
         std::vector<std::string> explicit_doc_part_numbers;
         std::optional<std::filesystem::path> output_path;
 
-        for (int i = 1; i < argc; ++i) {
-            const std::string arg = argv[i];
+        const auto args = get_utf8_args(argc, argv);
+        for (std::size_t i = 1; i < args.size(); ++i) {
+            const std::string& arg = args[i];
             auto next = [&]() -> std::string {
-                if (i + 1 >= argc) {
+                if (i + 1 >= args.size()) {
                     throw std::invalid_argument("missing value for " + arg);
                 }
-                return argv[++i];
+                return args[++i];
             };
 
             if (arg == "--pdf") {
@@ -671,6 +744,26 @@ int main(int argc, char** argv) {
                 request.table.condition_column = parse_span(next());
             } else if (arg == "--category") {
                 request.table.category = parse_category(next());
+            } else if (arg == "--header-unit-binding") {
+                const auto parts = split_pipe_fields(next(), 4);
+                const auto box = parse_csv_numbers(parts[1], 4);
+                request.table.header_unit_bindings.push_back(HeaderUnitBinding{
+                    parse_qualifier(parts[0]),
+                    HorizontalSpan{box[0], box[2]},
+                    box[1],
+                    box[3],
+                    parts[3],
+                    parts[2]});
+            } else if (arg == "--header-condition-binding") {
+                const auto parts = split_pipe_fields(next(), 4);
+                const auto box = parse_csv_numbers(parts[0], 4);
+                request.table.header_condition_binding = HeaderConditionBinding{
+                    HorizontalSpan{box[0], box[2]},
+                    box[1],
+                    box[3],
+                    parts[3],
+                    parts[1],
+                    parts[2]};
             } else if (arg == "--output") {
                 output_path = next();
             } else {

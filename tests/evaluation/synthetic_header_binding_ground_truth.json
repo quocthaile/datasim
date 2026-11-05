@@ -1,0 +1,340 @@
+{
+  "schema_version": "datasim.phase4e.annotations.v1",
+  "annotation_set_id": "datasim-phase4f-synthetic-header-binding-ground-truth-v1",
+  "annotator_count": 1,
+  "inter_annotator_agreement_claimed": false,
+  "notes": "Single-annotator ground-truth labels for Phase 4F synthetic header-binding regression fixtures (Cases A-H). Evaluation labels only.",
+  "cases": [
+    {
+      "case_id": "SYN-HB-CASE-01-BAND1-BOUND",
+      "document_id": "doc.synthetic.hb",
+      "expected_sha256": "505ca09bc45072b639b28ef1002a96cb63224302f9e23994355057609cfa9470",
+      "pdf_page_index": 0,
+      "printed_page_label": "HB-1",
+      "table_id": "TABLE_HB_BAND1",
+      "annotation_author": "datasim.phase4f.annotator.1",
+      "review_status": "adjudicated_single_annotator",
+      "adjudication_history": [
+        {
+          "timestamp": "2026-11-05T20:30:00Z",
+          "author": "datasim.phase4f.annotator.1",
+          "action": "initial_annotation_and_header_binding_verification",
+          "notes": "Verified Cases A, B, E, F, G against synthetic_header_binding_datasheet.pdf page 1 band 1."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "GT-HB-R1-TYP",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=typ",
+          "expected_header_evidence_regions": [
+            "header_unit;column=typ",
+            "header_condition;column=condition"
+          ],
+          "parameter_name": "CAPACITANCE_A",
+          "original_value_text": "0.22",
+          "original_unit_symbol": "uF",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 0.22,
+          "operating_conditions": [
+            {
+              "parameter_name": "VOLTAGE",
+              "original_value_text": "100",
+              "unit_symbol": "V",
+              "numeric_value": 100.0
+            }
+          ],
+          "raw_conditions_text": "100",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Case A + Case E + Case G (col 1): blank row unit bound from typ header (uF), bare condition 100 bound from condition header VOLTAGE (V)."
+        },
+        {
+          "entry_id": "GT-HB-R1-MAX",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=max",
+          "expected_header_evidence_regions": [
+            "header_unit;column=max",
+            "header_condition;column=condition"
+          ],
+          "parameter_name": "CAPACITANCE_A",
+          "original_value_text": "0.5",
+          "original_unit_symbol": "uA",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 0.5,
+          "operating_conditions": [
+            {
+              "parameter_name": "VOLTAGE",
+              "original_value_text": "100",
+              "unit_symbol": "V",
+              "numeric_value": 100.0
+            }
+          ],
+          "raw_conditions_text": "100",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Case G (col 2) + Case E: max column independently bound to uA."
+        },
+        {
+          "entry_id": "GT-HB-R2-TYP",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=typ",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "CAPACITANCE_B",
+          "original_value_text": "0.33",
+          "original_unit_symbol": "uF",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 0.33,
+          "operating_conditions": [],
+          "raw_conditions_text": "A",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Case B + Case F: explicit row unit uF is consistent with header unit uF (row unit takes precedence); non-numeric condition code 'A' remains unresolved."
+        }
+      ]
+    },
+    {
+      "case_id": "SYN-HB-CASE-02-UNICODE-UF",
+      "document_id": "doc.synthetic.hb",
+      "expected_sha256": "505ca09bc45072b639b28ef1002a96cb63224302f9e23994355057609cfa9470",
+      "pdf_page_index": 1,
+      "printed_page_label": "HB-2",
+      "table_id": "TABLE_HB_UNICODE",
+      "annotation_author": "datasim.phase4f.annotator.1",
+      "review_status": "adjudicated_single_annotator",
+      "adjudication_history": [
+        {
+          "timestamp": "2026-11-05T20:32:00Z",
+          "author": "datasim.phase4f.annotator.1",
+          "action": "initial_annotation_and_unicode_verification",
+          "notes": "Verified Unicode micro sign unit preservation on page 2."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "GT-HB-UNICODE-R1-TYP",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=typ",
+          "expected_header_evidence_regions": [
+            "header_unit;column=typ"
+          ],
+          "parameter_name": "0.22",
+          "original_value_text": "0.22",
+          "original_unit_symbol": "\u00b5F",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 0.22,
+          "operating_conditions": [],
+          "raw_conditions_text": "A",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Unicode unit symbol preserved verbatim from header."
+        }
+      ]
+    },
+    {
+      "case_id": "SYN-HB-CASE-05-UNBOUND-PHASE4C-TABLE",
+      "document_id": "doc.synthetic.rc",
+      "expected_sha256": "7133e861225318b47982dbf25ee2bb68a55ee5c11aa054675214515ab769cbb8",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_R",
+      "annotation_author": "datasim.phase4f.annotator.1",
+      "review_status": "adjudicated_single_annotator",
+      "adjudication_history": [
+        {
+          "timestamp": "2026-11-05T20:35:00Z",
+          "author": "datasim.phase4f.annotator.1",
+          "action": "initial_annotation_and_coordinate_verification",
+          "notes": "Case H: Original Phase 4C table with no header bindings."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "GT-R-ROW1-MIN",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=min",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "9.9",
+          "original_unit_symbol": "kohm",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 9.9,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW1-TYP",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=typ",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "10.0",
+          "original_unit_symbol": "kohm",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 10.0,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW1-MAX",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=max",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "10.1",
+          "original_unit_symbol": "kohm",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 10.1,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW2-MIN",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=min",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "9.8",
+          "original_unit_symbol": "kohm",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 9.8,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW2-TYP",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=typ",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "10.0",
+          "original_unit_symbol": "kohm",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 10.0,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW2-MAX",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=max",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "10.2",
+          "original_unit_symbol": "kohm",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 10.2,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW3-MIN",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=min",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "9.9",
+          "original_unit_symbol": "kohm",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 9.9,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW3-TYP",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=typ",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "10.01",
+          "original_unit_symbol": "kohm",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 10.01,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "GT-R-ROW3-MAX",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=max",
+          "expected_header_evidence_regions": [],
+          "parameter_name": "Resistance",
+          "original_value_text": "10.1",
+          "original_unit_symbol": "kohm",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 10.1,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        }
+      ]
+    }
+  ]
+}

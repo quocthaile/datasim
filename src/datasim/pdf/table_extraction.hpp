@@ -17,6 +17,24 @@ struct HorizontalSpan {
     double max = 0.0;
 };
 
+struct HeaderUnitBinding {
+    component::ValueQualifier qualifier = component::ValueQualifier::typical;
+    HorizontalSpan header_x_span;
+    double header_y_min = 0.0;
+    double header_y_max = 0.0;
+    std::string expected_header_text;
+    std::string unit_symbol;
+};
+
+struct HeaderConditionBinding {
+    HorizontalSpan header_x_span;
+    double header_y_min = 0.0;
+    double header_y_max = 0.0;
+    std::string expected_header_text;
+    std::string parameter_name;
+    std::string unit_symbol;
+};
+
 struct ElectricalTableLayout {
     std::string table_id;
     double region_x_min = 0.0;
@@ -33,6 +51,8 @@ struct ElectricalTableLayout {
     HorizontalSpan maximum_column;
     std::optional<HorizontalSpan> condition_column;
     std::optional<component::ParameterCategory> category;
+    std::vector<HeaderUnitBinding> header_unit_bindings;
+    std::optional<HeaderConditionBinding> header_condition_binding;
 };
 
 struct ExtractionRequest {

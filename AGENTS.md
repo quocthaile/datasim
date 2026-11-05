@@ -41,7 +41,14 @@ via PR #8 (`69aba4df7ff752355a40e394de5d05ac988df34b`) and verified by hosted
 Windows CI run `42025406013`. Phase 4E ([plan](docs/PHASE_4E_PLAN.md),
 [corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md),
 [validation](docs/PHASE_4E_VALIDATION.md)) implements the offline evaluation
-corpus and benchmark on `feat/phase-4e-datasheet-evaluation-corpus`. Preserve
+corpus and benchmark, merged into `main` via PR #9
+(`b45c32224e0316dd9f93b6e9bfc3ab89cd3ceaf4`) and verified by hosted Windows CI
+run `42037281172`. Phase 4F ([plan](docs/PHASE_4F_PLAN.md),
+[implementation](docs/PHASE_4F_IMPLEMENTATION.md),
+[validation](docs/PHASE_4F_VALIDATION.md),
+[ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md)) implements
+explicit, source-verified column-header unit and condition bindings inside
+`datasim_pdf` on `feat/phase-4f-explicit-header-binding`. Preserve
 the `datasim_intake` APIs and its candidate-only boundary. Keep PDF processing
 in the isolated `datasim_pdf` adapter; do not add OCR, persistence, LLM
 integration, GUI, semiconductor models, or a custom solver. Do not commit

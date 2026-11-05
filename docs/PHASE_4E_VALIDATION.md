@@ -2,9 +2,10 @@
 
 - **Phase**: 4E
 - **Status**:
-  - **Synthetic Corpus Regression Suite (`datasim-phase4e-synthetic-regression-v1`)**: **VERIFIED** locally and wired into CTest (`pdf_corpus_evaluation`) for hosted Windows CI
+  - **Synthetic Corpus Regression Suite (`datasim-phase4e-synthetic-regression-v1`)**: **VERIFIED** locally and in hosted Windows CI (`pdf_corpus_evaluation`, PR #9 runs [`42031281489`](https://github.com/quocthaile/datasim/actions/runs/42031281489), [`42031409931`](https://github.com/quocthaile/datasim/actions/runs/42031409931) and post-merge `main` run [`42037281172`](https://github.com/quocthaile/datasim/actions/runs/42037281172))
   - **Real-Datasheet Pilot Corpus (`datasim-phase4e-real-datasheet-pilot-v1`)**: **VERIFIED locally** on Windows x64 against 5 untracked manufacturer PDFs in `build/corpus/` (not executed in hosted CI due to third-party PDF redistribution restrictions)
 - **Baseline `main` Commit**: `69aba4df7ff752355a40e394de5d05ac988df34b` (PR #8 merge of Phase 4D; post-merge hosted Windows CI run [`42025406013`](https://github.com/quocthaile/datasim/actions/runs/42025406013) `success`)
+- **Merged Commit on `main`**: `b45c32224e0316dd9f93b6e9bfc3ab89cd3ceaf4` (PR #9; post-merge hosted Windows CI run [`42037281172`](https://github.com/quocthaile/datasim/actions/runs/42037281172) `success`)
 - **Branch**: `feat/phase-4e-datasheet-evaluation-corpus`
 
 ## 1. Environment and Artifact Checksums

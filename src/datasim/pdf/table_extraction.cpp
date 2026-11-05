@@ -117,6 +117,50 @@ std::optional<std::vector<component::OperatingCondition>> parse_conditions(std::
     return result;
 }
 
+bool is_single_token(std::string_view value) {
+    return !value.empty() && value.find_first_of(" \t\r\n") == std::string_view::npos;
+}
+
+bool has_whitespace_delimited_token(std::string_view text, std::string_view token) {
+    if (token.empty()) return false;
+    std::size_t pos = 0;
+    while ((pos = text.find(token, pos)) != std::string_view::npos) {
+        const bool left_ok = (pos == 0) || std::isspace(static_cast<unsigned char>(text[pos - 1U]));
+        const std::size_t end = pos + token.size();
+        const bool right_ok = (end == text.size()) || std::isspace(static_cast<unsigned char>(text[end]));
+        if (left_ok && right_ok) return true;
+        pos += 1U;
+    }
+    return false;
+}
+
+bool header_contains_unit_symbol(std::string_view header_text, std::string_view unit_symbol) {
+    if (!is_single_token(unit_symbol)) return false;
+    if (header_text == unit_symbol) return true;
+    const std::string paren = "(" + std::string(unit_symbol) + ")";
+    const std::string bracket = "[" + std::string(unit_symbol) + "]";
+    return has_whitespace_delimited_token(header_text, paren) ||
+           has_whitespace_delimited_token(header_text, bracket);
+}
+
+HorizontalSpan target_span_for_qualifier(const ElectricalTableLayout& t, component::ValueQualifier qualifier) {
+    switch (qualifier) {
+        case component::ValueQualifier::minimum: return t.minimum_column;
+        case component::ValueQualifier::typical: return t.typical_column;
+        case component::ValueQualifier::maximum: return t.maximum_column;
+        default: throw std::invalid_argument("header unit binding qualifier must be minimum, typical, or maximum");
+    }
+}
+
+std::string column_name_for_qualifier(component::ValueQualifier qualifier) {
+    switch (qualifier) {
+        case component::ValueQualifier::minimum: return "min";
+        case component::ValueQualifier::typical: return "typ";
+        case component::ValueQualifier::maximum: return "max";
+        default: throw std::invalid_argument("unsupported value qualifier");
+    }
+}
+
 void validate_request(const ExtractionRequest& request) {
     const auto& t = request.table;
     if (request.pdf_path.empty() || request.pdfinfo_path.empty() || request.pdftotext_path.empty())
@@ -133,10 +177,89 @@ void validate_request(const ExtractionRequest& request) {
             if (std::max(spans[i].min, spans[j].min) < std::min(spans[i].max, spans[j].max))
                 throw std::invalid_argument("table column spans overlap");
     if (t.condition_column.has_value()) {
+        if (!(t.condition_column->min < t.condition_column->max))
+            throw std::invalid_argument("invalid condition column span");
         for (const auto span : spans)
             if (std::max(span.min, t.condition_column->min) < std::min(span.max, t.condition_column->max))
                 throw std::invalid_argument("condition column overlaps another column");
     }
+    if (!t.header_unit_bindings.empty() || t.header_condition_binding.has_value()) {
+        if (!(t.header_y_min < t.header_y_max) || t.header_y_min < t.region_y_min || t.header_y_max > t.region_y_max)
+            throw std::invalid_argument("header bindings require a non-empty header y-range inside the table region");
+    }
+    std::vector<component::ValueQualifier> bound_qualifiers;
+    for (const auto& binding : t.header_unit_bindings) {
+        const auto target_span = target_span_for_qualifier(t, binding.qualifier);
+        if (std::find(bound_qualifiers.begin(), bound_qualifiers.end(), binding.qualifier) != bound_qualifiers.end())
+            throw std::invalid_argument("duplicate header unit binding for the same value column");
+        bound_qualifiers.push_back(binding.qualifier);
+        if (!(binding.header_x_span.min < binding.header_x_span.max) || !(binding.header_y_min < binding.header_y_max))
+            throw std::invalid_argument("invalid header unit binding box coordinates");
+        if (binding.header_x_span.min < t.region_x_min || binding.header_x_span.max > t.region_x_max ||
+            binding.header_y_min < t.header_y_min || binding.header_y_max > t.header_y_max)
+            throw std::invalid_argument("header unit binding box must lie within table region and header y-range");
+        if (!(std::max(binding.header_x_span.min, target_span.min) < std::min(binding.header_x_span.max, target_span.max)))
+            throw std::invalid_argument("header unit binding x-span does not overlap target value column");
+        if (binding.expected_header_text.empty() || !header_contains_unit_symbol(binding.expected_header_text, binding.unit_symbol))
+            throw std::invalid_argument("header unit binding expected_header_text must explicitly contain unit_symbol");
+    }
+    if (t.header_condition_binding.has_value()) {
+        if (!t.condition_column.has_value())
+            throw std::invalid_argument("header condition binding requires condition_column");
+        const auto& b = *t.header_condition_binding;
+        if (!(b.header_x_span.min < b.header_x_span.max) || !(b.header_y_min < b.header_y_max))
+            throw std::invalid_argument("invalid header condition binding box coordinates");
+        if (b.header_x_span.min < t.region_x_min || b.header_x_span.max > t.region_x_max ||
+            b.header_y_min < t.header_y_min || b.header_y_max > t.header_y_max)
+            throw std::invalid_argument("header condition binding box must lie within table region and header y-range");
+        if (!(std::max(b.header_x_span.min, t.condition_column->min) < std::min(b.header_x_span.max, t.condition_column->max)))
+            throw std::invalid_argument("header condition binding x-span does not overlap condition_column");
+        if (b.expected_header_text.empty() || !is_single_token(b.parameter_name) ||
+            !has_whitespace_delimited_token(b.expected_header_text, b.parameter_name) ||
+            !header_contains_unit_symbol(b.expected_header_text, b.unit_symbol))
+            throw std::invalid_argument("header condition binding expected_header_text must contain parameter_name and unit_symbol");
+    }
+}
+
+void verify_header_box_text(const std::vector<Word>& page_words, HorizontalSpan x_span,
+                            double y_min, double y_max, double row_y_tolerance,
+                            const std::string& expected_text) {
+    std::vector<Word> box_words;
+    for (const auto& word : page_words) {
+        const bool overlaps_x = std::max(word.x0, x_span.min) < std::min(word.x1, x_span.max);
+        const bool overlaps_y = std::max(word.y0, y_min) < std::min(word.y1, y_max);
+        if (!overlaps_x || !overlaps_y) continue;
+        if (word.x0 < x_span.min || word.x1 > x_span.max || word.y0 < y_min || word.y1 > y_max)
+            throw std::runtime_error("header word straddles configured header binding box: " + word.text);
+        box_words.push_back(word);
+    }
+    if (box_words.empty())
+        throw std::runtime_error("configured header binding box contains no selectable text");
+    std::sort(box_words.begin(), box_words.end(), [](const Word& a, const Word& b) {
+        if (a.y0 != b.y0) return a.y0 < b.y0;
+        if (a.x0 != b.x0) return a.x0 < b.x0;
+        return a.text < b.text;
+    });
+    std::vector<Row> lines;
+    for (const auto& word : box_words) {
+        const double center = (word.y0 + word.y1) / 2.0;
+        if (lines.empty() || std::abs(center - lines.back().y) > row_y_tolerance)
+            lines.push_back({center, {word}});
+        else {
+            auto& line = lines.back();
+            line.y = (line.y * static_cast<double>(line.words.size()) + center) /
+                     static_cast<double>(line.words.size() + 1U);
+            line.words.push_back(word);
+        }
+    }
+    std::string actual;
+    for (const auto& line : lines) {
+        if (!actual.empty()) actual.push_back(' ');
+        actual += join_words(line.words);
+    }
+    if (actual != expected_text)
+        throw std::runtime_error("header binding text mismatch: expected '" + expected_text +
+                                 "' but found '" + actual + "'");
 }
 
 std::string tool_version(const std::filesystem::path& tool, const std::filesystem::path& temp) {
@@ -205,6 +328,17 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
             if (a.x0 != b.x0) return a.x0 < b.x0;
             return a.text < b.text;
         });
+        for (const auto& binding : request.table.header_unit_bindings) {
+            verify_header_box_text(words, binding.header_x_span, binding.header_y_min,
+                                   binding.header_y_max, request.table.row_y_tolerance,
+                                   binding.expected_header_text);
+        }
+        if (request.table.header_condition_binding.has_value()) {
+            const auto& b = *request.table.header_condition_binding;
+            verify_header_box_text(words, b.header_x_span, b.header_y_min, b.header_y_max,
+                                   request.table.row_y_tolerance, b.expected_header_text);
+        }
+
         std::vector<Row> rows;
         for (const auto& word : selected) {
             if (word.y0 >= request.table.header_y_min && word.y1 <= request.table.header_y_max) continue;
@@ -228,6 +362,44 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         manifest.source_document = request.source_document;
         manifest.declared_pdf_page_count = page_count;
         const auto version = tool_version(request.pdftotext_path, temp.path);
+
+        struct VerifiedUnitHeader {
+            HeaderUnitBinding binding;
+            component::EvidenceLocation evidence;
+            bool registered = false;
+        };
+        std::vector<VerifiedUnitHeader> unit_headers;
+        unit_headers.reserve(request.table.header_unit_bindings.size());
+        for (const auto& binding : request.table.header_unit_bindings) {
+            const std::string col_name = column_name_for_qualifier(binding.qualifier);
+            const std::string hdr_base = safe_id(request.source_document.id.value + "." +
+                request.table.table_id + ".p" + std::to_string(request.pdf_page_index) +
+                ".header_unit." + col_name);
+            component::EvidenceLocation hdr_ev;
+            hdr_ev.id = {"ev." + hdr_base};
+            hdr_ev.source_document_id = request.source_document.id;
+            hdr_ev.pdf_page_index = request.pdf_page_index;
+            hdr_ev.printed_page_label = request.printed_page_label;
+            hdr_ev.table_or_figure_id = request.table.table_id;
+            hdr_ev.cell_or_region = "header_unit;column=" + col_name;
+            unit_headers.push_back({binding, std::move(hdr_ev), false});
+        }
+        std::optional<component::EvidenceLocation> cond_header_ev;
+        bool cond_header_registered = false;
+        if (request.table.header_condition_binding.has_value()) {
+            const std::string hdr_base = safe_id(request.source_document.id.value + "." +
+                request.table.table_id + ".p" + std::to_string(request.pdf_page_index) +
+                ".header_condition");
+            component::EvidenceLocation hdr_ev;
+            hdr_ev.id = {"ev." + hdr_base};
+            hdr_ev.source_document_id = request.source_document.id;
+            hdr_ev.pdf_page_index = request.pdf_page_index;
+            hdr_ev.printed_page_label = request.printed_page_label;
+            hdr_ev.table_or_figure_id = request.table.table_id;
+            hdr_ev.cell_or_region = "header_condition;column=condition";
+            cond_header_ev = std::move(hdr_ev);
+        }
+
         std::size_t row_number = 0;
         for (const auto& row : rows) {
             ++row_number;
@@ -279,19 +451,89 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 manifest.evidence.push_back({parameter_evidence, parameter, "parameter", false});
                 manifest.evidence.push_back({evidence, parameter, column_name, false});
 
+                VerifiedUnitHeader* matched_unit_header = nullptr;
+                for (auto& uh : unit_headers) {
+                    if (uh.binding.qualifier == qualifier) {
+                        matched_unit_header = &uh;
+                        break;
+                    }
+                }
+                std::optional<std::string> effective_unit;
+                bool used_header_unit = false;
+                if (!unit.empty()) {
+                    if (matched_unit_header != nullptr && unit != matched_unit_header->binding.unit_symbol) {
+                        throw std::runtime_error("row " + std::to_string(row_number) +
+                            " explicit unit '" + unit + "' conflicts with bound header unit '" +
+                            matched_unit_header->binding.unit_symbol + "'");
+                    }
+                    effective_unit = unit;
+                } else if (matched_unit_header != nullptr) {
+                    effective_unit = matched_unit_header->binding.unit_symbol;
+                    used_header_unit = true;
+                    if (!matched_unit_header->registered) {
+                        manifest.evidence.push_back({matched_unit_header->evidence,
+                                                     matched_unit_header->binding.expected_header_text,
+                                                     column_name + "_header", false});
+                        matched_unit_header->registered = true;
+                    }
+                }
+
+                std::optional<std::vector<component::OperatingCondition>> resolved_conditions;
+                bool used_header_condition = false;
+                std::optional<std::string> condition_ambiguity_notes;
+                if (condition_text.empty()) {
+                    resolved_conditions = std::vector<component::OperatingCondition>{};
+                } else if (condition_text.find('=') != std::string::npos) {
+                    resolved_conditions = parse_conditions(condition_text);
+                    if (request.table.header_condition_binding.has_value()) {
+                        const auto& cb = *request.table.header_condition_binding;
+                        if (!resolved_conditions.has_value())
+                            throw std::runtime_error("row " + std::to_string(row_number) +
+                                " inline operating condition conflicts with bound condition header");
+                        for (const auto& cond : *resolved_conditions) {
+                            if (cond.parameter_name != cb.parameter_name || cond.unit_symbol != cb.unit_symbol)
+                                throw std::runtime_error("row " + std::to_string(row_number) +
+                                    " inline operating condition conflicts with bound condition header");
+                        }
+                    }
+                    if (!resolved_conditions.has_value()) {
+                        condition_ambiguity_notes = "Condition text preserved verbatim but does not match the supported PARAMETER=value UNIT form.";
+                    }
+                } else if (request.table.header_condition_binding.has_value()) {
+                    const auto& cb = *request.table.header_condition_binding;
+                    const auto cond_scalar = intake::parse_unambiguous_scalar(condition_text);
+                    if (cond_scalar.has_value()) {
+                        resolved_conditions = std::vector<component::OperatingCondition>{
+                            component::OperatingCondition{cb.parameter_name, condition_text,
+                                                          cb.unit_symbol, cond_scalar, std::nullopt}};
+                        used_header_condition = true;
+                        if (!cond_header_registered) {
+                            manifest.evidence.push_back({*cond_header_ev, cb.expected_header_text,
+                                                         "condition_header", false});
+                            cond_header_registered = true;
+                        }
+                    } else {
+                        condition_ambiguity_notes = "Condition text preserved verbatim; bare cell is not an unambiguous scalar for the bound condition header.";
+                    }
+                } else {
+                    condition_ambiguity_notes = "Condition text preserved verbatim but does not match the supported PARAMETER=value UNIT form.";
+                }
+
                 component::ParameterObservation observation;
                 observation.id = {"obs." + base};
                 observation.component_id = request.component.id;
                 observation.parameter_name = parameter;
                 observation.original_value_text = value;
-                observation.original_unit_symbol = unit.empty() ? std::nullopt : std::optional<std::string>(unit);
+                observation.original_unit_symbol = effective_unit;
                 observation.unitless = false;
-                observation.parsed_numeric_value = unit.empty() ? std::nullopt : intake::parse_unambiguous_scalar(value);
+                observation.parsed_numeric_value = effective_unit.has_value()
+                    ? intake::parse_unambiguous_scalar(value) : std::nullopt;
                 observation.qualifier = qualifier;
                 observation.category = *request.table.category;
-                const auto conditions = parse_conditions(condition_text);
-                if (conditions.has_value()) observation.operating_conditions = *conditions;
+                if (resolved_conditions.has_value()) observation.operating_conditions = *resolved_conditions;
                 observation.evidence_refs = {parameter_evidence.id, evidence.id};
+                if (used_header_unit) observation.evidence_refs.push_back(matched_unit_header->evidence.id);
+                if (used_header_condition) observation.evidence_refs.push_back(cond_header_ev->id);
                 observation.extraction_method = component::ExtractionMethod::deterministic_table_parser;
                 observation.extraction_tool = "Poppler pdftotext -bbox-layout";
                 observation.extraction_tool_version = version;
@@ -299,12 +541,12 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 entry.observation = std::move(observation);
                 if (!condition_text.empty()) {
                     entry.raw_conditions_text = condition_text;
-                    if (!conditions.has_value()) {
-                        entry.ambiguity_notes = "Condition text preserved verbatim but does not match the supported PARAMETER=value UNIT form.";
+                    if (!resolved_conditions.has_value()) {
+                        entry.ambiguity_notes = condition_ambiguity_notes;
                         result.diagnostics.push_back("row " + std::to_string(row_number) + ": operating condition left unresolved: " + condition_text);
                     }
                 }
-                if (unit.empty())
+                if (!effective_unit.has_value())
                     result.diagnostics.push_back("row " + std::to_string(row_number) +
                         ": unit cell is blank; no unitless status or numeric value was inferred");
                 manifest.observations.push_back(std::move(entry));

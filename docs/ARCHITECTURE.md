@@ -33,13 +33,18 @@ and VERIFIED** on `main` (PR #6 at `7d9af1c`, PR #7 at
 `1704f726d901f3e1d00f9cdc918e80d352b443ac`, and PR #8 at
 `69aba4df7ff752355a40e394de5d05ac988df34b`; hosted Windows CI runs
 `41995104973`, `42000652152`, `42017272043`, `42023680012`, and `42025406013`).
-Phase 4E ([PHASE_4E_VALIDATION.md](PHASE_4E_VALIDATION.md)) adds an offline
-evaluation harness (`datasheet_eval_dump` + `scripts/eval/evaluate_pdf_corpus.py`)
-benchmarking `datasim_pdf` on synthetic fixtures and a local pilot corpus of
-untracked manufacturer PDFs. `datasim_pdf` shells out to local Poppler `pdfinfo`
-and `pdftotext -bbox-layout`, then passes explicitly selected text-cell
-observations through `datasim_intake`. It does not link Poppler into
-`datasim_intake` or authenticate source identity.
+Phase 4E ([PHASE_4E_VALIDATION.md](PHASE_4E_VALIDATION.md), merged via PR #9 at
+`b45c32224e0316dd9f93b6e9bfc3ab89cd3ceaf4`, hosted CI run `42037281172`) adds an
+offline evaluation harness (`datasheet_eval_dump` +
+`scripts/eval/evaluate_pdf_corpus.py`) benchmarking `datasim_pdf` on synthetic
+fixtures and a local pilot corpus of untracked manufacturer PDFs, and Phase 4F
+([PHASE_4F_VALIDATION.md](PHASE_4F_VALIDATION.md),
+[ADR-0007](decisions/ADR-0007-explicit-header-binding.md)) extends `datasim_pdf`
+with caller-configured, source-verified column-header unit and condition
+bindings (`HeaderUnitBinding` and `HeaderConditionBinding`). `datasim_pdf` shells
+out to local Poppler `pdfinfo` and `pdftotext -bbox-layout`, then passes
+explicitly selected text-cell observations through `datasim_intake`. It does not
+link Poppler into `datasim_intake` or authenticate source identity.
 
 ```mermaid
 flowchart TD
