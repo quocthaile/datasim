@@ -2,7 +2,7 @@
 
 Date: 2026-11-05
 
-Status: **IMPLEMENTED on `feat/phase-4f-explicit-header-binding` (local verification and Phase 4E pilot re-evaluation completed; awaiting hosted Windows CI on the Phase 4F pull request).**
+Status: **IMPLEMENTED, MERGED into `main` via PR #10 (`9f3c115d13a40204d3d7f83382a50c107b14b803`), and VERIFIED on Windows x64 (`MSYS2 UCRT64 GCC 16.2.0` / `Poppler 26.10.0` / `ngspice-47`) in hosted Windows CI runs `42042283386`, `42043481659`, and `42044651168`.**
 
 ## Context
 
@@ -64,3 +64,4 @@ Phase 4F requires a narrowly scoped, deterministic mechanism inside `datasim_pdf
 - Multi-value-column tables with distinct column-header units (e.g., `CAPACITANCE (μF)` in `typ` and `MAX. DCL (μA)` in `max`) can be bound independently per `ValueQualifier`.
 - Arbitrary header prose, mismatched header coordinates, row/header unit conflicts, and inline/header condition conflicts fail closed with deterministic diagnostics.
 - Non-numeric condition codes (such as `"A"` in `150D`) remain safely unresolved rather than being coerced into fake numeric conditions.
+

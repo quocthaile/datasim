@@ -47,8 +47,15 @@ run `42037281172`. Phase 4F ([PHASE_4F_PLAN.md](PHASE_4F_PLAN.md),
 [PHASE_4F_IMPLEMENTATION.md](PHASE_4F_IMPLEMENTATION.md),
 [PHASE_4F_VALIDATION.md](PHASE_4F_VALIDATION.md),
 [ADR-0007](decisions/ADR-0007-explicit-header-binding.md)) implements explicit,
-source-verified column-header unit and condition bindings inside `datasim_pdf` on
-`feat/phase-4f-explicit-header-binding`. No physical measurement is claimed.
+source-verified column-header unit and condition bindings inside `datasim_pdf`,
+merged into `main` via PR #10 (`9f3c115d13a40204d3d7f83382a50c107b14b803`) and
+verified by hosted Windows CI run `42044651168`. Phase 4G
+([PHASE_4G_PLAN.md](PHASE_4G_PLAN.md),
+[PHASE_4G_IMPLEMENTATION.md](PHASE_4G_IMPLEMENTATION.md),
+[PHASE_4G_VALIDATION.md](PHASE_4G_VALIDATION.md),
+[ADR-0008](decisions/ADR-0008-inline-value-unit-parsing.md)) implements explicit,
+bounded inline value/unit cell parsing inside `datasim_pdf` on
+`feat/phase-4g-inline-value-unit-parsing`. No physical measurement is claimed.
 Keep the Poppler adapter in `datasim_pdf`, above and depending on `datasim_intake`;
 do not modify existing Phase 2/3/4B/4D public contracts without a demonstrated,
 documented correctness defect. Do not infer licensing rights or commit vendor PDFs.

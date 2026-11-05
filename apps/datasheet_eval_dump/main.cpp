@@ -34,6 +34,8 @@ using datasim::intake::IntakeDiagnosticSeverity;
 using datasim::pdf::HeaderConditionBinding;
 using datasim::pdf::HeaderUnitBinding;
 using datasim::pdf::HorizontalSpan;
+using datasim::pdf::InlineValueUnitBinding;
+using datasim::pdf::ValueCellProvenance;
 
 std::vector<std::string> get_utf8_args(int argc, char** argv) {
 #ifdef _WIN32
@@ -95,6 +97,18 @@ std::vector<std::string> split_pipe_fields(const std::string& spec, std::size_t 
     }
     parts.push_back(spec.substr(start));
     return parts;
+}
+
+std::vector<std::string> split_csv_strings(const std::string& text) {
+    std::vector<std::string> result;
+    std::size_t start = 0;
+    while (start <= text.size()) {
+        const auto comma = text.find(',', start);
+        result.push_back(text.substr(start, comma == std::string::npos ? comma : comma - start));
+        if (comma == std::string::npos) break;
+        start = comma + 1U;
+    }
+    return result;
 }
 
 std::string json_escape(std::string_view input) {
@@ -602,9 +616,48 @@ void write_extraction_result_json(std::ostream& out, const datasim::pdf::Extract
             out << ",\n";
             out << "      \"ambiguity_notes\": ";
             write_json_string_or_null(out, entry.ambiguity_notes);
+            const ValueCellProvenance* matched_prov = nullptr;
+            for (const auto& prov : result.value_cell_provenance) {
+                if (prov.observation_id == obs.id) {
+                    matched_prov = &prov;
+                    break;
+                }
+            }
+            out << ",\n";
+            out << "      \"raw_cell_text\": ";
+            write_json_string_or_null(
+                out,
+                matched_prov != nullptr ? std::optional<std::string>(matched_prov->raw_cell_text) : std::nullopt);
+            out << ",\n";
+            out << "      \"raw_value_token\": ";
+            write_json_string_or_null(
+                out,
+                matched_prov != nullptr ? std::optional<std::string>(matched_prov->raw_value_token) : std::nullopt);
+            out << ",\n";
+            out << "      \"raw_inline_unit_token\": ";
+            write_json_string_or_null(
+                out,
+                matched_prov != nullptr ? matched_prov->raw_inline_unit_token : std::nullopt);
             out << "\n";
             out << "    }" << (i + 1 < obs_list.size() ? "," : "") << "\n";
         }
+    }
+    out << "  ],\n";
+
+    out << "  \"value_cell_provenance\": [\n";
+    for (std::size_t i = 0; i < result.value_cell_provenance.size(); ++i) {
+        const auto& prov = result.value_cell_provenance[i];
+        out << "    {\n";
+        out << "      \"observation_id\": \"" << json_escape(prov.observation_id.value) << "\",\n";
+        out << "      \"value_evidence_id\": \"" << json_escape(prov.value_evidence_id.value) << "\",\n";
+        out << "      \"row_index\": " << prov.row_index << ",\n";
+        out << "      \"qualifier\": \"" << qualifier_to_string(prov.qualifier) << "\",\n";
+        out << "      \"raw_cell_text\": \"" << json_escape(prov.raw_cell_text) << "\",\n";
+        out << "      \"raw_value_token\": \"" << json_escape(prov.raw_value_token) << "\",\n";
+        out << "      \"raw_inline_unit_token\": ";
+        write_json_string_or_null(out, prov.raw_inline_unit_token);
+        out << "\n";
+        out << "    }" << (i + 1 < result.value_cell_provenance.size() ? "," : "") << "\n";
     }
     out << "  ]\n";
     out << "}\n";
@@ -764,6 +817,11 @@ int main(int argc, char** argv) {
                     parts[3],
                     parts[1],
                     parts[2]};
+            } else if (arg == "--inline-unit-binding") {
+                const auto parts = split_pipe_fields(next(), 2);
+                request.table.inline_value_unit_bindings.push_back(InlineValueUnitBinding{
+                    parse_qualifier(parts[0]),
+                    split_csv_strings(parts[1])});
             } else if (arg == "--output") {
                 output_path = next();
             } else {

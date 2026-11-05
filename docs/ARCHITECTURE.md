@@ -39,9 +39,14 @@ offline evaluation harness (`datasheet_eval_dump` +
 `scripts/eval/evaluate_pdf_corpus.py`) benchmarking `datasim_pdf` on synthetic
 fixtures and a local pilot corpus of untracked manufacturer PDFs, and Phase 4F
 ([PHASE_4F_VALIDATION.md](PHASE_4F_VALIDATION.md),
-[ADR-0007](decisions/ADR-0007-explicit-header-binding.md)) extends `datasim_pdf`
+[ADR-0007](decisions/ADR-0007-explicit-header-binding.md), merged via PR #10 at
+`9f3c115d13a40204d3d7f83382a50c107b14b803`, hosted CI run `42044651168`) extends `datasim_pdf`
 with caller-configured, source-verified column-header unit and condition
-bindings (`HeaderUnitBinding` and `HeaderConditionBinding`). `datasim_pdf` shells
+bindings (`HeaderUnitBinding` and `HeaderConditionBinding`). Phase 4G
+([PHASE_4G_VALIDATION.md](PHASE_4G_VALIDATION.md),
+[ADR-0008](decisions/ADR-0008-inline-value-unit-parsing.md)) further extends `datasim_pdf`
+with explicitly configured inline value/unit cell parsing (`InlineValueUnitBinding` and
+`ValueCellProvenance`). `datasim_pdf` shells
 out to local Poppler `pdfinfo` and `pdftotext -bbox-layout`, then passes
 explicitly selected text-cell observations through `datasim_intake`. It does not
 link Poppler into `datasim_intake` or authenticate source identity.

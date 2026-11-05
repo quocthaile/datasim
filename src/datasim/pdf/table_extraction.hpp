@@ -35,6 +35,23 @@ struct HeaderConditionBinding {
     std::string unit_symbol;
 };
 
+struct InlineValueUnitBinding {
+    component::ValueQualifier qualifier = component::ValueQualifier::typical;
+    std::vector<std::string> allowed_unit_symbols;
+};
+
+struct ValueCellProvenance {
+    component::ObservationId observation_id;
+    component::EvidenceId value_evidence_id;
+    std::size_t row_index = 0;
+    component::ValueQualifier qualifier = component::ValueQualifier::unspecified;
+    std::string raw_cell_text;
+    std::string raw_value_token;
+    std::optional<std::string> raw_inline_unit_token;
+
+    auto operator<=>(const ValueCellProvenance&) const = default;
+};
+
 struct ElectricalTableLayout {
     std::string table_id;
     double region_x_min = 0.0;
@@ -53,6 +70,7 @@ struct ElectricalTableLayout {
     std::optional<component::ParameterCategory> category;
     std::vector<HeaderUnitBinding> header_unit_bindings;
     std::optional<HeaderConditionBinding> header_condition_binding;
+    std::vector<InlineValueUnitBinding> inline_value_unit_bindings;
 };
 
 struct ExtractionRequest {
@@ -72,6 +90,7 @@ struct ExtractionResult {
     std::optional<intake::IntakeManifest> manifest;
     std::optional<component::ComponentDomainBundle> candidate_bundle;
     std::vector<std::string> diagnostics;
+    std::vector<ValueCellProvenance> value_cell_provenance;
 };
 
 // Extracts only explicitly selected horizontal table bands from selectable PDF text.

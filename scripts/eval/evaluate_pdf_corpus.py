@@ -83,6 +83,7 @@ def find_executable(explicit: str | None, name: str) -> Path:
     exe_name = f"{name}.exe" if os.name == "nt" else name
     repo_root = Path(__file__).resolve().parents[2]
     for candidate in (
+        repo_root / "build" / "phase4g" / exe_name,
         repo_root / "build" / "phase4f" / exe_name,
         repo_root / "build" / "phase4e" / exe_name,
         repo_root / "build" / "ci" / exe_name,
@@ -345,6 +346,10 @@ def build_dump_command(
             f"{cb['parameter_name']}|{cb['unit_symbol']}|{cb['expected_header_text']}"
         )
         cmd.extend(["--header-condition-binding", spec])
+    for ib in geom.get("inline_value_unit_bindings", []):
+        units_csv = ",".join(str(u) for u in ib["allowed_unit_symbols"])
+        spec = f"{ib['qualifier']}|{units_csv}"
+        cmd.extend(["--inline-unit-binding", spec])
     return cmd
 
 
@@ -352,7 +357,13 @@ def classify_diagnostic_message(msg: str) -> str:
     lower = msg.lower()
     if "no selectable text; image-only" in lower or "no selectable words" in lower or "ocr" in lower:
         return "missing_selectable_text"
-    if "conflicts with bound header unit" in lower or "header unit" in lower:
+    if (
+        "conflicts with bound header unit" in lower
+        or "conflicts with explicit row unit" in lower
+        or "inline unit token" in lower
+        or "not permitted by configured inline value/unit binding" in lower
+        or "header unit" in lower
+    ):
         return "unit_mismatch"
     if "conflicts with bound condition header" in lower or "header condition" in lower:
         return "condition_mismatch"
@@ -372,7 +383,11 @@ def classify_diagnostic_message(msg: str) -> str:
         return "column_assignment_error"
     if "page count" in lower or "pdfinfo" in lower or "pdftotext" in lower or "digest mismatch" in lower or "cannot read pdf" in lower:
         return "backend_or_environment_failure"
-    if "unit cell is blank" in lower or "numeric value was not asserted" in lower:
+    if (
+        "unit cell is blank" in lower
+        or "numeric value was not asserted" in lower
+        or "unsupported value representation" in lower
+    ):
         return "ambiguous_numeric"
     if "operating condition" in lower:
         return "condition_mismatch"
@@ -821,7 +836,11 @@ def evaluate_corpus(
                     case_fp += 1
                     bump_tax("spurious_observation")
 
-            raw_val_ok = ext_obs.get("original_value_text") == g.get("original_value_text")
+            expected_raw_cell = g.get("expected_raw_cell_text")
+            raw_cell_ok = True
+            if expected_raw_cell is not None:
+                raw_cell_ok = ext_obs.get("raw_cell_text") == expected_raw_cell
+            raw_val_ok = (ext_obs.get("original_value_text") == g.get("original_value_text")) and raw_cell_ok
             unit_ok = ext_obs.get("original_unit_symbol") == g.get("original_unit_symbol")
             qual_ok = ext_obs.get("qualifier") == g.get("qualifier")
             param_ok = ext_obs.get("parameter_name") == g.get("parameter_name")
