@@ -3,7 +3,7 @@
 ## 1. Baseline & Scope
 
 - **Initial `origin/main` SHA**: `1704f726d901f3e1d00f9cdc918e80d352b443ac` (Phase 4C merged via PR #7; post-merge hosted Windows CI run `42017272043` succeeded).
-- **Development Branch**: `feat/phase-4d-pdf-to-simulation-gate`
+- **Development Branch**: `feat/phase-4d-pdf-to-simulation-gate` (merged into `main` via PR #8 at `69aba4df7ff752355a40e394de5d05ac988df34b`; hosted Windows CI runs [42023680012](https://github.com/quocthaile/datasim/actions/runs/42023680012), [42023886610](https://github.com/quocthaile/datasim/actions/runs/42023886610), and post-merge `main` run [42025406013](https://github.com/quocthaile/datasim/actions/runs/42025406013) succeeded).
 - **Scope**: End-to-end integration and validation gate connecting deterministic Poppler PDF extraction (`datasim_pdf`) -> evidence intake validation (`datasim_intake`) -> synthetic human engineering review and knowledge promotion (`datasim_component`) -> model compatibility and circuit assembly (`datasim_vertical`) -> real `ngspice` transient simulation (`datasim`), plus negative fail-closed trust-boundary tests and repeat-execution determinism checks.
 
 ## 2. Explicit Synthetic Fixture & Model Parameters

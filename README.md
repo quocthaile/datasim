@@ -58,23 +58,36 @@ candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows
    [Phase 4C implementation](docs/PHASE_4C_IMPLEMENTATION.md),
    [Phase 4C validation](docs/PHASE_4C_VALIDATION.md), and
    [ADR-0006](docs/decisions/ADR-0006-deterministic-pdf-table-extraction.md).
-6. **Phase 4D PDF-to-Simulation end-to-end validation gate (IMPLEMENTED on `feat/phase-4d-pdf-to-simulation-gate`, locally VERIFIED)**:
+6. **Phase 4D PDF-to-Simulation end-to-end validation gate**:
    end-to-end integration test (`tests/integration/pdf_simulation_gate.cpp`) connecting
    real Poppler extraction (`datasim_pdf`) on `synthetic_datasheet.pdf` (`SIM-R-10K` and
    `SIM-C-1UF` at `T_A=85 degC`) through `datasim_intake`, synthetic engineering review and
    conflict resolution (`datasim_component`), model compatibility and assembly
    (`datasim_vertical`), and real `ngspice-47` simulation (`datasim`), verified against an
    equivalent manual `RcConfig` (`R=10000 ohm`, `C=1e-6 F`) with 768 positive and negative
-   trust-boundary checks. See [Phase 4D plan](docs/PHASE_4D_PLAN.md),
+   trust-boundary checks. Merged into `main` via PR #8 at
+   `69aba4df7ff752355a40e394de5d05ac988df34b` and verified in hosted Windows CI runs
+   [42023680012](https://github.com/quocthaile/datasim/actions/runs/42023680012) (PR #8) and
+   [42025406013](https://github.com/quocthaile/datasim/actions/runs/42025406013) (post-merge `main`).
+   See [Phase 4D plan](docs/PHASE_4D_PLAN.md),
    [Phase 4D implementation](docs/PHASE_4D_IMPLEMENTATION.md), and
    [Phase 4D validation](docs/PHASE_4D_VALIDATION.md).
+7. **Phase 4E real-datasheet evaluation corpus and offline benchmark (IMPLEMENTED and VERIFIED on `feat/phase-4e-datasheet-evaluation-corpus`)**:
+   versioned corpus protocol, ground-truth annotation schema, development-only C++ extraction
+   dump adapter (`datasheet_eval_dump`), offline corpus evaluator (`scripts/eval/evaluate_pdf_corpus.py`),
+   and automated determinism/regression suite (`pdf_corpus_evaluation`), verified on the in-repo
+   synthetic regression corpus and locally benchmarked against 5 untracked Vishay resistor and
+   capacitor datasheets in `build/corpus/`. See [Phase 4E plan](docs/PHASE_4E_PLAN.md),
+   [Phase 4E corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md), and
+   [Phase 4E validation](docs/PHASE_4E_VALIDATION.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
 serialization, automatic unit conversion, LLM integration, external SPICE subcircuit
 loading, semiconductor models, physical measurement validation (`MEASURED`), and
-interactive visualization remain **PROPOSED**. No real-datasheet extraction accuracy
-is claimed.
+interactive visualization remain **PROPOSED**. Real-datasheet extraction is evaluated
+offline only within the bounded Phase 4E pilot corpus (`docs/PHASE_4E_VALIDATION.md`);
+general multi-layout vendor datasheet accuracy is not claimed.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet
@@ -96,6 +109,7 @@ numerical or review authority.
 - [Phase 4B implementation](docs/PHASE_4_IMPLEMENTATION.md) and [validation](docs/PHASE_4_VALIDATION.md) for the merged, hosted-verified in-memory candidate intake
 - [Phase 4C plan](docs/PHASE_4C_PLAN.md), [implementation](docs/PHASE_4C_IMPLEMENTATION.md), [validation](docs/PHASE_4C_VALIDATION.md), and [ADR-0006](docs/decisions/ADR-0006-deterministic-pdf-table-extraction.md) for the bounded local PDF table adapter
 - [Phase 4D plan](docs/PHASE_4D_PLAN.md), [implementation](docs/PHASE_4D_IMPLEMENTATION.md), and [validation](docs/PHASE_4D_VALIDATION.md) for the PDF-to-Simulation end-to-end validation gate
+- [Phase 4E plan](docs/PHASE_4E_PLAN.md), [corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md), and [validation](docs/PHASE_4E_VALIDATION.md) for the real-datasheet evaluation corpus and offline benchmark
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

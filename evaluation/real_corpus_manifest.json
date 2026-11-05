@@ -1,0 +1,392 @@
+{
+  "schema_version": "datasim.phase4e.corpus.v1",
+  "corpus_id": "datasim-phase4e-real-datasheet-pilot-v1",
+  "description": "Pilot real-datasheet evaluation manifest covering 2 resistor datasheets, 2 capacitor datasheets, 1 complex film-capacitor control datasheet, and 2 excluded KEMET candidate URLs. Vendor PDFs are never committed to Git and must reside in untracked build/corpus/.",
+  "documents": [
+    {
+      "document_id": "doc.vishay.mrs16_mrs25",
+      "manufacturer": "Vishay BCcomponents",
+      "publisher": "Vishay BCcomponents",
+      "part_numbers": ["MRS16", "MRS25"],
+      "title": "Professional Thin Film Leaded Resistors (Document Number 28724)",
+      "revision": "07-Mar-16",
+      "source_url": "https://www.vishay.com/docs/28724/mrs16m25.pdf",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "645bb41aaa34f2a72fc19fc71d02ddb14ed400ae97634684ad1745189505f47e",
+      "local_filename": "vishay_mrs16_mrs25.pdf",
+      "is_synthetic": false,
+      "page_count": 4,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "partially_supported_ambiguous",
+      "annotation_status": "annotated_single_reviewer_local_only",
+      "usage_rights": {
+        "license_identifier": "Proprietary-Vishay-Disclaimer-91000",
+        "redistribution_permitted": false,
+        "evaluation_permitted": true,
+        "evidence_notes": "Publicly downloadable manufacturer datasheet from vishay.com subject to Vishay Legal Disclaimer (www.vishay.com/doc?91000). Local engineering inspection permitted; redistribution of PDF or verbatim table text in public repository is not permitted."
+      }
+    },
+    {
+      "document_id": "doc.vishay.crcw_e3",
+      "manufacturer": "Vishay",
+      "publisher": "Vishay",
+      "part_numbers": ["D10/CRCW0402 e3", "D11/CRCW0603 e3", "D12/CRCW0805 e3"],
+      "title": "Standard Thick Film Chip Resistors D/CRCW e3 (Document Number 20035)",
+      "revision": "14-Apr-2026",
+      "source_url": "https://www.vishay.com/docs/20035/dcrcwe3.pdf",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "a10e1cf2bd4f0f6ef85de250077adb463cae243c2e8e0509354e09f050d24a92",
+      "local_filename": "vishay_crcw_e3.pdf",
+      "is_synthetic": false,
+      "page_count": 13,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "supported_single_page_table",
+      "annotation_status": "annotated_single_reviewer_local_only",
+      "usage_rights": {
+        "license_identifier": "Proprietary-Vishay-Disclaimer-91000",
+        "redistribution_permitted": false,
+        "evaluation_permitted": true,
+        "evidence_notes": "Publicly downloadable manufacturer datasheet from vishay.com subject to Vishay Legal Disclaimer (www.vishay.com/doc?91000). Local engineering inspection permitted; redistribution of PDF or verbatim table text in public repository is not permitted."
+      }
+    },
+    {
+      "document_id": "doc.vishay.vj_commercial_mlcc",
+      "manufacturer": "Vishay Vitramon",
+      "publisher": "Vishay Vitramon",
+      "part_numbers": ["VJ0402", "VJ0603", "VJ0805", "VJ1206", "VJ1210"],
+      "title": "Surface Mount Multilayer Ceramic Chip Capacitors for Commercial Applications VJ Commercial Series (Document Number 45199)",
+      "revision": "08-May-2026",
+      "source_url": "https://www.vishay.com/docs/45199/vjcommercialseries.pdf",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "6c9b40c81d312ba6dbe9d0a4e687ae18185efeebf8cb98e6d709020efa550211",
+      "local_filename": "vishay_vj_commercial_mlcc.pdf",
+      "is_synthetic": false,
+      "page_count": 17,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "partially_supported_ambiguous",
+      "annotation_status": "annotated_single_reviewer_local_only",
+      "usage_rights": {
+        "license_identifier": "Proprietary-Vishay-Disclaimer-91000",
+        "redistribution_permitted": false,
+        "evaluation_permitted": true,
+        "evidence_notes": "Publicly downloadable manufacturer datasheet from vishay.com subject to Vishay Legal Disclaimer (www.vishay.com/doc?91000). Local engineering inspection permitted; redistribution of PDF or verbatim table text in public repository is not permitted."
+      }
+    },
+    {
+      "document_id": "doc.vishay.150d_tantalum",
+      "manufacturer": "Vishay Sprague",
+      "publisher": "Vishay Sprague",
+      "part_numbers": ["150D"],
+      "title": "Solid-Electrolyte TANTALEX Capacitors, Hermetically-Sealed, Axial-Lead (Document Number 40015)",
+      "revision": "26-Mar-2026",
+      "source_url": "https://www.vishay.com/docs/40015/150d.pdf",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "197eeaedf55a47633246a565a73c8c078cc7da3a7246a472f0db4a48dbf523a7",
+      "local_filename": "vishay_150d_tantalum.pdf",
+      "is_synthetic": false,
+      "page_count": 16,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "partially_supported_ambiguous",
+      "annotation_status": "annotated_single_reviewer_local_only",
+      "usage_rights": {
+        "license_identifier": "Proprietary-Vishay-Disclaimer-91000",
+        "redistribution_permitted": false,
+        "evaluation_permitted": true,
+        "evidence_notes": "Publicly downloadable manufacturer datasheet from vishay.com subject to Vishay Legal Disclaimer (www.vishay.com/doc?91000). Local engineering inspection permitted; redistribution of PDF or verbatim table text in public repository is not permitted."
+      }
+    },
+    {
+      "document_id": "doc.vishay.mkp1840m_film",
+      "manufacturer": "Vishay Roederstein",
+      "publisher": "Vishay Roederstein",
+      "part_numbers": ["MKP1840 M"],
+      "title": "AC and Pulse Metallized Polypropylene Film Capacitors MKP1840 M (Document Number 26018)",
+      "revision": "27-Apr-2018",
+      "source_url": "https://www.vishay.com/docs/26018/mkp1840m.pdf",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "11cdd98ae202acb7dfaf013ff4d98e5b4c4a5abd8e1330dbf8471febe9958fe0",
+      "local_filename": "vishay_mkp1840m_film.pdf",
+      "is_synthetic": false,
+      "page_count": 13,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "unsupported_complex_layout",
+      "annotation_status": "annotated_negative_control",
+      "usage_rights": {
+        "license_identifier": "Proprietary-Vishay-Disclaimer-91000",
+        "redistribution_permitted": false,
+        "evaluation_permitted": true,
+        "evidence_notes": "Publicly downloadable manufacturer datasheet from vishay.com subject to Vishay Legal Disclaimer (www.vishay.com/doc?91000). Local engineering inspection permitted; redistribution of PDF or verbatim table text in public repository is not permitted."
+      }
+    },
+    {
+      "document_id": "doc.kemet.r82_film",
+      "manufacturer": "KEMET (YAGEO Group)",
+      "publisher": "KEMET Electronics Corporation",
+      "part_numbers": ["R82"],
+      "title": "Radial Metallized Polyester Film Capacitors R82 Series (KEM_F3101_R82)",
+      "revision": "unverified-tls-failure",
+      "source_url": "https://content.kemet.com/datasheets/KEM_F3101_R82.pdf",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": null,
+      "local_filename": null,
+      "is_synthetic": false,
+      "page_count": null,
+      "eligibility_status": "excluded",
+      "exclusion_reason": "tls_certificate_expired_on_official_source_host",
+      "layout_category": "missing_or_inaccessible_document",
+      "annotation_status": "excluded_unretrieved",
+      "usage_rights": {
+        "license_identifier": null,
+        "redistribution_permitted": false,
+        "evaluation_permitted": false,
+        "evidence_notes": "Official source host content.kemet.com failed strict TLS certificate verification ([SSL: CERTIFICATE_VERIFY_FAILED] certificate has expired) on 2026-11-05; excluded without bypassing TLS verification."
+      }
+    },
+    {
+      "document_id": "doc.kemet.f862_film",
+      "manufacturer": "KEMET (YAGEO Group)",
+      "publisher": "KEMET Electronics Corporation",
+      "part_numbers": ["F862"],
+      "title": "Metallized Polypropylene Film EMI Mains X2 Capacitors F862 Series (KEM_F3092_F862)",
+      "revision": "unverified-tls-failure",
+      "source_url": "https://content.kemet.com/datasheets/KEM_F3092_F862.pdf",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": null,
+      "local_filename": null,
+      "is_synthetic": false,
+      "page_count": null,
+      "eligibility_status": "excluded",
+      "exclusion_reason": "tls_certificate_expired_on_official_source_host",
+      "layout_category": "missing_or_inaccessible_document",
+      "annotation_status": "excluded_unretrieved",
+      "usage_rights": {
+        "license_identifier": null,
+        "redistribution_permitted": false,
+        "evaluation_permitted": false,
+        "evidence_notes": "Official source host content.kemet.com failed strict TLS certificate verification ([SSL: CERTIFICATE_VERIFY_FAILED] certificate has expired) on 2026-11-05; excluded without bypassing TLS verification."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "REAL-CASE-01-MRS16-VOLTAGE-BAND",
+      "document_id": "doc.vishay.mrs16_mrs25",
+      "pdf_page_index": 0,
+      "printed_page_label": "1",
+      "table_id": "TABLE_MRS16_VOLTAGE_SUBBAND",
+      "layout_category": "partially_supported_ambiguous",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.vishay.mrs16",
+        "manufacturer": "Vishay BCcomponents",
+        "part_number": "MRS16",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [60.0, 490.0, 315.0, 566.0],
+        "row_y_tolerance": 3.5,
+        "header": [490.0, 491.0],
+        "parameter_column": [60.0, 210.0],
+        "minimum_column": [210.0, 240.0],
+        "typical_column": [240.0, 270.0],
+        "maximum_column": [290.0, 305.5],
+        "unit_column": [306.0, 315.0],
+        "category": "recommended_operating_condition"
+      }
+    },
+    {
+      "case_id": "REAL-CASE-02-MRS16-MRS25-FULL-TABLE",
+      "document_id": "doc.vishay.mrs16_mrs25",
+      "pdf_page_index": 0,
+      "printed_page_label": "1",
+      "table_id": "TABLE_MRS16_MRS25_FULL",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["outside or ambiguously across configured column spans"],
+      "component": {
+        "component_id": "cmp.vishay.mrs16",
+        "manufacturer": "Vishay BCcomponents",
+        "part_number": "MRS16",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [60.0, 375.0, 500.0, 585.0],
+        "row_y_tolerance": 2.0,
+        "header": [375.0, 450.0],
+        "parameter_column": [60.0, 210.0],
+        "minimum_column": [210.0, 240.0],
+        "typical_column": [240.0, 270.0],
+        "maximum_column": [285.0, 304.7],
+        "unit_column": [304.7, 315.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "REAL-CASE-03-CRCW-VOLTAGE-BAND",
+      "document_id": "doc.vishay.crcw_e3",
+      "pdf_page_index": 1,
+      "printed_page_label": "2",
+      "table_id": "TABLE_CRCW_OP_VOLTAGE_BAND",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.vishay.crcw0402e3",
+        "manufacturer": "Vishay",
+        "part_number": "D10/CRCW0402 e3",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [255.0, 155.0, 415.0, 192.0],
+        "row_y_tolerance": 2.0,
+        "header": [155.0, 156.0],
+        "parameter_column": [255.0, 335.0],
+        "minimum_column": [335.0, 360.0],
+        "typical_column": [360.0, 385.0],
+        "maximum_column": [390.0, 404.098],
+        "unit_column": [404.099, 415.0],
+        "category": "recommended_operating_condition"
+      }
+    },
+    {
+      "case_id": "REAL-CASE-04-CRCW-TCR-MERGED-TABLE",
+      "document_id": "doc.vishay.crcw_e3",
+      "pdf_page_index": 1,
+      "printed_page_label": "2",
+      "table_id": "TABLE_CRCW_TCR_RANGE",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["selected region contained no supported min/typ/max value cells"],
+      "component": {
+        "component_id": "cmp.vishay.crcw0402e3",
+        "manufacturer": "Vishay",
+        "part_number": "D10/CRCW0402 e3",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [55.0, 290.0, 540.0, 520.0],
+        "row_y_tolerance": 2.0,
+        "header": [290.0, 355.0],
+        "parameter_column": [55.0, 150.0],
+        "minimum_column": [150.0, 220.0],
+        "typical_column": [220.0, 310.0],
+        "maximum_column": [310.0, 420.0],
+        "unit_column": [420.0, 540.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "REAL-CASE-05-VJ-MLCC-C0G-MIN-BAND",
+      "document_id": "doc.vishay.vj_commercial_mlcc",
+      "pdf_page_index": 1,
+      "printed_page_label": "2",
+      "table_id": "TABLE_VJ_C0G_MIN_CAP",
+      "layout_category": "partially_supported_ambiguous",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.vishay.vj0402",
+        "manufacturer": "Vishay Vitramon",
+        "part_number": "VJ0402",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [190.0, 140.0, 425.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [140.0, 141.0],
+        "parameter_column": [190.0, 225.0],
+        "minimum_column": [393.0, 407.0],
+        "typical_column": [225.0, 250.0],
+        "maximum_column": [250.0, 275.0],
+        "unit_column": [407.0, 422.0],
+        "condition_column": [295.0, 320.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "REAL-CASE-06-VJ-MLCC-FULL-TABLE",
+      "document_id": "doc.vishay.vj_commercial_mlcc",
+      "pdf_page_index": 1,
+      "printed_page_label": "2",
+      "table_id": "TABLE_VJ_QUICK_REF_FULL",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["outside or ambiguously across configured column spans"],
+      "component": {
+        "component_id": "cmp.vishay.vj0402",
+        "manufacturer": "Vishay Vitramon",
+        "part_number": "VJ0402",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [55.0, 110.0, 545.0, 470.0],
+        "row_y_tolerance": 2.0,
+        "header": [110.0, 140.0],
+        "parameter_column": [55.0, 225.0],
+        "minimum_column": [390.0, 410.0],
+        "typical_column": [225.0, 250.0],
+        "maximum_column": [485.0, 505.0],
+        "unit_column": [505.0, 535.0],
+        "condition_column": [295.0, 320.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "REAL-CASE-07-150D-RATINGS-SUBBAND",
+      "document_id": "doc.vishay.150d_tantalum",
+      "pdf_page_index": 1,
+      "printed_page_label": "2",
+      "table_id": "TABLE_150D_6V_SUBBAND",
+      "layout_category": "partially_supported_ambiguous",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.vishay.150d",
+        "manufacturer": "Vishay Sprague",
+        "part_number": "150D",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [85.0, 382.0, 360.0, 440.0],
+        "row_y_tolerance": 2.0,
+        "header": [382.0, 383.0],
+        "parameter_column": [255.0, 355.0],
+        "minimum_column": [120.0, 140.0],
+        "typical_column": [85.0, 115.0],
+        "maximum_column": [145.0, 165.0],
+        "unit_column": [165.0, 178.0],
+        "condition_column": [180.0, 205.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "REAL-CASE-08-MKP1840M-SPECIFIC-REF",
+      "document_id": "doc.vishay.mkp1840m_film",
+      "pdf_page_index": 1,
+      "printed_page_label": "2",
+      "table_id": "TABLE_MKP1840M_SPECIFIC_REF",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["outside or ambiguously across configured column spans"],
+      "component": {
+        "component_id": "cmp.vishay.mkp1840m",
+        "manufacturer": "Vishay Roederstein",
+        "part_number": "MKP1840 M",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [50.0, 465.0, 545.0, 690.0],
+        "row_y_tolerance": 2.0,
+        "header": [465.0, 492.0],
+        "parameter_column": [50.0, 200.0],
+        "minimum_column": [200.0, 260.0],
+        "typical_column": [260.0, 340.0],
+        "maximum_column": [340.0, 440.0],
+        "unit_column": [440.0, 545.0],
+        "category": "electrical_characteristic"
+      }
+    }
+  ]
+}
