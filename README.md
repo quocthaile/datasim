@@ -83,15 +83,31 @@ candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows
    See [Phase 4E plan](docs/PHASE_4E_PLAN.md),
    [Phase 4E corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md), and
    [Phase 4E validation](docs/PHASE_4E_VALIDATION.md).
-8. **Phase 4F explicit column-header unit and condition binding (IMPLEMENTED and VERIFIED on `feat/phase-4f-explicit-header-binding`)**:
+8. **Phase 4F explicit column-header unit and condition binding**:
    caller-configured, source-verified `HeaderUnitBinding` and `HeaderConditionBinding` inside
-   `datasim_pdf` with distinct header `EvidenceLocation` provenance, verified on synthetic
-   regression cases A–H and locally benchmarked on the Phase 4E real-datasheet pilot corpus
-   (`TP = 14/15`, `Precision = 0.9333`, `Recall = 0.9333`, `F1 = 0.9333`, `4/4` unsupported
-   layouts fail-closed). See [Phase 4F plan](docs/PHASE_4F_PLAN.md),
+   `datasim_pdf` with distinct header `EvidenceLocation` provenance, merged into `main` via
+   PR #10 at `9f3c115d13a40204d3d7f83382a50c107b14b803`, verified in hosted Windows CI runs
+   [42042283386](https://github.com/quocthaile/datasim/actions/runs/42042283386),
+   [42043481659](https://github.com/quocthaile/datasim/actions/runs/42043481659) (PR #10), and
+   [42044651168](https://github.com/quocthaile/datasim/actions/runs/42044651168) (post-merge `main`),
+   and locally benchmarked on the Phase 4E real-datasheet pilot corpus (`TP = 14/15`,
+   `Precision = 0.9333`, `Recall = 0.9333`, `F1 = 0.9333`, `4/4` unsupported layouts
+   fail-closed). See [Phase 4F plan](docs/PHASE_4F_PLAN.md),
    [Phase 4F implementation](docs/PHASE_4F_IMPLEMENTATION.md),
    [Phase 4F validation](docs/PHASE_4F_VALIDATION.md), and
    [ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md).
+9. **Phase 4G deterministic inline value/unit parsing (IMPLEMENTED and VERIFIED on `feat/phase-4g-inline-value-unit-parsing`)**:
+   caller-configured `InlineValueUnitBinding` and `ValueCellProvenance` inside `datasim_pdf`
+   for single-cell numeric value and unit tokens (`200 V`, `0.4 W`, `220 pF`, `10 nF`, `1.0 µF`)
+   with strict unit allowlists, unit precedence/conflict rules, intra-cell word bounding-box
+   collision rejection, and verbatim raw-cell preservation (`raw_cell_text`), verified on
+   synthetic regression cases 1–14 and locally benchmarked on the real-datasheet pilot corpus
+   (`TP = 14/15` on the identical 15-observation subset eliminating sub-point column splits, and
+   `TP = 20/22`, `F1 = 0.9091` on the P2-expanded 22-observation subset). See
+   [Phase 4G plan](docs/PHASE_4G_PLAN.md),
+   [Phase 4G implementation](docs/PHASE_4G_IMPLEMENTATION.md),
+   [Phase 4G validation](docs/PHASE_4G_VALIDATION.md), and
+   [ADR-0008](docs/decisions/ADR-0008-inline-value-unit-parsing.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
@@ -123,6 +139,7 @@ numerical or review authority.
 - [Phase 4D plan](docs/PHASE_4D_PLAN.md), [implementation](docs/PHASE_4D_IMPLEMENTATION.md), and [validation](docs/PHASE_4D_VALIDATION.md) for the PDF-to-Simulation end-to-end validation gate
 - [Phase 4E plan](docs/PHASE_4E_PLAN.md), [corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md), and [validation](docs/PHASE_4E_VALIDATION.md) for the real-datasheet evaluation corpus and offline benchmark
 - [Phase 4F plan](docs/PHASE_4F_PLAN.md), [implementation](docs/PHASE_4F_IMPLEMENTATION.md), [validation](docs/PHASE_4F_VALIDATION.md), and [ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md) for explicit column-header unit and condition bindings
+- [Phase 4G plan](docs/PHASE_4G_PLAN.md), [implementation](docs/PHASE_4G_IMPLEMENTATION.md), [validation](docs/PHASE_4G_VALIDATION.md), and [ADR-0008](docs/decisions/ADR-0008-inline-value-unit-parsing.md) for deterministic inline value/unit parsing
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

@@ -1,0 +1,123 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 7 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 700 800] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Symbol >>
+endobj
+6 0 obj
+<< /Length 2779 >>
+stream
+BT /F1 10 Tf 25 725 Td (Parameter) Tj ET
+BT /F1 10 Tf 220 725 Td (Unit) Tj ET
+BT /F1 10 Tf 270 725 Td (Min) Tj ET
+BT /F1 10 Tf 345 725 Td (Typ) Tj ET
+BT /F1 10 Tf 425 725 Td (Max \(V\)) Tj ET
+BT /F1 10 Tf 510 725 Td (Condition) Tj ET
+BT /F1 10 Tf 25 700 Td (Operating voltage) Tj ET
+BT /F1 10 Tf 430 700 Td (200 V) Tj ET
+BT /F1 10 Tf 510 700 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 675 Td (Rated dissipation) Tj ET
+BT /F1 10 Tf 430 675 Td (0.4 W) Tj ET
+BT /F1 10 Tf 510 675 Td (T_A=70 degC) Tj ET
+BT /F1 10 Tf 25 650 Td (Capacitance C0G) Tj ET
+BT /F1 10 Tf 275 650 Td (1.0 pF) Tj ET
+BT /F1 10 Tf 350 650 Td (220 pF) Tj ET
+BT /F1 10 Tf 510 650 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 625 Td (Capacitance X7R) Tj ET
+BT /F1 10 Tf 275 625 Td (56 pF) Tj ET
+BT /F1 10 Tf 350 625 Td (10 nF) Tj ET
+BT /F1 10 Tf 510 625 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 600 Td (Unbound rating) Tj ET
+BT /F1 10 Tf 430 600 Td (200) Tj ET
+BT /F1 10 Tf 510 600 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 575 Td (Isolation voltage) Tj ET
+BT /F1 10 Tf 430 575 Td (1,000 V) Tj ET
+BT /F1 10 Tf 510 575 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 550 Td (Peak pulse voltage) Tj ET
+BT /F1 10 Tf 275 550 Td (200* V) Tj ET
+BT /F1 10 Tf 430 550 Td (200 V*) Tj ET
+BT /F1 10 Tf 510 550 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 475 Td (Parameter) Tj ET
+BT /F1 10 Tf 220 475 Td (Unit) Tj ET
+BT /F1 10 Tf 270 475 Td (Min) Tj ET
+BT /F1 10 Tf 345 475 Td (Typ) Tj ET
+BT /F1 10 Tf 425 475 Td (Max) Tj ET
+BT /F1 10 Tf 510 475 Td (Condition) Tj ET
+BT /F1 10 Tf 25 450 Td (Capacitance range) Tj ET
+BT /F1 10 Tf 350 450 Td (0.22..0.47 uF) Tj ET
+BT /F1 10 Tf 510 450 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 400 Td (Parameter) Tj ET
+BT /F1 10 Tf 220 400 Td (Unit) Tj ET
+BT /F1 10 Tf 270 400 Td (Min) Tj ET
+BT /F1 10 Tf 345 400 Td (Typ) Tj ET
+BT /F1 10 Tf 425 400 Td (Max) Tj ET
+BT /F1 10 Tf 510 400 Td (Condition) Tj ET
+BT /F1 10 Tf 25 375 Td (Operating voltage) Tj ET
+BT /F1 10 Tf 225 375 Td (mV) Tj ET
+BT /F1 10 Tf 430 375 Td (200 V) Tj ET
+BT /F1 10 Tf 510 375 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 325 Td (Parameter) Tj ET
+BT /F1 10 Tf 220 325 Td (Unit) Tj ET
+BT /F1 10 Tf 270 325 Td (Min) Tj ET
+BT /F1 10 Tf 345 325 Td (Typ) Tj ET
+BT /F1 10 Tf 425 325 Td (Max) Tj ET
+BT /F1 10 Tf 510 325 Td (Condition) Tj ET
+BT /F1 10 Tf 25 300 Td (Overlapping cell) Tj ET
+BT /F1 10 Tf 430 300 Td (200) Tj ET
+BT /F1 10 Tf 435 300 Td (V) Tj ET
+BT /F1 10 Tf 510 300 Td (T_A=25 degC) Tj ET
+BT /F1 10 Tf 25 250 Td (Parameter) Tj ET
+BT /F1 10 Tf 220 250 Td (Unit) Tj ET
+BT /F1 10 Tf 270 250 Td (Min) Tj ET
+BT /F1 10 Tf 345 250 Td (Typ) Tj ET
+BT /F1 10 Tf 425 250 Td (Max \(mV\)) Tj ET
+BT /F1 10 Tf 510 250 Td (Condition) Tj ET
+BT /F1 10 Tf 25 225 Td (Operating voltage) Tj ET
+BT /F1 10 Tf 430 225 Td (200 V) Tj ET
+BT /F1 10 Tf 510 225 Td (T_A=25 degC) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 700 800] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 393 >>
+stream
+BT /F1 10 Tf 25 700 Td (Parameter) Tj ET
+BT /F1 10 Tf 220 700 Td (Unit) Tj ET
+BT /F1 10 Tf 270 700 Td (Min) Tj ET
+BT /F1 10 Tf 345 700 Td (Typ) Tj ET
+BT /F1 10 Tf 425 700 Td (Max) Tj ET
+BT /F1 10 Tf 510 700 Td (Condition) Tj ET
+BT /F1 10 Tf 25 675 Td (Nominal capacitance) Tj ET
+BT /F1 10 Tf 350 675 Td (1.0 ) Tj /F2 10 Tf (m) Tj /F1 10 Tf (F) Tj ET
+BT /F1 10 Tf 510 675 Td (T_A=25 degC) Tj ET
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000263 00000 n 
+0000000333 00000 n 
+0000000400 00000 n 
+0000003231 00000 n 
+0000003367 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+3811
+%%EOF

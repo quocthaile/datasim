@@ -1,7 +1,7 @@
 # Phase 4F Plan — Explicit Column-Header Unit and Condition Binding
 
 - **Phase**: 4F
-- **Status**: IMPLEMENTED and VERIFIED on `feat/phase-4f-explicit-header-binding` (synthetic regression suite A–H verified in CTest; Phase 4E pilot corpus re-evaluated locally against untracked manufacturer PDFs in `build/corpus/`)
+- **Status**: IMPLEMENTED, MERGED into `main` via PR #10 (`9f3c115d13a40204d3d7f83382a50c107b14b803`), and VERIFIED by hosted Windows CI runs [`42042283386`](https://github.com/quocthaile/datasim/actions/runs/42042283386), [`42043481659`](https://github.com/quocthaile/datasim/actions/runs/42043481659) (PR #10), and [`42044651168`](https://github.com/quocthaile/datasim/actions/runs/42044651168) (post-merge `main`)
 - **Baseline**: `main` at `b45c32224e0316dd9f93b6e9bfc3ab89cd3ceaf4` (PR #9 merge of Phase 4E, verified by hosted Windows CI run [`42037281172`](https://github.com/quocthaile/datasim/actions/runs/42037281172))
 - **Related Documents**:
   - [ADR-0007: Explicit Column-Header Unit and Condition Binding](decisions/ADR-0007-explicit-header-binding.md)
@@ -48,3 +48,4 @@ Phase 4F implements the **P1** recommendation from Phase 4E ([ADR-0007](decision
    - Extend [`tests/fixtures/make_synthetic_datasheet_pdf.py`](../tests/fixtures/make_synthetic_datasheet_pdf.py) to generate a dedicated synthetic PDF fixture `tests/fixtures/synthetic_header_binding_datasheet.pdf` (preserving `synthetic_datasheet.pdf` and `image_only_datasheet.pdf` byte-for-byte unchanged) and verify Cases A–H in [`tests/unit/pdf_extraction_tests.cpp`](../tests/unit/pdf_extraction_tests.cpp) and [`tests/evaluation/test_pdf_corpus_evaluator.py`](../tests/evaluation/test_pdf_corpus_evaluator.py).
 5. **Phase 4E vs. Phase 4F Benchmark Comparison**:
    - Re-evaluate the real-datasheet pilot corpus (`evaluation/real_corpus_manifest.json` vs. `evaluation/real_corpus_manifest_phase4f.json`) and record the exact baseline vs. post-change metrics in [`docs/PHASE_4F_VALIDATION.md`](PHASE_4F_VALIDATION.md).
+

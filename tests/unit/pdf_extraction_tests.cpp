@@ -15,6 +15,9 @@
 #ifndef DATASIM_HEADER_BINDING_PDF_PATH
 #error DATASIM_HEADER_BINDING_PDF_PATH must be defined
 #endif
+#ifndef DATASIM_INLINE_UNIT_PDF_PATH
+#error DATASIM_INLINE_UNIT_PDF_PATH must be defined
+#endif
 
 namespace {
 int checks = 0;
@@ -339,6 +342,287 @@ int main() {
                 unicode_res.manifest->observations.front().observation.original_unit_symbol == std::string("\xC2\xB5" "F") &&
                 unicode_res.manifest->observations.front().observation.parsed_numeric_value == 0.22,
                 "Unicode unit symbol preserved verbatim without ASCII conversion");
+
+        // Phase 4G synthetic regression tests (Cases 1-14):
+        auto iu_req = request_for(0, "capacitor", "SIM-IU-MIXED", "doc.synthetic.iu");
+        iu_req.pdf_path = DATASIM_INLINE_UNIT_PDF_PATH;
+        iu_req.printed_page_label = "IU-1";
+        iu_req.table.table_id = "TABLE_INLINE_BAND1";
+        iu_req.table.region_x_min = 20; iu_req.table.region_y_min = 60;
+        iu_req.table.region_x_max = 650; iu_req.table.region_y_max = 260;
+        iu_req.table.header_y_min = 60; iu_req.table.header_y_max = 85;
+        iu_req.table.parameter_column = {20, 215};
+        iu_req.table.unit_column = {215, 265};
+        iu_req.table.minimum_column = {265, 340};
+        iu_req.table.typical_column = {340, 420};
+        iu_req.table.maximum_column = {420, 505};
+        iu_req.table.condition_column = pdf::HorizontalSpan{505, 650};
+
+        // Case 14 — Legacy Phase 4F behavior with inline parsing disabled:
+        const auto iu_disabled = pdf::extract_electrical_table(iu_req);
+        require(iu_disabled.candidate_bundle.has_value(), "Case 14: legacy extraction with inline parsing disabled succeeds");
+        require(iu_disabled.manifest->observations.size() == 10U, "Case 14: 10 cells extracted across 7 rows");
+        require(iu_disabled.manifest->observations[0].observation.original_value_text == "200 V" &&
+                !iu_disabled.manifest->observations[0].observation.original_unit_symbol.has_value() &&
+                !iu_disabled.manifest->observations[0].observation.parsed_numeric_value.has_value(),
+                "Case 14: without inline binding, '200 V' remains unsplit with blank unit and no scalar");
+        require(iu_disabled.value_cell_provenance.size() == 10U &&
+                iu_disabled.value_cell_provenance[0].raw_cell_text == "200 V" &&
+                iu_disabled.value_cell_provenance[0].raw_value_token == "200 V" &&
+                !iu_disabled.value_cell_provenance[0].raw_inline_unit_token.has_value(),
+                "Case 14: provenance records unsplit raw cell text when inline parsing is disabled");
+
+        // Configure explicit inline value/unit bindings for min, typ, max (Cases 1, 2, 3, 4, 7, 8, 10, 11):
+        iu_req.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::minimum, {"pF", "V"}},
+            {component::ValueQualifier::typical, {"pF", "nF"}},
+            {component::ValueQualifier::maximum, {"V", "W"}},
+        };
+        const auto iu_enabled = pdf::extract_electrical_table(iu_req);
+        require(iu_enabled.candidate_bundle.has_value(), "Cases 1-4/7/8/10/11: inline-enabled extraction yields valid candidate bundle");
+        require(iu_enabled.manifest->observations.size() == 10U, "Cases 1-4/7/8/10/11: 10 observations extracted");
+        require(iu_enabled.value_cell_provenance.size() == 10U, "Cases 1-4/7/8/10/11: 10 cell provenance records retained");
+        for (const auto& obs : iu_enabled.candidate_bundle->observations) {
+            require(obs.review_state == component::ReviewState::candidate && obs.review_history.empty(),
+                    "Phase 4G: all inline-parsed observations remain candidate-only");
+        }
+
+        // Case 1 — "200 V" (Row 1 max):
+        const auto& c1_obs = iu_enabled.manifest->observations[0].observation;
+        const auto& c1_prov = iu_enabled.value_cell_provenance[0];
+        require(c1_obs.id.value == "obs.doc.synthetic.iu.TABLE_INLINE_BAND1.p0.r1.max",
+                "Case 1: deterministic observation ID preserved");
+        require(c1_obs.parameter_name == "Operating voltage" &&
+                c1_obs.original_value_text == "200" &&
+                c1_obs.original_unit_symbol == "V" &&
+                c1_obs.parsed_numeric_value == 200.0,
+                "Case 1: '200 V' split into value '200', unit 'V', scalar 200.0");
+        require(c1_prov.observation_id == c1_obs.id &&
+                c1_prov.raw_cell_text == "200 V" &&
+                c1_prov.raw_value_token == "200" &&
+                c1_prov.raw_inline_unit_token == "V",
+                "Case 1: full source cell '200 V' preserved in ValueCellProvenance");
+
+        // Case 2 — "0.4 W" (Row 2 max):
+        const auto& c2_obs = iu_enabled.manifest->observations[1].observation;
+        const auto& c2_prov = iu_enabled.value_cell_provenance[1];
+        require(c2_obs.parameter_name == "Rated dissipation" &&
+                c2_obs.original_value_text == "0.4" &&
+                c2_obs.original_unit_symbol == "W" &&
+                c2_obs.parsed_numeric_value == 0.4 &&
+                c2_prov.raw_cell_text == "0.4 W",
+                "Case 2: '0.4 W' split into decimal '0.4', unit 'W', scalar 0.4, raw cell '0.4 W'");
+
+        // Case 3 & Case 11 — "1.0 pF" (Row 3 min) and "220 pF" (Row 3 typ) in adjacent columns [265,340] and [340,420]:
+        const auto& c3_min_obs = iu_enabled.manifest->observations[2].observation;
+        const auto& c3_typ_obs = iu_enabled.manifest->observations[3].observation;
+        require(c3_min_obs.qualifier == component::ValueQualifier::minimum &&
+                c3_min_obs.original_value_text == "1.0" &&
+                c3_min_obs.original_unit_symbol == "pF" &&
+                c3_min_obs.parsed_numeric_value == 1.0 &&
+                iu_enabled.value_cell_provenance[2].raw_cell_text == "1.0 pF",
+                "Case 11: adjacent minimum column '1.0 pF' parsed without cross-column leakage");
+        require(c3_typ_obs.qualifier == component::ValueQualifier::typical &&
+                c3_typ_obs.original_value_text == "220" &&
+                c3_typ_obs.original_unit_symbol == "pF" &&
+                c3_typ_obs.parsed_numeric_value == 220.0 &&
+                iu_enabled.value_cell_provenance[3].raw_cell_text == "220 pF",
+                "Case 3 & Case 11: '220 pF' prefixed unit parsed in adjacent typical column");
+
+        // Case 4 — "56 pF" (Row 4 min) and "10 nF" (Row 4 typ, second prefixed unit in same column):
+        const auto& c4_typ_obs = iu_enabled.manifest->observations[5].observation;
+        require(c4_typ_obs.parameter_name == "Capacitance X7R" &&
+                c4_typ_obs.original_value_text == "10" &&
+                c4_typ_obs.original_unit_symbol == "nF" &&
+                c4_typ_obs.parsed_numeric_value == 10.0 &&
+                iu_enabled.value_cell_provenance[5].raw_cell_text == "10 nF",
+                "Case 4: '10 nF' prefixed unit parsed in same column as '220 pF' without unit conversion");
+
+        // Case 7 — Missing unit (Row 5 max: bare "200" with blank row unit and no header binding):
+        const auto& c7_obs = iu_enabled.manifest->observations[6].observation;
+        const auto& c7_prov = iu_enabled.value_cell_provenance[6];
+        require(c7_obs.parameter_name == "Unbound rating" &&
+                c7_obs.original_value_text == "200" &&
+                !c7_obs.original_unit_symbol.has_value() &&
+                !c7_obs.unitless &&
+                !c7_obs.parsed_numeric_value.has_value() &&
+                c7_prov.raw_cell_text == "200" &&
+                !c7_prov.raw_inline_unit_token.has_value(),
+                "Case 7: bare '200' without unit leaves unit and scalar unasserted");
+
+        // Case 8 — Ambiguous number ("1,000 V" on Row 6 max):
+        const auto& c8_obs = iu_enabled.manifest->observations[7].observation;
+        const auto& c8_prov = iu_enabled.value_cell_provenance[7];
+        require(c8_obs.parameter_name == "Isolation voltage" &&
+                c8_obs.original_value_text == "1,000" &&
+                c8_obs.original_unit_symbol == "V" &&
+                !c8_obs.parsed_numeric_value.has_value() &&
+                c8_prov.raw_cell_text == "1,000 V" &&
+                c8_prov.raw_value_token == "1,000" &&
+                c8_prov.raw_inline_unit_token == "V",
+                "Case 8: '1,000 V' preserves ambiguous number '1,000', unit 'V', raw cell '1,000 V', and no scalar");
+        require(iu_enabled.report.has_code(intake::IntakeDiagnosticCode::ambiguous_numeric_text),
+                "Case 8: intake report flags ambiguous_numeric_text warning for '1,000'");
+
+        // Case 10 — Footnote-marked source text ("200* V" in Row 7 min and "200 V*" in Row 7 max):
+        const auto& c10_min_obs = iu_enabled.manifest->observations[8].observation;
+        const auto& c10_max_entry = iu_enabled.manifest->observations[9];
+        const auto& c10_max_obs = c10_max_entry.observation;
+        require(c10_min_obs.original_value_text == "200*" &&
+                c10_min_obs.original_unit_symbol == "V" &&
+                !c10_min_obs.parsed_numeric_value.has_value() &&
+                iu_enabled.value_cell_provenance[8].raw_cell_text == "200* V",
+                "Case 10a: '200* V' preserves '200*' and unit 'V' without scalar");
+        require(c10_max_obs.original_value_text == "200" &&
+                c10_max_obs.original_unit_symbol == "V" &&
+                !c10_max_obs.parsed_numeric_value.has_value() &&
+                c10_max_entry.ambiguity_notes.has_value() &&
+                iu_enabled.value_cell_provenance[9].raw_cell_text == "200 V*" &&
+                iu_enabled.value_cell_provenance[9].raw_inline_unit_token == "V",
+                "Case 10b: '200 V*' strips '*' from unit symbol, preserves '200 V*' in provenance, and leaves scalar unasserted");
+
+        // Repeat-run determinism check for Phase 4G:
+        const auto iu_repeated = pdf::extract_electrical_table(iu_req);
+        require(iu_repeated.candidate_bundle == iu_enabled.candidate_bundle &&
+                iu_repeated.value_cell_provenance == iu_enabled.value_cell_provenance &&
+                iu_repeated.diagnostics == iu_enabled.diagnostics,
+                "Phase 4G repeat extraction produces identical candidate bundle, provenance, and diagnostics");
+
+        // Case 5 — "200 V" with consistent header binding ("Max (V)" on Row 1 sub-band):
+        auto iu_consistent_hdr = iu_req;
+        iu_consistent_hdr.table.region_y_max = 110;
+        iu_consistent_hdr.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::maximum, {"V"}}};
+        iu_consistent_hdr.table.header_unit_bindings = {
+            {component::ValueQualifier::maximum, {420, 505}, 65, 80, "Max (V)", "V"}};
+        const auto c5_res = pdf::extract_electrical_table(iu_consistent_hdr);
+        require(c5_res.candidate_bundle.has_value() &&
+                c5_res.manifest->observations.size() == 1U &&
+                c5_res.manifest->observations[0].observation.original_value_text == "200" &&
+                c5_res.manifest->observations[0].observation.original_unit_symbol == "V" &&
+                c5_res.manifest->observations[0].observation.parsed_numeric_value == 200.0 &&
+                c5_res.manifest->observations[0].observation.evidence_refs.size() == 2U,
+                "Case 5: '200 V' with consistent header binding 'V' succeeds and uses cell-level evidence");
+
+        // Case 6a — "200 V" with conflicting header binding ("Max (mV)" on Band 5):
+        auto iu_conflict_hdr = iu_req;
+        iu_conflict_hdr.table.table_id = "TABLE_INLINE_BAND5";
+        iu_conflict_hdr.table.region_y_min = 535; iu_conflict_hdr.table.region_y_max = 585;
+        iu_conflict_hdr.table.header_y_min = 535; iu_conflict_hdr.table.header_y_max = 560;
+        iu_conflict_hdr.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::maximum, {"V", "mV"}}};
+        iu_conflict_hdr.table.header_unit_bindings = {
+            {component::ValueQualifier::maximum, {420, 505}, 540, 555, "Max (mV)", "mV"}};
+        const auto c6a_res = pdf::extract_electrical_table(iu_conflict_hdr);
+        require(!c6a_res.candidate_bundle.has_value() &&
+                !c6a_res.diagnostics.empty() &&
+                c6a_res.diagnostics.front().find("inline unit 'V' conflicts with bound header unit 'mV'") != std::string::npos,
+                "Case 6a: '200 V' with conflicting header unit 'mV' fails closed without conversion");
+
+        // Case 6b — "200 V" with conflicting explicit row unit ("mV" on Band 3):
+        auto iu_conflict_row = iu_req;
+        iu_conflict_row.table.table_id = "TABLE_INLINE_BAND3";
+        iu_conflict_row.table.region_y_min = 385; iu_conflict_row.table.region_y_max = 435;
+        iu_conflict_row.table.header_y_min = 385; iu_conflict_row.table.header_y_max = 410;
+        iu_conflict_row.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::maximum, {"V"}}};
+        const auto c6b_res = pdf::extract_electrical_table(iu_conflict_row);
+        require(!c6b_res.candidate_bundle.has_value() &&
+                !c6b_res.diagnostics.empty() &&
+                c6b_res.diagnostics.front().find("inline unit 'V' conflicts with explicit row unit 'mV'") != std::string::npos,
+                "Case 6b: '200 V' with conflicting explicit row unit 'mV' fails closed");
+
+        // Case 9 — Range ("0.22..0.47 uF" on Band 2) fails closed:
+        auto iu_range = iu_req;
+        iu_range.table.table_id = "TABLE_INLINE_BAND2";
+        iu_range.table.region_y_min = 310; iu_range.table.region_y_max = 360;
+        iu_range.table.header_y_min = 310; iu_range.table.header_y_max = 335;
+        iu_range.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::typical, {"uF"}}};
+        const auto c9_res = pdf::extract_electrical_table(iu_range);
+        require(!c9_res.candidate_bundle.has_value() &&
+                !c9_res.diagnostics.empty() &&
+                c9_res.diagnostics.front().find("contains unsupported value representation '0.22..0.47'") != std::string::npos,
+                "Case 9: range '0.22..0.47 uF' fails closed and is never coerced to a scalar");
+
+        // Unpermitted inline unit token ("0.4 W" when only {"V"} is allowed) fails closed:
+        auto iu_unpermitted_unit = iu_req;
+        iu_unpermitted_unit.table.region_y_max = 135;
+        iu_unpermitted_unit.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::maximum, {"V"}}};
+        const auto unperm_res = pdf::extract_electrical_table(iu_unpermitted_unit);
+        require(!unperm_res.candidate_bundle.has_value() &&
+                !unperm_res.diagnostics.empty() &&
+                unperm_res.diagnostics.front().find("inline unit token 'W' is not permitted") != std::string::npos,
+                "Unpermitted inline unit token 'W' fails closed");
+
+        // Case 11 negative check — Straddling inline unit word across narrow column boundary fails closed:
+        auto iu_narrow_straddle = iu_req;
+        iu_narrow_straddle.table.minimum_column = {265, 298}; // cuts through 'pF' at x=[291.68, 303.35]
+        const auto c11_neg = pdf::extract_electrical_table(iu_narrow_straddle);
+        require(!c11_neg.candidate_bundle.has_value() &&
+                !c11_neg.diagnostics.empty() &&
+                c11_neg.diagnostics.front().find("outside or ambiguously across configured column spans") != std::string::npos,
+                "Case 11 negative: inline unit word straddling narrow column boundary fails closed");
+
+        // Case 12 — Duplicate or overlapping word boxes inside a single value cell (Band 4) fails closed:
+        auto iu_overlap_cell = iu_req;
+        iu_overlap_cell.table.table_id = "TABLE_INLINE_BAND4";
+        iu_overlap_cell.table.region_y_min = 460; iu_overlap_cell.table.region_y_max = 510;
+        iu_overlap_cell.table.header_y_min = 460; iu_overlap_cell.table.header_y_max = 485;
+        const auto c12_res = pdf::extract_electrical_table(iu_overlap_cell);
+        require(!c12_res.candidate_bundle.has_value() &&
+                !c12_res.diagnostics.empty() &&
+                c12_res.diagnostics.front().find("overlapping or duplicate word bounding boxes") != std::string::npos,
+                "Case 12: overlapping word bounding boxes inside a value cell fail closed");
+
+        // Case 13 — Unicode inline unit preservation (Page 2 of synthetic_inline_unit_datasheet.pdf has "1.0 µF"):
+        auto iu_unicode = iu_req;
+        iu_unicode.pdf_page_index = 1;
+        iu_unicode.printed_page_label = "IU-2";
+        iu_unicode.table.table_id = "TABLE_INLINE_UNICODE";
+        iu_unicode.table.region_y_min = 85; iu_unicode.table.region_y_max = 135;
+        iu_unicode.table.header_y_min = 85; iu_unicode.table.header_y_max = 110;
+        iu_unicode.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::typical, {std::string("\xC2\xB5" "F")}}};
+        const auto c13_res = pdf::extract_electrical_table(iu_unicode);
+        require(c13_res.candidate_bundle.has_value() &&
+                c13_res.manifest->observations.size() == 1U &&
+                c13_res.manifest->observations[0].observation.original_value_text == "1.0" &&
+                c13_res.manifest->observations[0].observation.original_unit_symbol == std::string("\xC2\xB5" "F") &&
+                c13_res.manifest->observations[0].observation.parsed_numeric_value == 1.0 &&
+                c13_res.value_cell_provenance.size() == 1U &&
+                c13_res.value_cell_provenance[0].raw_cell_text == std::string("1.0 \xC2\xB5" "F"),
+                "Case 13: Unicode inline unit symbol preserved verbatim in observation and cell provenance");
+
+        // Configuration validation negative checks:
+        auto iu_empty_allow = iu_req;
+        iu_empty_allow.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::maximum, {}}};
+        const auto empty_allow_res = pdf::extract_electrical_table(iu_empty_allow);
+        require(!empty_allow_res.candidate_bundle.has_value() &&
+                !empty_allow_res.diagnostics.empty() &&
+                empty_allow_res.diagnostics.front().find("requires at least one allowed_unit_symbol") != std::string::npos,
+                "Empty allowed_unit_symbols in InlineValueUnitBinding rejected");
+
+        auto iu_bad_symbol = iu_req;
+        iu_bad_symbol.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::maximum, {"10V"}}};
+        const auto bad_symbol_res = pdf::extract_electrical_table(iu_bad_symbol);
+        require(!bad_symbol_res.candidate_bundle.has_value() &&
+                !bad_symbol_res.diagnostics.empty() &&
+                bad_symbol_res.diagnostics.front().find("invalid allowed_unit_symbol") != std::string::npos,
+                "Invalid numeric-prefixed allowed_unit_symbol rejected");
+
+        auto iu_dup_qual = iu_req;
+        iu_dup_qual.table.inline_value_unit_bindings = {
+            {component::ValueQualifier::maximum, {"V"}},
+            {component::ValueQualifier::maximum, {"W"}}};
+        const auto dup_qual_res = pdf::extract_electrical_table(iu_dup_qual);
+        require(!dup_qual_res.candidate_bundle.has_value() &&
+                !dup_qual_res.diagnostics.empty() &&
+                dup_qual_res.diagnostics.front().find("duplicate inline value/unit binding") != std::string::npos,
+                "Duplicate InlineValueUnitBinding for the same qualifier rejected");
 
         std::cout << "PDF extraction checks: " << checks << '\n';
         return 0;

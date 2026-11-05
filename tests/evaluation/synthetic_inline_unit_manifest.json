@@ -1,0 +1,352 @@
+{
+  "schema_version": "datasim.phase4e.corpus.v1",
+  "corpus_id": "datasim-phase4g-synthetic-inline-unit-v1",
+  "description": "Synthetic regression corpus for Phase 4G deterministic inline value/unit parsing (Cases 1-14).",
+  "documents": [
+    {
+      "document_id": "doc.synthetic.iu",
+      "manufacturer": "Datasim Synthetic",
+      "publisher": "Datasim Synthetic",
+      "part_numbers": ["SIM-IU-MIXED"],
+      "title": "Fictional inline value/unit electrical characteristics",
+      "revision": "fixture-rev-1",
+      "source_url": "https://github.com/quocthaile/datasim/blob/main/tests/fixtures/make_synthetic_datasheet_pdf.py",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "f3022a2fd8a498961a89f7d62030ac66d7d427fc290b4201fcfcba58eebc861f",
+      "repo_relative_path": "tests/fixtures/synthetic_inline_unit_datasheet.pdf",
+      "is_synthetic": true,
+      "page_count": 2,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "supported_single_page_table",
+      "annotation_status": "annotated_single_reviewer",
+      "usage_rights": {
+        "license_identifier": "Datasim-Internal-Synthetic-Fixture",
+        "redistribution_permitted": true,
+        "evaluation_permitted": true,
+        "evidence_notes": "Generated in-repo by tests/fixtures/make_synthetic_datasheet_pdf.py; contains no vendor material."
+      }
+    },
+    {
+      "document_id": "doc.synthetic.rc",
+      "manufacturer": "Datasim Synthetic",
+      "publisher": "Datasim Synthetic",
+      "part_numbers": ["SIM-R-10K", "SIM-C-1UF"],
+      "title": "Fictional electrical characteristics",
+      "revision": "fixture-rev-1",
+      "source_url": "https://github.com/quocthaile/datasim/blob/main/tests/fixtures/make_synthetic_datasheet_pdf.py",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "7133e861225318b47982dbf25ee2bb68a55ee5c11aa054675214515ab769cbb8",
+      "repo_relative_path": "tests/fixtures/synthetic_datasheet.pdf",
+      "is_synthetic": true,
+      "page_count": 2,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "supported_single_page_table",
+      "annotation_status": "annotated_single_reviewer",
+      "usage_rights": {
+        "license_identifier": "Datasim-Internal-Synthetic-Fixture",
+        "redistribution_permitted": true,
+        "evaluation_permitted": true,
+        "evidence_notes": "Generated in-repo by tests/fixtures/make_synthetic_datasheet_pdf.py; contains no vendor material."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "SYN-IU-CASE-01-BAND1-INLINE",
+      "document_id": "doc.synthetic.iu",
+      "pdf_page_index": 0,
+      "printed_page_label": "IU-1",
+      "table_id": "TABLE_INLINE_BAND1",
+      "layout_category": "partially_supported_ambiguous",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.iu.mixed",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-IU-MIXED",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 60.0, 650.0, 260.0],
+        "row_y_tolerance": 2.0,
+        "header": [60.0, 85.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 265.0],
+        "minimum_column": [265.0, 340.0],
+        "typical_column": [340.0, 420.0],
+        "maximum_column": [420.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "inline_value_unit_bindings": [
+          {
+            "qualifier": "minimum",
+            "allowed_unit_symbols": ["pF", "V"]
+          },
+          {
+            "qualifier": "typical",
+            "allowed_unit_symbols": ["pF", "nF"]
+          },
+          {
+            "qualifier": "maximum",
+            "allowed_unit_symbols": ["V", "W"]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-IU-CASE-02-UNICODE-UF",
+      "document_id": "doc.synthetic.iu",
+      "pdf_page_index": 1,
+      "printed_page_label": "IU-2",
+      "table_id": "TABLE_INLINE_UNICODE",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.iu.mixed",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-IU-MIXED",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 85.0, 650.0, 135.0],
+        "row_y_tolerance": 2.0,
+        "header": [85.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 265.0],
+        "minimum_column": [265.0, 340.0],
+        "typical_column": [340.0, 420.0],
+        "maximum_column": [420.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "inline_value_unit_bindings": [
+          {
+            "qualifier": "typical",
+            "allowed_unit_symbols": ["\u00b5F"]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-IU-CASE-03-CONSISTENT-HEADER",
+      "document_id": "doc.synthetic.iu",
+      "pdf_page_index": 0,
+      "printed_page_label": "IU-1",
+      "table_id": "TABLE_INLINE_CONSISTENT_HDR",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.iu.mixed",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-IU-MIXED",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 60.0, 650.0, 110.0],
+        "row_y_tolerance": 2.0,
+        "header": [60.0, 85.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 265.0],
+        "minimum_column": [265.0, 340.0],
+        "typical_column": [340.0, 420.0],
+        "maximum_column": [420.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "header_unit_bindings": [
+          {
+            "qualifier": "maximum",
+            "header_box": [420.0, 65.0, 505.0, 80.0],
+            "unit_symbol": "V",
+            "expected_header_text": "Max (V)"
+          }
+        ],
+        "inline_value_unit_bindings": [
+          {
+            "qualifier": "maximum",
+            "allowed_unit_symbols": ["V"]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-IU-CASE-04-HEADER-UNIT-CONFLICT",
+      "document_id": "doc.synthetic.iu",
+      "pdf_page_index": 0,
+      "printed_page_label": "IU-1",
+      "table_id": "TABLE_INLINE_BAND5",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["inline unit 'V' conflicts with bound header unit 'mV'"],
+      "component": {
+        "component_id": "cmp.fixture.iu.mixed",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-IU-MIXED",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 535.0, 650.0, 585.0],
+        "row_y_tolerance": 2.0,
+        "header": [535.0, 560.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 265.0],
+        "minimum_column": [265.0, 340.0],
+        "typical_column": [340.0, 420.0],
+        "maximum_column": [420.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "header_unit_bindings": [
+          {
+            "qualifier": "maximum",
+            "header_box": [420.0, 540.0, 505.0, 555.0],
+            "unit_symbol": "mV",
+            "expected_header_text": "Max (mV)"
+          }
+        ],
+        "inline_value_unit_bindings": [
+          {
+            "qualifier": "maximum",
+            "allowed_unit_symbols": ["V", "mV"]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-IU-CASE-05-ROW-UNIT-CONFLICT",
+      "document_id": "doc.synthetic.iu",
+      "pdf_page_index": 0,
+      "printed_page_label": "IU-1",
+      "table_id": "TABLE_INLINE_BAND3",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["inline unit 'V' conflicts with explicit row unit 'mV'"],
+      "component": {
+        "component_id": "cmp.fixture.iu.mixed",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-IU-MIXED",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 385.0, 650.0, 435.0],
+        "row_y_tolerance": 2.0,
+        "header": [385.0, 410.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 265.0],
+        "minimum_column": [265.0, 340.0],
+        "typical_column": [340.0, 420.0],
+        "maximum_column": [420.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "inline_value_unit_bindings": [
+          {
+            "qualifier": "maximum",
+            "allowed_unit_symbols": ["V"]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-IU-CASE-06-UNSUPPORTED-RANGE",
+      "document_id": "doc.synthetic.iu",
+      "pdf_page_index": 0,
+      "printed_page_label": "IU-1",
+      "table_id": "TABLE_INLINE_BAND2",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["contains unsupported value representation '0.22..0.47'"],
+      "component": {
+        "component_id": "cmp.fixture.iu.mixed",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-IU-MIXED",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 310.0, 650.0, 360.0],
+        "row_y_tolerance": 2.0,
+        "header": [310.0, 335.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 265.0],
+        "minimum_column": [265.0, 340.0],
+        "typical_column": [340.0, 420.0],
+        "maximum_column": [420.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "inline_value_unit_bindings": [
+          {
+            "qualifier": "typical",
+            "allowed_unit_symbols": ["uF"]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-IU-CASE-07-OVERLAPPING-CELL-WORDS",
+      "document_id": "doc.synthetic.iu",
+      "pdf_page_index": 0,
+      "printed_page_label": "IU-1",
+      "table_id": "TABLE_INLINE_BAND4",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["overlapping or duplicate word bounding boxes"],
+      "component": {
+        "component_id": "cmp.fixture.iu.mixed",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-IU-MIXED",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 460.0, 650.0, 510.0],
+        "row_y_tolerance": 2.0,
+        "header": [460.0, 485.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 265.0],
+        "minimum_column": [265.0, 340.0],
+        "typical_column": [340.0, 420.0],
+        "maximum_column": [420.0, 505.0],
+        "condition_column": [505.0, 650.0],
+        "category": "electrical_characteristic",
+        "inline_value_unit_bindings": [
+          {
+            "qualifier": "maximum",
+            "allowed_unit_symbols": ["V"]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "SYN-IU-CASE-08-LEGACY-DISABLED",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_R",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.resistor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-10K",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 690.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    }
+  ]
+}
+

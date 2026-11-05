@@ -48,6 +48,7 @@ std::vector<std::string> get_utf8_args(int argc, char** argv) {
 struct ParsedCliArgs {
     std::map<std::string, std::string> values;
     std::vector<std::string> header_unit_bindings;
+    std::vector<std::string> inline_unit_bindings;
 };
 
 ParsedCliArgs parse_args(int argc, char** argv) {
@@ -55,7 +56,7 @@ ParsedCliArgs parse_args(int argc, char** argv) {
     ParsedCliArgs parsed;
     for (std::size_t i = 1; i < raw.size(); ++i) {
         const std::string& key = raw[i];
-        if (key == "--help") return {{{"--help", "true"}}, {}};
+        if (key == "--help") return {{{"--help", "true"}}, {}, {}};
         if (key.rfind("--", 0) != 0 || i + 1 >= raw.size())
             throw std::invalid_argument("expected --option value pairs");
         const std::string& val = raw[++i];
@@ -63,9 +64,25 @@ ParsedCliArgs parse_args(int argc, char** argv) {
             parsed.header_unit_bindings.push_back(val);
             continue;
         }
+        if (key == "--inline-unit-binding") {
+            parsed.inline_unit_bindings.push_back(val);
+            continue;
+        }
         if (!parsed.values.emplace(key, val).second) throw std::invalid_argument("duplicate option: " + key);
     }
     return parsed;
+}
+
+std::vector<std::string> split_csv_strings(const std::string& text) {
+    std::vector<std::string> result;
+    std::size_t start = 0;
+    while (start <= text.size()) {
+        const auto comma = text.find(',', start);
+        result.push_back(text.substr(start, comma == std::string::npos ? comma : comma - start));
+        if (comma == std::string::npos) break;
+        start = comma + 1U;
+    }
+    return result;
 }
 
 std::vector<std::string> split_pipe_fields(const std::string& spec, std::size_t count) {
@@ -160,6 +177,7 @@ void usage() {
                  "  --typ x_min,x_max --max x_min,x_max [--condition x_min,x_max]\n"
                  "  [--header-unit-binding QUALIFIER|x_min,y_min,x_max,y_max|UNIT|EXPECTED_TEXT]\n"
                  "  [--header-condition-binding x_min,y_min,x_max,y_max|PARAM|UNIT|EXPECTED_TEXT]\n"
+                 "  [--inline-unit-binding QUALIFIER|UNIT1,UNIT2,...]\n"
                  "Coordinates are points in Poppler's page coordinate space. The result is candidate-only.\n";
 }
 }
@@ -231,6 +249,11 @@ int main(int argc, char** argv) {
             const auto box = parse_csv_4(parts[0]);
             table.header_condition_binding = pdf::HeaderConditionBinding{
                 {box[0], box[2]}, box[1], box[3], parts[3], parts[1], parts[2]};
+        }
+        for (const auto& ib_spec : parsed.inline_unit_bindings) {
+            const auto parts = split_pipe_fields(ib_spec, 2);
+            table.inline_value_unit_bindings.push_back(pdf::InlineValueUnitBinding{
+                parse_qualifier(parts[0]), split_csv_strings(parts[1])});
         }
 
         const auto result = pdf::extract_electrical_table(request);

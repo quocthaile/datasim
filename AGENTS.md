@@ -48,7 +48,14 @@ run `42037281172`. Phase 4F ([plan](docs/PHASE_4F_PLAN.md),
 [validation](docs/PHASE_4F_VALIDATION.md),
 [ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md)) implements
 explicit, source-verified column-header unit and condition bindings inside
-`datasim_pdf` on `feat/phase-4f-explicit-header-binding`. Preserve
+`datasim_pdf`, merged into `main` via PR #10
+(`9f3c115d13a40204d3d7f83382a50c107b14b803`) and verified by hosted Windows CI
+run `42044651168`. Phase 4G ([plan](docs/PHASE_4G_PLAN.md),
+[implementation](docs/PHASE_4G_IMPLEMENTATION.md),
+[validation](docs/PHASE_4G_VALIDATION.md),
+[ADR-0008](docs/decisions/ADR-0008-inline-value-unit-parsing.md)) implements
+explicit, bounded inline value/unit cell parsing inside `datasim_pdf` on
+`feat/phase-4g-inline-value-unit-parsing`. Preserve
 the `datasim_intake` APIs and its candidate-only boundary. Keep PDF processing
 in the isolated `datasim_pdf` adapter; do not add OCR, persistence, LLM
 integration, GUI, semiconductor models, or a custom solver. Do not commit

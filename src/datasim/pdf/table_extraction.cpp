@@ -161,6 +161,124 @@ std::string column_name_for_qualifier(component::ValueQualifier qualifier) {
     }
 }
 
+bool is_valid_inline_unit_token(std::string_view symbol) {
+    if (!is_single_token(symbol)) return false;
+    const auto first = static_cast<unsigned char>(symbol.front());
+    if (std::isdigit(first) || first == '+' || first == '-' || first == '.' || first == '*') {
+        return false;
+    }
+    bool has_unit_char = false;
+    for (const char ch : symbol) {
+        const auto byte = static_cast<unsigned char>(ch);
+        if (std::iscntrl(byte)) return false;
+        if (ch == '*' || ch == ',' || ch == ';' || ch == '=' ||
+            ch == '(' || ch == ')' || ch == '[' || ch == ']') {
+            return false;
+        }
+        if (std::isalpha(byte) || ch == '%' || byte >= 0x80U) {
+            has_unit_char = true;
+        }
+    }
+    return has_unit_char;
+}
+
+bool is_locale_ambiguous_number(std::string_view token) {
+    if (token.empty()) return false;
+    std::size_t pos = 0;
+    if (token[0] == '+' || token[0] == '-') {
+        pos = 1U;
+        if (pos >= token.size()) return false;
+    }
+    if (!std::isdigit(static_cast<unsigned char>(token[pos])) ||
+        !std::isdigit(static_cast<unsigned char>(token.back()))) {
+        return false;
+    }
+    bool has_comma = false;
+    bool prev_comma = false;
+    for (; pos < token.size(); ++pos) {
+        const char ch = token[pos];
+        if (ch == ',') {
+            if (prev_comma) return false;
+            has_comma = true;
+            prev_comma = true;
+        } else if (std::isdigit(static_cast<unsigned char>(ch))) {
+            prev_comma = false;
+        } else {
+            return false;
+        }
+    }
+    return has_comma;
+}
+
+bool is_supported_inline_value_token(std::string_view token, bool allow_footnote) {
+    if (intake::parse_unambiguous_scalar(token).has_value()) return true;
+    if (allow_footnote && token.size() > 1U && token.back() == '*' &&
+        intake::parse_unambiguous_scalar(token.substr(0, token.size() - 1U)).has_value()) {
+        return true;
+    }
+    if (allow_footnote && is_locale_ambiguous_number(token)) return true;
+    return false;
+}
+
+struct ParsedInlineCell {
+    std::string value_token;
+    std::optional<std::string> unit_token;
+    bool unit_has_footnote = false;
+};
+
+ParsedInlineCell parse_inline_value_unit_cell(const std::string& raw_cell_text,
+                                              const InlineValueUnitBinding& binding,
+                                              std::size_t row_number) {
+    std::istringstream stream(raw_cell_text);
+    std::vector<std::string> tokens;
+    std::string token;
+    while (stream >> token) {
+        tokens.push_back(token);
+    }
+    if (tokens.size() > 2U) {
+        throw std::runtime_error("row " + std::to_string(row_number) +
+            " inline value cell '" + raw_cell_text +
+            "' contains unsupported multi-token representation");
+    }
+    if (tokens.size() == 2U) {
+        const std::string& val_tok = tokens[0];
+        const std::string& unit_cand = tokens[1];
+        std::optional<std::string> inline_unit;
+        bool unit_footnote = false;
+        if (std::find(binding.allowed_unit_symbols.begin(),
+                      binding.allowed_unit_symbols.end(),
+                      unit_cand) != binding.allowed_unit_symbols.end()) {
+            inline_unit = unit_cand;
+        } else if (unit_cand.size() > 1U && unit_cand.back() == '*') {
+            const std::string stripped = unit_cand.substr(0, unit_cand.size() - 1U);
+            if (std::find(binding.allowed_unit_symbols.begin(),
+                          binding.allowed_unit_symbols.end(),
+                          stripped) != binding.allowed_unit_symbols.end()) {
+                inline_unit = stripped;
+                unit_footnote = true;
+            }
+        }
+        if (!inline_unit.has_value()) {
+            throw std::runtime_error("row " + std::to_string(row_number) +
+                " inline unit token '" + unit_cand +
+                "' is not permitted by configured inline value/unit binding");
+        }
+        if (!is_supported_inline_value_token(val_tok, !unit_footnote)) {
+            throw std::runtime_error("row " + std::to_string(row_number) +
+                " inline value cell '" + raw_cell_text +
+                "' contains unsupported value representation '" + val_tok + "'");
+        }
+        return {val_tok, inline_unit, unit_footnote};
+    }
+    const std::string& val_tok = tokens[0];
+    if (!is_supported_inline_value_token(val_tok, true)) {
+        throw std::runtime_error("row " + std::to_string(row_number) +
+            " inline value cell '" + raw_cell_text +
+            "' contains unsupported value representation '" + val_tok + "'");
+    }
+    return {val_tok, std::nullopt, false};
+}
+
 void validate_request(const ExtractionRequest& request) {
     const auto& t = request.table;
     if (request.pdf_path.empty() || request.pdfinfo_path.empty() || request.pdftotext_path.empty())
@@ -219,6 +337,28 @@ void validate_request(const ExtractionRequest& request) {
             !header_contains_unit_symbol(b.expected_header_text, b.unit_symbol))
             throw std::invalid_argument("header condition binding expected_header_text must contain parameter_name and unit_symbol");
     }
+    std::vector<component::ValueQualifier> inline_bound_qualifiers;
+    for (const auto& binding : t.inline_value_unit_bindings) {
+        (void)target_span_for_qualifier(t, binding.qualifier);
+        if (std::find(inline_bound_qualifiers.begin(), inline_bound_qualifiers.end(), binding.qualifier) !=
+            inline_bound_qualifiers.end()) {
+            throw std::invalid_argument("duplicate inline value/unit binding for the same value column");
+        }
+        inline_bound_qualifiers.push_back(binding.qualifier);
+        if (binding.allowed_unit_symbols.empty()) {
+            throw std::invalid_argument("inline value/unit binding requires at least one allowed_unit_symbol");
+        }
+        std::vector<std::string> seen_units;
+        for (const auto& unit_symbol : binding.allowed_unit_symbols) {
+            if (!is_valid_inline_unit_token(unit_symbol)) {
+                throw std::invalid_argument("invalid allowed_unit_symbol in inline value/unit binding: " + unit_symbol);
+            }
+            if (std::find(seen_units.begin(), seen_units.end(), unit_symbol) != seen_units.end()) {
+                throw std::invalid_argument("duplicate allowed_unit_symbol in inline value/unit binding: " + unit_symbol);
+            }
+            seen_units.push_back(unit_symbol);
+        }
+    }
 }
 
 void verify_header_box_text(const std::vector<Word>& page_words, HorizontalSpan x_span,
@@ -276,6 +416,30 @@ std::string row_cell(const std::vector<Word>& words, HorizontalSpan span) {
     std::vector<Word> selected;
     for (const auto& word : words) if (contains_x(span, (word.x0 + word.x1) / 2.0)) selected.push_back(word);
     return join_words(std::move(selected));
+}
+
+std::string row_value_cell(const std::vector<Word>& words, HorizontalSpan span, std::size_t row_number) {
+    std::vector<Word> selected;
+    for (const auto& word : words) {
+        if (contains_x(span, (word.x0 + word.x1) / 2.0)) selected.push_back(word);
+    }
+    std::sort(selected.begin(), selected.end(), [](const Word& a, const Word& b) {
+        if (a.x0 != b.x0) return a.x0 < b.x0;
+        if (a.x1 != b.x1) return a.x1 < b.x1;
+        return a.text < b.text;
+    });
+    for (std::size_t i = 0; i + 1U < selected.size(); ++i) {
+        if (selected[i + 1U].x0 < selected[i].x1) {
+            throw std::runtime_error("row " + std::to_string(row_number) +
+                " value cell has overlapping or duplicate word bounding boxes");
+        }
+    }
+    std::string result;
+    for (const auto& word : selected) {
+        if (!result.empty()) result.push_back(' ');
+        result += word.text;
+    }
+    return result;
 }
 
 struct TempDirectory {
@@ -400,6 +564,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
             cond_header_ev = std::move(hdr_ev);
         }
 
+        std::vector<ValueCellProvenance> cell_provenance;
         std::size_t row_number = 0;
         for (const auto& row : rows) {
             ++row_number;
@@ -431,8 +596,26 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                      {component::ValueQualifier::minimum, request.table.minimum_column, "min"},
                      {component::ValueQualifier::typical, request.table.typical_column, "typ"},
                      {component::ValueQualifier::maximum, request.table.maximum_column, "max"}}) {
-                const std::string value = row_cell(row.words, column);
-                if (value.empty() || value == "-" || value == std::string("\xE2\x80\x94")) continue;
+                const std::string raw_cell_text = row_value_cell(row.words, column, row_number);
+                if (raw_cell_text.empty() || raw_cell_text == "-" || raw_cell_text == std::string("\xE2\x80\x94")) continue;
+
+                const InlineValueUnitBinding* inline_binding = nullptr;
+                for (const auto& ib : request.table.inline_value_unit_bindings) {
+                    if (ib.qualifier == qualifier) {
+                        inline_binding = &ib;
+                        break;
+                    }
+                }
+                std::string value_token = raw_cell_text;
+                std::optional<std::string> inline_unit_token;
+                bool unit_has_footnote = false;
+                if (inline_binding != nullptr) {
+                    const auto parsed_inline = parse_inline_value_unit_cell(raw_cell_text, *inline_binding, row_number);
+                    value_token = parsed_inline.value_token;
+                    inline_unit_token = parsed_inline.unit_token;
+                    unit_has_footnote = parsed_inline.unit_has_footnote;
+                }
+
                 const std::string base = safe_id(request.source_document.id.value + "." +
                     request.table.table_id + ".p" + std::to_string(request.pdf_page_index) +
                     ".r" + std::to_string(row_number) + "." + column_name);
@@ -443,7 +626,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 evidence.printed_page_label = request.printed_page_label;
                 evidence.table_or_figure_id = request.table.table_id;
                 evidence.cell_or_region = "row=" + std::to_string(row_number) + ";column=" + column_name;
-                if (value.find('*') != std::string::npos) evidence.footnote_refs = {"*"};
+                if (raw_cell_text.find('*') != std::string::npos) evidence.footnote_refs = {"*"};
                 component::EvidenceLocation parameter_evidence = evidence;
                 parameter_evidence.id = {"ev." + base + ".parameter"};
                 parameter_evidence.cell_or_region = "row=" + std::to_string(row_number) + ";column=parameter/unit";
@@ -460,14 +643,41 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 }
                 std::optional<std::string> effective_unit;
                 bool used_header_unit = false;
-                if (!unit.empty()) {
+                if (inline_unit_token.has_value()) {
+                    if (!unit.empty() && *inline_unit_token != unit) {
+                        throw std::runtime_error("row " + std::to_string(row_number) +
+                            " inline unit '" + *inline_unit_token + "' conflicts with explicit row unit '" + unit + "'");
+                    }
+                    if (matched_unit_header != nullptr && *inline_unit_token != matched_unit_header->binding.unit_symbol) {
+                        throw std::runtime_error("row " + std::to_string(row_number) +
+                            " inline unit '" + *inline_unit_token + "' conflicts with bound header unit '" +
+                            matched_unit_header->binding.unit_symbol + "'");
+                    }
+                    effective_unit = *inline_unit_token;
+                } else if (!unit.empty()) {
                     if (matched_unit_header != nullptr && unit != matched_unit_header->binding.unit_symbol) {
                         throw std::runtime_error("row " + std::to_string(row_number) +
                             " explicit unit '" + unit + "' conflicts with bound header unit '" +
                             matched_unit_header->binding.unit_symbol + "'");
                     }
+                    if (inline_binding != nullptr &&
+                        std::find(inline_binding->allowed_unit_symbols.begin(),
+                                  inline_binding->allowed_unit_symbols.end(), unit) ==
+                            inline_binding->allowed_unit_symbols.end()) {
+                        throw std::runtime_error("row " + std::to_string(row_number) +
+                            " explicit unit '" + unit + "' is not permitted by configured inline value/unit binding");
+                    }
                     effective_unit = unit;
                 } else if (matched_unit_header != nullptr) {
+                    if (inline_binding != nullptr &&
+                        std::find(inline_binding->allowed_unit_symbols.begin(),
+                                  inline_binding->allowed_unit_symbols.end(),
+                                  matched_unit_header->binding.unit_symbol) ==
+                            inline_binding->allowed_unit_symbols.end()) {
+                        throw std::runtime_error("row " + std::to_string(row_number) +
+                            " bound header unit '" + matched_unit_header->binding.unit_symbol +
+                            "' is not permitted by configured inline value/unit binding");
+                    }
                     effective_unit = matched_unit_header->binding.unit_symbol;
                     used_header_unit = true;
                     if (!matched_unit_header->registered) {
@@ -523,11 +733,11 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 observation.id = {"obs." + base};
                 observation.component_id = request.component.id;
                 observation.parameter_name = parameter;
-                observation.original_value_text = value;
+                observation.original_value_text = value_token;
                 observation.original_unit_symbol = effective_unit;
                 observation.unitless = false;
-                observation.parsed_numeric_value = effective_unit.has_value()
-                    ? intake::parse_unambiguous_scalar(value) : std::nullopt;
+                observation.parsed_numeric_value = (effective_unit.has_value() && !unit_has_footnote)
+                    ? intake::parse_unambiguous_scalar(value_token) : std::nullopt;
                 observation.qualifier = qualifier;
                 observation.category = *request.table.category;
                 if (resolved_conditions.has_value()) observation.operating_conditions = *resolved_conditions;
@@ -546,9 +756,26 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                         result.diagnostics.push_back("row " + std::to_string(row_number) + ": operating condition left unresolved: " + condition_text);
                     }
                 }
+                if (unit_has_footnote) {
+                    const std::string fn_note = "Footnote-qualified inline value cell preserved without asserted numeric scalar.";
+                    entry.ambiguity_notes = entry.ambiguity_notes.has_value()
+                        ? (*entry.ambiguity_notes + " " + fn_note)
+                        : std::optional<std::string>(fn_note);
+                    result.diagnostics.push_back("row " + std::to_string(row_number) +
+                        ": footnote-qualified inline value cell '" + raw_cell_text +
+                        "'; numeric value was not asserted");
+                }
                 if (!effective_unit.has_value())
                     result.diagnostics.push_back("row " + std::to_string(row_number) +
                         ": unit cell is blank; no unitless status or numeric value was inferred");
+                cell_provenance.push_back({
+                    entry.observation.id,
+                    evidence.id,
+                    row_number,
+                    qualifier,
+                    raw_cell_text,
+                    value_token,
+                    inline_unit_token});
                 manifest.observations.push_back(std::move(entry));
             }
         }
@@ -557,6 +784,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         result.report = std::move(candidate.report);
         result.manifest = std::move(manifest);
         result.candidate_bundle = std::move(candidate.bundle);
+        result.value_cell_provenance = std::move(cell_provenance);
     } catch (const std::exception& error) {
         result.diagnostics.push_back(error.what());
     }

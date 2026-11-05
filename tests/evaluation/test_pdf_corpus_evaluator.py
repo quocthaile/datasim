@@ -303,6 +303,10 @@ class TestPdfCorpusEvaluator(unittest.TestCase):
         if real_p4f_path.is_file():
             real_p4f = json.loads(real_p4f_path.read_text(encoding="utf-8"))
             eval_mod.validate_corpus_manifest(real_p4f)
+        real_p4g_path = self.repo_root / "evaluation" / "real_corpus_manifest_phase4g.json"
+        if real_p4g_path.is_file():
+            real_p4g = json.loads(real_p4g_path.read_text(encoding="utf-8"))
+            eval_mod.validate_corpus_manifest(real_p4g)
 
     def test_phase4f_header_unit_and_condition_bindings(self) -> None:
         hb_manifest = self.repo_root / "tests" / "evaluation" / "synthetic_header_binding_manifest.json"
@@ -352,6 +356,57 @@ class TestPdfCorpusEvaluator(unittest.TestCase):
 
             sec_d = report["section_d_reproducibility_and_diagnostics"]
             self.assertEqual(sec_d["repeat_runs_verified"], 5)
+            self.assertEqual(sec_d["repeat_run_mismatches"], 0)
+            self.assertTrue(sec_d["candidate_only_verified"])
+
+    def test_phase4g_inline_value_unit_parsing(self) -> None:
+        iu_manifest = self.repo_root / "tests" / "evaluation" / "synthetic_inline_unit_manifest.json"
+        iu_annotations = self.repo_root / "tests" / "evaluation" / "synthetic_inline_unit_ground_truth.json"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            json1 = tmp / "iu1.json"
+            md1 = tmp / "iu1.md"
+            rc = eval_mod.main(
+                [
+                    "--manifest",
+                    str(iu_manifest),
+                    "--annotations",
+                    str(iu_annotations),
+                    "--repo-root",
+                    str(self.repo_root),
+                    "--eval-dump-bin",
+                    str(self.eval_dump_bin),
+                    "--pdfinfo",
+                    str(self.pdfinfo_bin),
+                    "--pdftotext",
+                    str(self.pdftotext_bin),
+                    "--output-json",
+                    str(json1),
+                    "--output-md",
+                    str(md1),
+                ]
+            )
+            self.assertEqual(rc, 0)
+            report = json.loads(json1.read_text(encoding="utf-8"))
+            sec_b = report["section_b_supported_extraction_quality"]
+            self.assertEqual(sec_b["tp"], 21)
+            self.assertEqual(sec_b["fp"], 0)
+            self.assertEqual(sec_b["fn"], 0)
+            self.assertAlmostEqual(sec_b["precision"], 1.0)
+            self.assertAlmostEqual(sec_b["recall"], 1.0)
+            self.assertAlmostEqual(sec_b["f1"], 1.0)
+            for field_name, stats in sec_b["field_level_agreement"].items():
+                self.assertEqual(stats["matched"], 21, f"Field {field_name} mismatch")
+                self.assertEqual(stats["total"], 21)
+
+            sec_c = report["section_c_fail_closed_behavior"]
+            self.assertEqual(sec_c["expected_fail_closed_cases"], 4)
+            self.assertEqual(sec_c["actual_fail_closed_cases"], 4)
+            self.assertEqual(sec_c["false_accept_cases"], 0)
+            self.assertEqual(sec_c["diagnostic_matched_fail_closed_cases"], 4)
+
+            sec_d = report["section_d_reproducibility_and_diagnostics"]
+            self.assertEqual(sec_d["repeat_runs_verified"], 8)
             self.assertEqual(sec_d["repeat_run_mismatches"], 0)
             self.assertTrue(sec_d["candidate_only_verified"])
 
