@@ -575,6 +575,14 @@ void inspect_component_synthetic_markers(
         }
     }
 
+    const bool synthetic_source_context =
+        bundle->component.is_synthetic &&
+        !bundle->documents.empty() &&
+        std::all_of(
+            bundle->documents.begin(),
+            bundle->documents.end(),
+            [](const component::SourceDocument& doc) { return doc.is_synthetic; });
+
     for (const auto& obs : bundle->observations) {
         if (obs.id == resolved.source_observation_id ||
             (bundle->knowledge.has_value() &&
@@ -582,7 +590,9 @@ void inspect_component_synthetic_markers(
                  bundle->knowledge->approved_observation_refs.begin(),
                  bundle->knowledge->approved_observation_refs.end(),
                  obs.id) != bundle->knowledge->approved_observation_refs.end())) {
-            if (obs.extraction_method == component::ExtractionMethod::synthetic_fixture) {
+            if (obs.extraction_method == component::ExtractionMethod::synthetic_fixture ||
+                (synthetic_source_context &&
+                 obs.extraction_method == component::ExtractionMethod::deterministic_table_parser)) {
                 any_synthetic = true;
             } else {
                 any_non_synthetic = true;

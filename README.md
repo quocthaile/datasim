@@ -2,8 +2,8 @@
 
 **Datasheet-driven electronic component modeling, simulation, and visualization.**
 
-Datasim comprises three verified numerical/domain modules and the verified Phase 4B
-candidate intake on Windows x64. Phase 4C is implemented on a feature branch.
+Datasim comprises three verified numerical/domain modules, the verified Phase 4B
+candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows x64:
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
@@ -46,14 +46,35 @@ candidate intake on Windows x64. Phase 4C is implemented on a feature branch.
    `7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`; hosted Windows CI run
    [41995104973](https://github.com/quocthaile/datasim/actions/runs/41995104973)
    exercised the non-skipped P-07 real-ngspice path.
+5. **Phase 4C deterministic PDF table extraction (`datasim_pdf`)**: isolated
+   Poppler `pdfinfo` / `pdftotext -bbox-layout` adapter for explicitly selected
+   single-page tables with non-overlapping column spans, emitting candidate-only
+   observations through `datasim_intake`. Merged by PR #7 at
+   `1704f726d901f3e1d00f9cdc918e80d352b443ac` and verified on synthetic fixtures in
+   hosted Windows CI runs
+   [42000652152](https://github.com/quocthaile/datasim/actions/runs/42000652152) (PR #7)
+   and [42017272043](https://github.com/quocthaile/datasim/actions/runs/42017272043)
+   (post-merge `main`). See [Phase 4C plan](docs/PHASE_4C_PLAN.md),
+   [Phase 4C implementation](docs/PHASE_4C_IMPLEMENTATION.md),
+   [Phase 4C validation](docs/PHASE_4C_VALIDATION.md), and
+   [ADR-0006](docs/decisions/ADR-0006-deterministic-pdf-table-extraction.md).
+6. **Phase 4D PDF-to-Simulation end-to-end validation gate (IMPLEMENTED on `feat/phase-4d-pdf-to-simulation-gate`, locally VERIFIED)**:
+   end-to-end integration test (`tests/integration/pdf_simulation_gate.cpp`) connecting
+   real Poppler extraction (`datasim_pdf`) on `synthetic_datasheet.pdf` (`SIM-R-10K` and
+   `SIM-C-1UF` at `T_A=85 degC`) through `datasim_intake`, synthetic engineering review and
+   conflict resolution (`datasim_component`), model compatibility and assembly
+   (`datasim_vertical`), and real `ngspice-47` simulation (`datasim`), verified against an
+   equivalent manual `RcConfig` (`R=10000 ohm`, `C=1e-6 F`) with 768 positive and negative
+   trust-boundary checks. See [Phase 4D plan](docs/PHASE_4D_PLAN.md),
+   [Phase 4D implementation](docs/PHASE_4D_IMPLEMENTATION.md), and
+   [Phase 4D validation](docs/PHASE_4D_VALIDATION.md).
 
-This is not yet a general-purpose circuit simulator or datasheet processor. PDF/OCR
-OCR ingestion, persistent storage, general-purpose JSON serialization, automatic unit
-conversion, LLM integration, external SPICE subcircuit loading, semiconductor models,
-and interactive visualization remain **PROPOSED**. The bounded Phase 4C local
-selectable-text table adapter is **IMPLEMENTED and VERIFIED** on its feature branch
-(PR #7, open and unmerged). Hosted Windows CI run
-[42000652152](https://github.com/quocthaile/datasim/actions/runs/42000652152) passed.
+This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
+PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
+serialization, automatic unit conversion, LLM integration, external SPICE subcircuit
+loading, semiconductor models, physical measurement validation (`MEASURED`), and
+interactive visualization remain **PROPOSED**. No real-datasheet extraction accuracy
+is claimed.
 
 The intended workflow moves from source evidence to reviewed component knowledge,
 then to an explicitly selected model and deterministic simulation. A datasheet
@@ -74,6 +95,7 @@ numerical or review authority.
 - [Phase 4 plan](docs/PHASE_4_PLAN.md) and [validation plan](docs/PHASE_4_VALIDATION_PLAN.md) for the Phase 4A design and reconciled Phase 4B test semantics
 - [Phase 4B implementation](docs/PHASE_4_IMPLEMENTATION.md) and [validation](docs/PHASE_4_VALIDATION.md) for the merged, hosted-verified in-memory candidate intake
 - [Phase 4C plan](docs/PHASE_4C_PLAN.md), [implementation](docs/PHASE_4C_IMPLEMENTATION.md), [validation](docs/PHASE_4C_VALIDATION.md), and [ADR-0006](docs/decisions/ADR-0006-deterministic-pdf-table-extraction.md) for the bounded local PDF table adapter
+- [Phase 4D plan](docs/PHASE_4D_PLAN.md), [implementation](docs/PHASE_4D_IMPLEMENTATION.md), and [validation](docs/PHASE_4D_VALIDATION.md) for the PDF-to-Simulation end-to-end validation gate
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

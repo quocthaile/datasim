@@ -36,11 +36,13 @@ integration, external SPICE subcircuits, semiconductor models, and UI. The follo
 paragraphs preserve the original initialization scope record.
 
 Phase 4 update: Phase 4A planning and the Phase 4B in-memory candidate intake are
-merged into `main`; Phase 4B is hosted-verified by run `41995104973`. Phase 4C
-implements a separate, bounded local selectable-text PDF table adapter on its
-feature branch. OCR, persistence, LLM integration, approval automation and real
-datasheet accuracy claims remain out of scope or unverified; see the Phase 4C plan,
-implementation and validation records.
+merged into `main` (PRs #5 and #6; Phase 4B hosted-verified by run `41995104973`).
+Phase 4C implements a separate, bounded local selectable-text PDF table adapter
+(`datasim_pdf`), merged into `main` via PR #7 (`1704f726d901f3e1d00f9cdc918e80d352b443ac`)
+and hosted-verified on synthetic fixtures by runs `42000652152` and `42017272043`.
+OCR, persistence, LLM integration, approval automation, physical measurements, and
+real datasheet accuracy claims remain out of scope or unverified; see the Phase 4C
+plan, implementation, and validation records.
 
 PROPOSED capabilities include document processing, evidence-linked parameter
 extraction, engineering review, component knowledge management, model association,

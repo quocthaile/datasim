@@ -1,8 +1,10 @@
 # Phase 4C plan: Deterministic datasheet table extraction MVP
 
-Status: **IMPLEMENTED SCOPE; backend selection and feature remain under review in
-the Phase 4C pull request.** No extraction accuracy claim is made for real vendor
-datasheets.
+Status: **IMPLEMENTED and MERGED in PR #7 (`1704f726d901f3e1d00f9cdc918e80d352b443ac`),
+VERIFIED on synthetic fixtures by hosted Windows CI runs `42000652152` and
+`42017272043`.** Open licensing and redistribution policy questions remain
+**PROPOSED**. No extraction accuracy claim is made for real vendor
+datasheets, and no physical measurements were taken.
 
 ## Objective and boundaries
 
@@ -78,7 +80,7 @@ test failures in CI, not skips.
 
 ## Status vocabulary
 
-- **IMPLEMENTED**: code and docs present on `feat/phase-4c-deterministic-extraction`.
+- **IMPLEMENTED**: code and docs merged into `main` via PR #7 (`1704f726d901f3e1d00f9cdc918e80d352b443ac`).
 - **VERIFIED**: only a command that actually completed with its result recorded.
 - **PROPOSED**: a decision or capability awaiting review.
 - **NOT VERIFIED**: no passing execution evidence, including any skipped test.

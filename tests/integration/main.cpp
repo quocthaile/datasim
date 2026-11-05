@@ -4,6 +4,7 @@
 #include "datasim/simulation/io/report.hpp"
 #include "datasim/vertical/provenance/run_provenance.hpp"
 #include "intake_integration_fixture.hpp"
+#include "pdf_simulation_gate.hpp"
 #include "../unit/vertical_slice_fixtures.hpp"
 #include <algorithm>
 #include <chrono>
@@ -99,6 +100,7 @@ int main(int argc, char** argv) {
         std::cout << "PASS: intake-derived numerical comparison max_difference_V="
                   << maximum_numerical_difference << " tolerance_V=0.05\n";
         std::cout << "PASS: intake-derived byte comparison results.csv=identical\n";
+        vertical::testing::run_pdf_to_simulation_gate(exe, dir);
         std::cout << "PASS: samples=" << samples.size() << " max_error_V=" << report.max_absolute_error_V
             << " rmse_V=" << report.rmse_V << " artifacts=" << dir.string() << '\n';
         return 0;

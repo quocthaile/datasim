@@ -1,11 +1,14 @@
 # Phase 4C implementation: deterministic PDF table extraction
 
-Status: **IMPLEMENTED and VERIFIED** on `feat/phase-4c-deterministic-extraction`
-from merged Phase 4B `main` commit `7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`.
+Status: **IMPLEMENTED and VERIFIED** on `main`, merged via PR #7 at
+`1704f726d901f3e1d00f9cdc918e80d352b443ac` from the Phase 4B `main` baseline
+(`7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`).
 Hosted Windows CI run [42000652152](https://github.com/quocthaile/datasim/actions/runs/42000652152)
-passed; PR #7 remains open for review and is not merged. See
+(PR #7 head `8291401`) and post-merge `main` run
+[42017272043](https://github.com/quocthaile/datasim/actions/runs/42017272043)
+passed on synthetic fixtures. See
 [validation](PHASE_4C_VALIDATION.md) for local and hosted results. No
-real-datasheet accuracy is claimed.
+real-datasheet accuracy or physical measurement is claimed.
 
 ## Adapter boundary
 

@@ -28,10 +28,16 @@ semiconductor simulation, or a custom solver.
 
 Phase 4A and Phase 4B are merged into `main` by PRs #5 and #6; Phase 4B's P-07
 real-ngspice release gate passed hosted Windows CI run `41995104973`. Phase 4C
-(`PHASE_4C_PLAN.md`, `PHASE_4C_IMPLEMENTATION.md`,
-`PHASE_4C_VALIDATION.md`, and ADR-0006) is implemented and hosted-verified by run
-`42000652152` on `feat/phase-4c-deterministic-extraction`; PR #7 remains open and
-unmerged.
+([PHASE_4C_PLAN.md](PHASE_4C_PLAN.md), [PHASE_4C_IMPLEMENTATION.md](PHASE_4C_IMPLEMENTATION.md),
+[PHASE_4C_VALIDATION.md](PHASE_4C_VALIDATION.md), and
+[ADR-0006](decisions/ADR-0006-deterministic-pdf-table-extraction.md)) is implemented,
+merged into `main` via PR #7 (`1704f726d901f3e1d00f9cdc918e80d352b443ac`), and
+verified on synthetic selectable-text PDF fixtures by hosted Windows CI runs
+`42000652152` (PR #7 branch) and `42017272043` (post-merge `main`). Phase 4D
+([PHASE_4D_PLAN.md](PHASE_4D_PLAN.md), [PHASE_4D_IMPLEMENTATION.md](PHASE_4D_IMPLEMENTATION.md),
+[PHASE_4D_VALIDATION.md](PHASE_4D_VALIDATION.md)) implements the PDF-to-Simulation
+end-to-end validation gate on `feat/phase-4d-pdf-to-simulation-gate`. No
+real-datasheet extraction accuracy or physical measurement is claimed.
 Keep the Poppler adapter in `datasim_pdf`, above and depending on `datasim_intake`;
 do not modify existing Phase 2/3/4B public contracts without a demonstrated,
 documented correctness defect. Do not infer licensing rights or commit vendor PDFs.
