@@ -1,5 +1,7 @@
 #include "datasim/pdf/table_extraction.hpp"
 #include <cstdlib>
+#include <algorithm>
+#include <limits>
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
@@ -623,6 +625,132 @@ int main() {
                 !dup_qual_res.diagnostics.empty() &&
                 dup_qual_res.diagnostics.front().find("duplicate inline value/unit binding") != std::string::npos,
                 "Duplicate InlineValueUnitBinding for the same qualifier rejected");
+
+        auto hierarchy = resistor_request;
+        hierarchy.pdf_path = DATASIM_HIERARCHY_PDF_PATH;
+        hierarchy.table.region_y_max = 260;
+        hierarchy.table.parent_context_bindings = {
+            {{20, 115, 210, 130}, "Pulse rating:", {{2, "short"}, {3, "long"}}},
+            {{20, 190, 210, 205}, "Hold rating:", {{5, "short"}}}};
+        const auto context = pdf::extract_electrical_table(hierarchy);
+        require(context.candidate_bundle.has_value(), "two explicit parent groups extracted");
+        require(context.manifest->observations.size() == 4U, "parent-only rows produce no values");
+        require(context.manifest->observations[0].observation.parameter_name == "Pulse rating: short", "first child composition");
+        require(context.manifest->observations[1].observation.parameter_name == "Pulse rating: long", "second child composition");
+        require(context.manifest->observations[2].observation.parameter_name == "Hold rating: short", "adjacent group isolated");
+        require(context.manifest->observations[3].observation.parameter_name == "Complete resistance", "unselected complete label unchanged");
+        require(context.parameter_context_provenance.size() == 3U, "only selected children have context provenance");
+        const auto repeated_context = pdf::extract_electrical_table(hierarchy);
+        require(context.candidate_bundle == repeated_context.candidate_bundle, "hierarchy bundle deterministic");
+        require(context.parameter_context_provenance == repeated_context.parameter_context_provenance, "hierarchy provenance deterministic");
+        require(context.diagnostics == repeated_context.diagnostics, "hierarchy diagnostics deterministic");
+        for (const auto& p : context.parameter_context_provenance) {
+            require(p.parent_box.x_min == 20 && p.child_row_box.y_min > p.parent_box.y_max, "separate source geometry");
+            require(!p.raw_child_row_text.empty() && !p.raw_child_parameter_text.empty(), "original child text retained");
+            bool parent_found = false, child_found = false;
+            for (const auto& e : context.manifest->evidence) {
+                if (e.location.id == p.parent_evidence_id) parent_found = e.row_label == p.raw_parent_text;
+                if (e.location.id == p.child_evidence_id) child_found = e.row_label == p.raw_child_parameter_text;
+            }
+            require(parent_found && child_found && p.parent_evidence_id != p.child_evidence_id, "distinct parent and child evidence resolves");
+            for (const auto& entry : context.manifest->observations) {
+                if (entry.observation.id != p.observation_id) continue;
+                require(entry.observation.review_state == component::ReviewState::candidate &&
+                        entry.observation.review_history.empty(), "context never approves observations");
+                require(std::find(entry.observation.evidence_refs.begin(), entry.observation.evidence_refs.end(), p.parent_evidence_id)
+                        != entry.observation.evidence_refs.end(), "observation references parent evidence");
+            }
+        }
+        require(!context.candidate_bundle->knowledge.has_value() && context.candidate_bundle->models.empty(), "context cannot promote knowledge or models");
+        auto legacy_hierarchy = hierarchy;
+        legacy_hierarchy.table.parent_context_bindings.clear();
+        const auto legacy_context = pdf::extract_electrical_table(legacy_hierarchy);
+        require(legacy_context.candidate_bundle.has_value() && legacy_context.parameter_context_provenance.empty(), "legacy mode preserved");
+        require(legacy_context.manifest->observations.front().observation.parameter_name == "short", "legacy name not composed");
+        require(legacy_context.value_cell_provenance == context.value_cell_provenance, "physical row IDs and value provenance unchanged");
+        auto reject_context = [&](const pdf::ExtractionRequest& r, const std::string& diagnostic) {
+            const auto out = pdf::extract_electrical_table(r);
+            require(!out.candidate_bundle && !out.manifest && out.parameter_context_provenance.empty() &&
+                    out.value_cell_provenance.empty(), "invalid hierarchy fails atomically");
+            require(std::any_of(out.diagnostics.begin(), out.diagnostics.end(), [&](const auto& d) {
+                return d.find(diagnostic) != std::string::npos;
+            }), "invalid hierarchy has expected diagnostic");
+        };
+        auto bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].expected_parent_text = "Altered heading";
+        reject_context(bad_context, "text mismatch");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].parent_box = {20, 130, 210, 139};
+        reject_context(bad_context, "text mismatch");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].parent_box.x_max = 40;
+        reject_context(bad_context, "cuts a source word");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].children[0].row_index = 99;
+        reject_context(bad_context, "outside selected scope");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].children[0].row_index = 1;
+        reject_context(bad_context, "no value cell");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].children[0].expected_parameter_text = "Complete label";
+        reject_context(bad_context, "child text mismatch");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[1].children.push_back({3, "long"});
+        reject_context(bad_context, "competing child assignments");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings.push_back(bad_context.table.parent_context_bindings[0]);
+        reject_context(bad_context, "boxes overlap");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].parent_box.y_min = std::numeric_limits<double>::quiet_NaN();
+        reject_context(bad_context, "must be finite");
+
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings[0].children.push_back({2, "short"});
+        reject_context(bad_context, "competing child assignments");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings = {{{20, 115, 210, 130}, "Pulse rating:", {{5, "short"}}}};
+        reject_context(bad_context, "intervening parameter heading");
+        auto partial = hierarchy;
+        partial.table.parent_context_bindings[0].children.pop_back();
+        const auto partial_result = pdf::extract_electrical_table(partial);
+        require(partial_result.candidate_bundle.has_value() &&
+                partial_result.manifest->observations[1].observation.parameter_name == "long", "unselected sibling never inherits");
+        bad_context = hierarchy;
+        bad_context.table.region_y_min = 430; bad_context.table.region_y_max = 485;
+        bad_context.table.parent_context_bindings = {{{20, 435, 150, 455}, "Overlap Text", {{2, ""}}}};
+        reject_context(bad_context, "overlapping source words");
+        bad_context = hierarchy;
+        bad_context.table.region_y_min = 530; bad_context.table.region_y_max = 560;
+        bad_context.table.parent_context_bindings = {{{20, 535, 100, 555}, "Group", {{1, "Own label"}}}};
+        reject_context(bad_context, "competing text");
+
+        auto merged = hierarchy;
+        merged.table.region_y_min = 280; merged.table.region_y_max = 335;
+        merged.table.header_y_min = 0; merged.table.header_y_max = 0;
+        merged.table.parent_context_bindings = {{{20, 285, 210, 330}, "Shared rating", {{1, ""}, {2, ""}}}};
+        const auto merged_result = pdf::extract_electrical_table(merged);
+        require(merged_result.candidate_bundle.has_value(), "bounded merged parameter cell supported");
+        require(merged_result.manifest->observations.size() == 2U, "merged cell has exactly two value owners");
+        for (const auto& p : merged_result.parameter_context_provenance)
+            require(p.raw_child_parameter_text.empty(), "merged blank child preserved");
+        for (const auto& e : merged_result.manifest->observations)
+            require(e.observation.parameter_name == "Shared rating", "merged parent inherited exactly");
+        bad_context = merged;
+        bad_context.table.parent_context_bindings[0].children.pop_back();
+        reject_context(bad_context, "unassigned value row");
+        bad_context = merged;
+        bad_context.table.parent_context_bindings.push_back(bad_context.table.parent_context_bindings[0]);
+        reject_context(bad_context, "boxes overlap");
+        bad_context = merged;
+        bad_context.table.parent_context_bindings[0].parent_box.y_max = 320;
+        reject_context(bad_context, "partial child geometry");
+        bad_context = hierarchy;
+        bad_context.table.parent_context_bindings = {{{20, 115, 210, 130}, "Pulse rating:", {{6, ""}}}};
+        reject_context(bad_context, "child text mismatch");
+        auto multi = hierarchy;
+        multi.table.region_y_max = 410;
+        multi.table.condition_column.reset();
+        reject_context(multi, "configured column spans");
 
         std::cout << "PDF extraction checks: " << checks << '\n';
         return 0;

@@ -139,7 +139,8 @@ if(BUILD_TESTING)
         DATASIM_SYNTHETIC_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_datasheet.pdf"
         DATASIM_IMAGE_ONLY_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/image_only_datasheet.pdf"
         DATASIM_HEADER_BINDING_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_header_binding_datasheet.pdf"
-        DATASIM_INLINE_UNIT_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_inline_unit_datasheet.pdf")
+        DATASIM_INLINE_UNIT_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_inline_unit_datasheet.pdf"
+        DATASIM_HIERARCHY_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_hierarchy_datasheet.pdf")
     if(MSVC)
         target_compile_options(pdf_extraction_tests PRIVATE /W4 /permissive-)
     else()

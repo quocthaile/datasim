@@ -96,3 +96,8 @@ Phase 1/1.5 answers the initial ideal-RC/transient scope ([ADR-0002](decisions/A
 and Phase 2 establishes the dependency-free C++20 in-memory component domain contracts
 ([ADR-0003](decisions/ADR-0003-component-domain-model.md)). No choice of Qt, OpenGL,
 Python runtime dependency, SQLite, JSON library, or custom SPICE solver is made.
+
+Phase 4G is now merged via PR #11 (`357dc52aa809`, post-merge CI `42052973122`).
+Phase 4H adds explicit hierarchical context on its separate feature branch; see
+[validation](PHASE_4H_VALIDATION.md). Phase 4I baseline reconstruction and Phase 4J
+release closure remain PROPOSED and gated on preceding merges and hosted CI.

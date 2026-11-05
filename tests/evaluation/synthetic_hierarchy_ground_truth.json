@@ -1,0 +1,141 @@
+{
+  "schema_version": "datasim.phase4e.annotations.v1",
+  "annotation_set_id": "datasim-phase4h-fictional-labels-v1",
+  "annotator_count": 1,
+  "inter_annotator_agreement_claimed": false,
+  "notes": "Expected values derived from the fictional fixture generator, not vendor observations.",
+  "cases": [
+    {
+      "case_id": "SYN-H-PARENTS",
+      "document_id": "doc.synthetic.hierarchy",
+      "expected_sha256": "b7007dc666a3c56e3531facd0bd3ced9239865292f63f4e6c1aa676466908558",
+      "pdf_page_index": 0,
+      "printed_page_label": "H-1",
+      "table_id": "HIERARCHY",
+      "annotation_author": "datasim.synthetic-fixture-specification",
+      "review_status": "fixture_specification",
+      "adjudication_history": [
+        {
+          "action": "fictional_fixture_specification",
+          "notes": "Labels specified by make_hierarchy_pdf.py; no human engineering approval claimed."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "SYN-H-PARENTS-2",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=typ",
+          "parameter_name": "Pulse rating: short",
+          "original_value_text": "12",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 12.0,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "SYN-H-PARENTS-3",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=typ",
+          "parameter_name": "Pulse rating: long",
+          "original_value_text": "8",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 8.0,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "SYN-H-PARENTS-5",
+          "row_index": 5,
+          "cell_or_region": "row=5;column=typ",
+          "parameter_name": "Hold rating: short",
+          "original_value_text": "6",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 6.0,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "SYN-H-PARENTS-6",
+          "row_index": 6,
+          "cell_or_region": "row=6;column=typ",
+          "parameter_name": "Complete resistance",
+          "original_value_text": "10",
+          "original_unit_symbol": "ohm",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 10.0,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        }
+      ]
+    },
+    {
+      "case_id": "SYN-H-MERGED",
+      "document_id": "doc.synthetic.hierarchy",
+      "expected_sha256": "b7007dc666a3c56e3531facd0bd3ced9239865292f63f4e6c1aa676466908558",
+      "pdf_page_index": 0,
+      "printed_page_label": "H-1",
+      "table_id": "HIERARCHY",
+      "annotation_author": "datasim.synthetic-fixture-specification",
+      "review_status": "fixture_specification",
+      "adjudication_history": [
+        {
+          "action": "fictional_fixture_specification",
+          "notes": "Labels specified by make_hierarchy_pdf.py; no human engineering approval claimed."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "SYN-H-MERGED-1",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=typ",
+          "parameter_name": "Shared rating",
+          "original_value_text": "4",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 4.0,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        },
+        {
+          "entry_id": "SYN-H-MERGED-2",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=typ",
+          "parameter_name": "Shared rating",
+          "original_value_text": "3",
+          "original_unit_symbol": "V",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 3.0,
+          "operating_conditions": [],
+          "raw_conditions_text": null,
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true
+        }
+      ]
+    }
+  ]
+}
