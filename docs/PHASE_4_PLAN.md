@@ -1,9 +1,9 @@
 # Phase 4 plan: Deterministic datasheet evidence intake (Phase 4A planning)
 
-Status: **PLANNED / PROPOSED — planning only.** This document implements nothing.
-Every new API, type, schema, or module named here is `PROPOSED` and does not exist in
-the repository. Phase 4B implementation is **not authorized** until the owner accepts
-this plan and [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md). Test design:
+Status: **Phase 4A planning plus Phase 4B implementation record.** The original
+planning decisions remain proposals unless explicitly described as implemented in
+[PHASE_4_IMPLEMENTATION.md](PHASE_4_IMPLEMENTATION.md). Phase 4B is implemented on
+the feature branch, but owner approval and merge are not claimed. Test design:
 [Phase 4 validation plan](PHASE_4_VALIDATION_PLAN.md).
 
 ## 1. Baseline and Phase 3 release-gate evidence
@@ -105,7 +105,7 @@ no document page count; no row/column/symbol fields; no manufacturer or suffix c
 against documents (F2); no curator/reviewer separation (F5); no persistence or
 serialization; no unit conversion beyond reviewed `NormalizedParameter` records.
 
-## 3. Proposed intake data flow
+## 3. Intake data flow (implemented for in-memory manifests)
 
 ```mermaid
 flowchart TD
@@ -129,22 +129,22 @@ The six boundaries map to six distinct data holders:
 5. **Selected models**: `ModelArtifactDescriptor`, `ModelValidationRecord`.
 6. **Execution**: `datasim_vertical` and `datasim`.
 
-## 4. Proposed intake interface (all `PROPOSED`)
+## 4. Intake interface (implemented on the Phase 4B feature branch)
 
 ```text
-module   datasim_intake            (PROPOSED)  links datasim_component only
-namespace datasim::intake          (PROPOSED)
-IntakeOriginClass                  (PROPOSED)  { synthetic_fixture, manual_curation }  — no "verified" value
-IntakeManifest                     (PROPOSED)  schema_version, origin, curator ReviewerIdentity,
+module   datasim_intake            (IMPLEMENTED)  links datasim_component only
+namespace datasim::intake          (IMPLEMENTED)
+IntakeOriginClass                  (IMPLEMENTED)  { synthetic_fixture, manual_curation }  — no "verified" value
+IntakeManifest                     (IMPLEMENTED)  schema_version, origin, curator ReviewerIdentity,
                                                ComponentIdentity claimed, SourceDocument,
                                                declared_pdf_page_count?, publisher_differs_declaration?,
                                                vector<IntakeEvidenceEntry>, vector<IntakeObservationEntry>
-IntakeEvidenceEntry                (PROPOSED)  EvidenceLocation + optional row_label, column_label (D3)
-IntakeObservationEntry             (PROPOSED)  ParameterObservation (candidate) + raw_symbol?, raw_qualifier_text?,
+IntakeEvidenceEntry                (IMPLEMENTED)  EvidenceLocation + optional row_label, column_label (D3)
+IntakeObservationEntry             (IMPLEMENTED)  ParameterObservation (candidate) + raw_symbol?, raw_qualifier_text?,
                                                raw_conditions_text?, ambiguity_notes
-IntakeDiagnosticCode / IntakeDiagnostic (PROPOSED)
-validate_intake_manifest(...)      (PROPOSED)  -> IntakeReport (domain ValidationReport + intake diagnostics)
-build_candidate_bundle(...)        (PROPOSED)  -> ComponentDomainBundle, only if validation has no errors
+IntakeDiagnosticCode / IntakeDiagnostic (IMPLEMENTED)
+validate_intake_manifest(...)      (IMPLEMENTED)  -> IntakeReport (domain ValidationReport + intake diagnostics)
+build_candidate_bundle(...)        (IMPLEMENTED)  -> optional ComponentDomainBundle plus report
 ```
 
 Guarantees of `build_candidate_bundle` (PROPOSED): every observation is `candidate`
@@ -273,11 +273,11 @@ sources unless D2 explicitly authorizes it.
 
 | ID | Decision | Recommended default |
 | --- | --- | --- |
-| D1 | Convention: does `associated_part_numbers` hold base MPNs or full orderable MPNs including suffix? Exact suffix matching rule. | Full orderable MPN string, compared exactly together with suffix; document in intake. |
+| D1 | Convention: does `associated_part_numbers` hold base MPNs or full orderable MPNs including suffix? Exact suffix matching rule. | **Owner decision pending.** Current 4B behavior requires the full orderable MPN and exact suffix match; it does not establish this as the project-wide policy. |
 | D2 | Where do manufacturer/suffix/page-bound checks live: intake only, or hardening of `datasim_component` (modifies a verified module)? | Intake only for 4B; revisit later. |
 | D3 | Row/column/symbol/raw-qualifier fields: intake sidecar, verbatim in `cell_or_region`, or extend `EvidenceLocation`/`ParameterObservation`? | Sidecar plus verbatim `cell_or_region`; no contract change. |
 | D4 | Add `declared_pdf_page_count` to `SourceDocument` (contract change) or keep in manifest? | Manifest only. |
-| D5 | Require curator ≠ approver (four-eyes) policy? | Record curator; enforce in intake review handoff test only, not domain contract. |
+| D5 | Require curator ≠ approver (four-eyes) policy? | **Owner decision pending.** Current 4B records the curator but does not enforce or claim curator/reviewer separation as approved policy. |
 | D6 | Adopt a repository license and a fixture license identifier. | Owner decision; blocks nothing in 4B-1…4B-4. |
 | D7 | Fix F4 (skip detection in CI) in a separate task? | Yes, separate authorization. |
 | D8 | Root `AGENTS.md` status text (Phase 3 branch wording; Phase 4 authorization). | Owner edit; not changed here. |

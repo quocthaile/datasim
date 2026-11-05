@@ -2,9 +2,10 @@
 
 Date: 2026-11-04
 
-Status: **PROPOSED**. This ADR records a design for owner review. Nothing described
-here as `PROPOSED` is implemented, verified, or authorized for implementation. No
-source, build, or dependency change accompanies it. Related plan:
+Status: **PROPOSED decision record with an IMPLEMENTED feature-branch slice**.
+Owner approval and merge are not claimed. The bounded in-memory contracts and
+validation described in [PHASE_4_IMPLEMENTATION.md](../PHASE_4_IMPLEMENTATION.md)
+are implemented without changing the existing domain modules. Related plan:
 [Phase 4 plan](../PHASE_4_PLAN.md); test design:
 [Phase 4 validation plan](../PHASE_4_VALIDATION_PLAN.md).
 
@@ -125,6 +126,24 @@ and approver is an open decision (D5).
   `EvidenceLocation::cell_or_region` until D3 is decided.
 - Parsed values remain in original units, so the review/normalization step stays
   mandatory and visible.
+
+## Phase 4B implementation notes
+
+The implementation adds `datasim_intake` under `src/datasim/intake/`, linking
+only `datasim_component`. It uses one manifest source document, explicit page
+index provenance, declared page-count bounds, exact publisher/part checks, and
+candidate-only bundle construction. Ambiguous raw numeric text is a warning when
+no parsed value is asserted and an error when a parsed value is asserted. These
+are implementation details of the feature branch, not claims that the owner has
+accepted every open decision above.
+
+The bounded 4B implementation and its synthetic P-07 test now exist on the
+feature branch. The P-07 result remains **NOT VERIFIED** until real ngspice runs
+without a CTest skip.
+
+Metadata review is an owner decision: the current human review records metadata
+acceptance for a candidate, but does not authenticate a source, hash, reviewer
+identity, or manufacturer relationship.
 
 ## Limitations
 

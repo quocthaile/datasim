@@ -39,11 +39,15 @@ serialization, datasheet parsing, LLM integration, external SPICE subcircuits,
 nonlinear semiconductor models, physical measurement validation (`MEASURED`), and
 Stage 5+ remain unauthorized/`PROPOSED`.
 
-Phase 4A (**deterministic datasheet evidence intake**, a candidate-only boundary ahead
-of Stage 5) is **PLANNED / PROPOSED, documentation only**: see
+Phase 4A (**deterministic datasheet evidence intake**) remains the planning record,
+while the bounded Phase 4B in-memory candidate-only boundary is **IMPLEMENTED** on
+the feature branch. Its synthetic P-07 handoff test is implemented, but Phase 4B
+is not **VERIFIED** or owner-approved until a hosted non-skipped ngspice run
+records the 4001-point, 0.05 V numerical check and separate byte comparison. See
 [Phase 4 plan](PHASE_4_PLAN.md), [Phase 4 validation plan](PHASE_4_VALIDATION_PLAN.md),
-and [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md). No intake code exists;
-Phase 4B implementation requires owner acceptance of the plan and ADR.
+[Phase 4 implementation](PHASE_4_IMPLEMENTATION.md), [Phase 4 validation](PHASE_4_VALIDATION.md),
+and [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md). The feature branch
+contains the implementation and is not merged or owner-approved.
 
 | Stage | Status | Scope and exit criteria |
 | --- | --- | --- |
@@ -52,8 +56,16 @@ Phase 4B implementation requires owner acceptance of the plan and ADR.
 | 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. (ADR-0002 selected ngspice executable integration for Phase 1 ideal RC only.) |
 | 3: Knowledge contracts | VERIFIED (in-memory C++20; persistence PROPOSED) | In-memory C++20 evidence, observation, deterministic review lifecycle, component knowledge, conflict visibility, and model metadata/validation contracts verified on synthetic Resistor and Capacitor fixtures ([Phase 2 validation](PHASE_2_VALIDATION.md)). Persistent storage, interchange serialization, and curve series remain PROPOSED. |
 | 4: Deterministic vertical slice | VERIFIED (ideal-RC transient slice; general multi-analysis/subcircuit PROPOSED) | Approved `ComponentKnowledge` and explicitly selected `ModelArtifactDescriptor` instances connected via `CircuitAssembly`, SI parameter resolution, model/backend compatibility gate, `RcConfig` adapter, and `provenance_metadata.json` ([Phase 3 validation](PHASE_3_VALIDATION.md)). External subcircuits and nonlinear device models remain PROPOSED. |
-| 5: Assisted extraction | PROPOSED (Phase 4A evidence-intake boundary is a PLANNED design only: [plan](PHASE_4_PLAN.md), [validation plan](PHASE_4_VALIDATION_PLAN.md), [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md)) | Evaluate document processing and optional local LLM assistance against reviewed fixtures; prove the review gate blocks invalid inputs. |
+| 5: Assisted extraction | PROPOSED (Phase 4A design; Phase 4B intake boundary IMPLEMENTED but not yet VERIFIED) | Evaluate document processing and optional local LLM assistance against reviewed fixtures; prove the review gate blocks invalid inputs. |
 | 6: Visualization and validation | PROPOSED | Present results and evidence with units, warnings and assumptions; conduct separately scoped physical validation if equipment/data are available. |
+
+## Phase 4C proposal
+
+Phase 4C is **PROPOSED** only: define owner-approved metadata review policy,
+curator/reviewer separation, and a licensed, versioned external evidence source
+contract before considering any PDF/OCR, persistence, or assisted extraction
+work. It must not change the Phase 4B candidate/review boundary or make an LLM
+or extracted document a numerical authority.
 
 ## Open technical questions
 

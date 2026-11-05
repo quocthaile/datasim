@@ -26,6 +26,11 @@ full provenance. Preserve user changes, do not commit directly to `main`, do not
 pull requests, and do not implement PDF/OCR/datasheet ingestion, persistence, LLM
 integration, GUI, semiconductor models, or a custom solver.
 
+Phase 4B is implemented on `feat/phase-4b-evidence-intake`, with PR #4 merged
+into that feature branch and hosted CI run `41962956370` successful for its
+existing checks. The P-07 release-gate result still requires a non-skipped
+ngspice run; Phase 4B is not merged into `main` or owner-approved.
+
 Build and run CTest as documented. Integration skips are not passes. No LLM is a
 numerical authority; manual RC parameters and synthetic fixtures are not
 datasheet-extracted knowledge.

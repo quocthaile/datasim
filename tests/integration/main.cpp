@@ -3,7 +3,9 @@
 #include "datasim/simulation/validation/validation.hpp"
 #include "datasim/simulation/io/report.hpp"
 #include "datasim/vertical/provenance/run_provenance.hpp"
+#include "intake_integration_fixture.hpp"
 #include "../unit/vertical_slice_fixtures.hpp"
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -63,6 +65,24 @@ int main(int argc, char** argv) {
             read_file_bytes(dir / "vertical-run" / "errors.csv") != read_file_bytes(dir / "reported-run" / "errors.csv") ||
             read_file_bytes(dir / "vertical-run" / "circuit.cir") != read_file_bytes(dir / "reported-run" / "circuit.cir"))
             throw std::runtime_error("vertical slice generated artifacts differ from equivalent manual RC run");
+        const auto intake_assembly = vertical::testing::make_intake_derived_rc_assembly();
+        const auto intake_run = vertical::execute_vertical_rc_run(
+            intake_assembly, v_inputs, exe.string(), dir / "intake-vertical-run");
+        if (!intake_run.run.validation.passed || intake_run.run.validation.errors.size() != 4001)
+            throw std::runtime_error("intake-derived vertical slice common-grid run failed");
+        if (intake_run.run.samples.size() != run.samples.size())
+            throw std::runtime_error("intake-derived sample count differs from manual RC run");
+        double maximum_numerical_difference = 0.0;
+        for (std::size_t i = 0; i < run.samples.size(); ++i) {
+            maximum_numerical_difference = std::max(
+                maximum_numerical_difference,
+                std::abs(intake_run.run.samples[i].vout_V - run.samples[i].vout_V));
+        }
+        if (maximum_numerical_difference > 0.05)
+            throw std::runtime_error("intake-derived waveform exceeds 0.05 V tolerance");
+        if (read_file_bytes(dir / "intake-vertical-run" / "results.csv") !=
+            read_file_bytes(dir / "reported-run" / "results.csv"))
+            throw std::runtime_error("intake-derived artifacts are not byte-identical to manual RC");
         const auto prov_text = read_file_bytes(dir / "vertical-run" / "provenance_metadata.json");
         if (prov_text.find("\"execution_status\":\"SUCCEEDED\"") == std::string::npos ||
             prov_text.find("\"validation_status\":\"PASSED\"") == std::string::npos ||
@@ -76,6 +96,9 @@ int main(int argc, char** argv) {
         std::cout << "PASS: vertical slice identical to manual RC (samples=" << v_run.run.samples.size()
             << " max_error_V=" << v_run.run.validation.max_absolute_error_V
             << " rmse_V=" << v_run.run.validation.rmse_V << ")\n";
+        std::cout << "PASS: intake-derived numerical comparison max_difference_V="
+                  << maximum_numerical_difference << " tolerance_V=0.05\n";
+        std::cout << "PASS: intake-derived byte comparison results.csv=identical\n";
         std::cout << "PASS: samples=" << samples.size() << " max_error_V=" << report.max_absolute_error_V
             << " rmse_V=" << report.rmse_V << " artifacts=" << dir.string() << '\n';
         return 0;

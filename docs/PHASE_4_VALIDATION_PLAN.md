@@ -1,6 +1,7 @@
 # Phase 4 validation plan: Evidence intake (Phase 4A planning)
 
-Status: **PROPOSED test design.** No test in this document exists or has run. No
+Status: **Reconciled test design.** Phase 4B coverage is recorded in
+[PHASE_4_VALIDATION.md](PHASE_4_VALIDATION.md). No
 benchmark result, extraction accuracy, or real-datasheet outcome is claimed. Context:
 [Phase 4 plan](PHASE_4_PLAN.md), [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md).
 All type and function names prefixed `PROPOSED` below do not exist yet; names without
@@ -118,7 +119,7 @@ domain rule; `I` = `PROPOSED` intake rule.
 | N-50 | Approved knowledge from synthetic intake run under `ExecutionPolicy::engineering_approved_only` | rejected; `test_only_synthetic` classification only | D (Phase 3) |
 | N-51 | Approved observation lacking a validated model | `unvalidated` rejection | D (Phase 3) |
 | N-52 | Non-SI unit (`kohm`) on `NormalizedParameter` supplied to resolution | rejected (Phase 3 SI gate) | D (Phase 3) |
-| P-07 | End-to-end synthetic: intake → human review → normalized → knowledge → model → ideal-RC run; byte-identical to manual `RcConfig` | pass only with real ngspice; otherwise `NOT VERIFIED` | D (Phase 3) + I |
+| P-07 | End-to-end synthetic: intake → human review → normalized → knowledge → model/validation → `datasim_vertical` → ideal-RC run; compare 4001 points numerically at 0.05 V and report byte identity separately | pass only with real ngspice and no CTest skip; otherwise `NOT VERIFIED` | D (Phase 3) + I |
 
 ## 3. Evaluation metrics (definitions only)
 
@@ -142,8 +143,11 @@ specified, not extraction accuracy.
 
 ## 4. Acceptance criteria (for the later Phase 4B implementation)
 
-1. All P- and N- cases above pass with each negative case asserting its specific code
-   and the absence of a candidate bundle.
+1. Observable P- and N-cases are covered by the Phase 4B intake tests. Cases that
+   require fields not present in the accepted contract remain documented as
+   unsupported rather than represented by fake passing tests. Hard negative cases
+   assert the specific diagnostic and absence of a candidate bundle; ambiguous raw
+   values without an asserted parse are recoverable warnings and retain a bundle.
 2. Existing suites: `unit` 92, `component_model` 270, `vertical_slice` 1483 checks and
    `backend_errors` pass unchanged; `ngspice_rc` and `rc_study` pass with real
    `ngspice-47` in a run that records "0 skipped", with `results.csv` SHA-256
@@ -159,7 +163,26 @@ specified, not extraction accuracy.
 7. Hosted Windows CI passes; local runs without ngspice are reported as `NOT VERIFIED`
    for integration.
 
-## 5. Documentation checks for this Phase 4A branch
+## 5. Phase 4B hardening traceability
+
+| Requirement | Test | Expected/actual status |
+| --- | --- | --- |
+| P-01/P-02/P-03/P-04/P-05/P-06 | `intake_tests` valid fixture and preservation checks | Passed in Release |
+| N-01/N-02/N-03/N-04/N-05/N-06/N-07/N-08 | `intake_tests` reference, identity, suffix, and page checks | Passed in Release |
+| N-12/N-13/N-14/N-16/N-17/N-18 | `intake_tests` raw numeric and unit checks | Passed in Release |
+| N-20/N-21/N-24 | `intake_tests` qualifier, bound, and condition checks | Passed in Release |
+| N-30/N-32 | `intake_tests` conflict visibility checks | Passed in Release |
+| N-33/N-43/N-44 | `intake_tests` candidate and provenance checks | Passed in Release |
+| N-34/N-35/N-37/N-40/N-41 | `intake_handoff_tests` review and promotion checks | Passed in Release |
+| N-42/N-46/N-47 | Contract lacks authentication/content fields | BLOCKED/NOT IMPLEMENTED |
+| N-49/N-50/N-51/N-52 | Existing Phase 3 vertical-slice suites | Existing suite passed; intake does not bypass it |
+| P-07 | Real ngspice end-to-end equivalence | IMPLEMENTED in `ngspice_rc`; NOT VERIFIED until a non-skipped run completes |
+
+Sidecar-only source-cell and raw extraction metadata are intentionally not
+asserted as `ComponentDomainBundle` fields; their ownership is documented in
+[PHASE_4_IMPLEMENTATION.md](PHASE_4_IMPLEMENTATION.md).
+
+## 6. Documentation checks for this Phase 4A branch
 
 Relative links resolve, fenced blocks balanced, Mermaid parses, `PROPOSED` markers
 present on all new names, diff limited to documentation. Results are recorded in the
