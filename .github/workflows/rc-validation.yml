@@ -29,6 +29,7 @@ jobs:
           pdfinfo -v 2>&1 | tee pdfinfo-version.txt
           grep -q 'pdfinfo version 26.10.0' pdfinfo-version.txt
           python tests/fixtures/make_synthetic_datasheet_pdf.py
+          python tests/fixtures/make_hierarchy_pdf.py
       - name: Install pinned ngspice release
         run: |
           curl --fail --location https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-ngspice-47-1-any.pkg.tar.zst -o ngspice.pkg.tar.zst

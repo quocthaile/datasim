@@ -1,3 +1,4 @@
+#include "../pdf_context_cli.hpp"
 #include "datasim/pdf/table_extraction.hpp"
 #include <cstdlib>
 #include <filesystem>
@@ -49,6 +50,7 @@ struct ParsedCliArgs {
     std::map<std::string, std::string> values;
     std::vector<std::string> header_unit_bindings;
     std::vector<std::string> inline_unit_bindings;
+    std::vector<std::string> parent_context_bindings;
 };
 
 ParsedCliArgs parse_args(int argc, char** argv) {
@@ -62,6 +64,10 @@ ParsedCliArgs parse_args(int argc, char** argv) {
         const std::string& val = raw[++i];
         if (key == "--header-unit-binding") {
             parsed.header_unit_bindings.push_back(val);
+            continue;
+        }
+        if (key == "--parent-context") {
+            parsed.parent_context_bindings.push_back(val);
             continue;
         }
         if (key == "--inline-unit-binding") {
@@ -177,6 +183,7 @@ void usage() {
                  "  --typ x_min,x_max --max x_min,x_max [--condition x_min,x_max]\n"
                  "  [--header-unit-binding QUALIFIER|x_min,y_min,x_max,y_max|UNIT|EXPECTED_TEXT]\n"
                  "  [--header-condition-binding x_min,y_min,x_max,y_max|PARAM|UNIT|EXPECTED_TEXT]\n"
+                 "  [--parent-context BOX|PARENT|ROW:CHILD[|ROW:CHILD...]]\n"
                  "  [--inline-unit-binding QUALIFIER|UNIT1,UNIT2,...]\n"
                  "Coordinates are points in Poppler's page coordinate space. The result is candidate-only.\n";
 }
@@ -255,6 +262,9 @@ int main(int argc, char** argv) {
             table.inline_value_unit_bindings.push_back(pdf::InlineValueUnitBinding{
                 parse_qualifier(parts[0]), split_csv_strings(parts[1])});
         }
+
+        for (const auto& spec : parsed.parent_context_bindings)
+            table.parent_context_bindings.push_back(pdf::cli::parse_parent_context(spec));
 
         const auto result = pdf::extract_electrical_table(request);
         for (const auto& diagnostic : result.diagnostics) std::cerr << "Extraction diagnostic: " << diagnostic << '\n';

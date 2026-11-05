@@ -1,3 +1,4 @@
+#include "../pdf_context_cli.hpp"
 #include "datasim/pdf/table_extraction.hpp"
 
 #include <cmath>
@@ -659,6 +660,24 @@ void write_extraction_result_json(std::ostream& out, const datasim::pdf::Extract
         out << "\n";
         out << "    }" << (i + 1 < result.value_cell_provenance.size() ? "," : "") << "\n";
     }
+    out << "  ],\n  \"parameter_context_provenance\": [\n";
+    for (std::size_t i = 0; i < result.parameter_context_provenance.size(); ++i) {
+        const auto& p = result.parameter_context_provenance[i];
+        out << "    {\"observation_id\": \"" << json_escape(p.observation_id.value)
+            << "\", \"parent_evidence_id\": \"" << json_escape(p.parent_evidence_id.value)
+            << "\", \"child_evidence_id\": \"" << json_escape(p.child_evidence_id.value)
+            << "\", \"row_index\": " << p.row_index
+            << ", \"raw_parent_text\": \"" << json_escape(p.raw_parent_text)
+            << "\", \"raw_child_parameter_text\": \"" << json_escape(p.raw_child_parameter_text)
+            << "\", \"raw_child_row_text\": \"" << json_escape(p.raw_child_row_text) << "\"";
+        const auto write_box = [&](const char* key, const datasim::pdf::SourceBox& b) {
+            out << ", \"" << key << "\": [" << b.x_min << ", " << b.y_min
+                << ", " << b.x_max << ", " << b.y_max << "]";
+        };
+        write_box("parent_box", p.parent_box);
+        write_box("child_row_box", p.child_row_box);
+        out << "}" << (i + 1U < result.parameter_context_provenance.size() ? "," : "") << "\n";
+    }
     out << "  ]\n";
     out << "}\n";
 }
@@ -817,6 +836,8 @@ int main(int argc, char** argv) {
                     parts[3],
                     parts[1],
                     parts[2]};
+            } else if (arg == "--parent-context") {
+                request.table.parent_context_bindings.push_back(datasim::pdf::cli::parse_parent_context(next()));
             } else if (arg == "--inline-unit-binding") {
                 const auto parts = split_pipe_fields(next(), 2);
                 request.table.inline_value_unit_bindings.push_back(InlineValueUnitBinding{

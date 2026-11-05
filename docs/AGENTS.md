@@ -97,3 +97,11 @@ diff contains only authorized changes and existing user work is preserved.
 Run the CMake build and CTest suite documented in
 [Phase 1](PHASE_1_IMPLEMENTATION.md) and [Phase 2](PHASE_2_IMPLEMENTATION.md).
 Report unavailable tools or remote access honestly; skipped integration tests are not passes.
+
+Phase 4G is merged via PR #11 at `357dc52aa809`, with successful post-merge
+Windows CI run `42052973122`. Phase 4H is implemented on
+`feat/phase-4h-hierarchical-table-context`; see [PHASE_4H_VALIDATION.md](PHASE_4H_VALIDATION.md)
+and [ADR-0009](decisions/ADR-0009-hierarchical-table-context.md).
+Preserve explicit parent/child source verification, candidate-only output, and
+legacy extraction with no hierarchy bindings. Phase 4I may start only after Phase
+4H merges and post-merge CI succeeds. Do not merge automatically.

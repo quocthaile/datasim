@@ -142,3 +142,12 @@ transient spike ([ADR-0002](decisions/ADR-0002-phase-1-ngspice-executable.md)).
 Evaluate Xyce and existing simulation workflows before introducing a custom solver;
 see [ADR-0001](decisions/ADR-0001-simulation-backend-boundary.md). No commitment to
 Qt, OpenGL, Python, SQLite, or another application stack is made.
+
+## Phase 4H explicit context extension
+
+[ADR-0009](decisions/ADR-0009-hierarchical-table-context.md) adds source-verified
+parent/child configuration and a geometry/text provenance sidecar entirely inside
+`datasim_pdf`. Separate parent and child `EvidenceLocation` references survive in
+the candidate bundle; detailed boxes and raw text remain in the extraction result.
+The dependency graph and intake/review/simulation boundaries are unchanged.
+See [implementation](PHASE_4H_IMPLEMENTATION.md) and [validation](PHASE_4H_VALIDATION.md).

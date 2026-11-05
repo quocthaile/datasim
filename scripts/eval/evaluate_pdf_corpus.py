@@ -350,7 +350,50 @@ def build_dump_command(
         units_csv = ",".join(str(u) for u in ib["allowed_unit_symbols"])
         spec = f"{ib['qualifier']}|{units_csv}"
         cmd.extend(["--inline-unit-binding", spec])
+    for binding in geom.get("parent_context_bindings", []):
+        fields = [",".join(str(v) for v in binding["parent_box"]), binding["expected_parent_text"]]
+        fields += [f"{c['row_index']}:{c['expected_parameter_text']}" for c in binding["children"]]
+        if any("|" in field for field in fields):
+            raise EvaluationConfigError("Parent context CLI text cannot contain pipes")
+        cmd.extend(["--parent-context", "|".join(fields)])
     return cmd
+
+
+def context_provenance_matches(dump: dict, obs: dict, case: dict, row_index: int | None) -> bool:
+    """Check configured context evidence separately from composed label agreement."""
+    expected = [(b, child) for b in case["table_geometry"].get("parent_context_bindings", [])
+                for child in b["children"] if child["row_index"] == row_index]
+    actual = [p for p in dump.get("parameter_context_provenance", [])
+              if p.get("observation_id") == obs["id"]]
+    if not expected:
+        return not actual
+    if len(expected) != 1 or len(actual) != 1:
+        return False
+    binding, child = expected[0]
+    p = actual[0]
+    evidence = {e["id"]: e for e in dump.get("evidence", [])}
+    parent = evidence.get(p.get("parent_evidence_id"), {})
+    child_ev = evidence.get(p.get("child_evidence_id"), {})
+    refs = obs.get("evidence_refs", [])
+    row_box = p.get("child_row_box", [])
+    if (len(row_box) != 4 or not all(isinstance(v, (int, float)) and math.isfinite(v) for v in row_box)
+            or row_box[0] >= row_box[2] or row_box[1] >= row_box[3]):
+        return False
+    return (p.get("row_index") == row_index
+            and p.get("parent_box") == binding["parent_box"]
+            and p.get("raw_parent_text") == binding["expected_parent_text"]
+            and p.get("raw_child_parameter_text") == child["expected_parameter_text"]
+            and bool(p.get("raw_child_row_text"))
+            and parent.get("id") != child_ev.get("id")
+            and all(e.get("id") in refs
+                    and e.get("source_document_id") == case["document_id"]
+                    and e.get("pdf_page_index") == case["pdf_page_index"]
+                    and e.get("printed_page_label") == case.get("printed_page_label")
+                    and e.get("table_or_figure_id") == case["table_id"] for e in (parent, child_ev))
+            and parent.get("row_label") == binding["expected_parent_text"]
+            and child_ev.get("row_label") == child["expected_parameter_text"]
+            and str(parent.get("cell_or_region", "")).startswith("parent_context=")
+            and child_ev.get("cell_or_region") == f"row={row_index};column=parameter/unit")
 
 
 def classify_diagnostic_message(msg: str) -> str:
@@ -879,6 +922,7 @@ def evaluate_corpus(
                 and ev.get("table_or_figure_id") == case["table_id"]
                 and ev.get("cell_or_region") == g.get("cell_or_region")
                 and hdr_ev_ok
+                and context_provenance_matches(dump1, ext_obs, case, g.get("row_index"))
             )
             footnotes_ok = (ev.get("footnote_refs", []) if ev else []) == g.get("footnote_refs", [])
             scalar_ok = floats_equal(ext_obs.get("parsed_numeric_value"), g.get("expected_parsed_numeric_value"))

@@ -40,6 +40,36 @@ struct InlineValueUnitBinding {
     std::vector<std::string> allowed_unit_symbols;
 };
 
+// Poppler top-origin page coordinates in points; no implied table recognition.
+struct SourceBox {
+    double x_min = 0.0, y_min = 0.0, x_max = 0.0, y_max = 0.0;
+    auto operator<=>(const SourceBox&) const = default;
+};
+
+struct ParentContextChild {
+    std::size_t row_index = 0; // One-based original physical row, including headings.
+    std::string expected_parameter_text;
+};
+
+struct ParentContextBinding {
+    SourceBox parent_box;
+    std::string expected_parent_text;
+    std::vector<ParentContextChild> children;
+};
+
+struct ParameterContextProvenance {
+    component::ObservationId observation_id;
+    component::EvidenceId parent_evidence_id;
+    component::EvidenceId child_evidence_id;
+    std::size_t row_index = 0;
+    SourceBox parent_box;
+    SourceBox child_row_box;
+    std::string raw_parent_text;
+    std::string raw_child_parameter_text;
+    std::string raw_child_row_text;
+    auto operator<=>(const ParameterContextProvenance&) const = default;
+};
+
 struct ValueCellProvenance {
     component::ObservationId observation_id;
     component::EvidenceId value_evidence_id;
@@ -71,6 +101,7 @@ struct ElectricalTableLayout {
     std::vector<HeaderUnitBinding> header_unit_bindings;
     std::optional<HeaderConditionBinding> header_condition_binding;
     std::vector<InlineValueUnitBinding> inline_value_unit_bindings;
+    std::vector<ParentContextBinding> parent_context_bindings;
 };
 
 struct ExtractionRequest {
@@ -91,6 +122,7 @@ struct ExtractionResult {
     std::optional<component::ComponentDomainBundle> candidate_bundle;
     std::vector<std::string> diagnostics;
     std::vector<ValueCellProvenance> value_cell_provenance;
+    std::vector<ParameterContextProvenance> parameter_context_provenance;
 };
 
 // Extracts only explicitly selected horizontal table bands from selectable PDF text.

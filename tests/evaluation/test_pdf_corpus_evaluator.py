@@ -411,6 +411,44 @@ class TestPdfCorpusEvaluator(unittest.TestCase):
             self.assertTrue(sec_d["candidate_only_verified"])
 
 
+    def test_phase4h_context_and_provenance(self) -> None:
+        import subprocess
+        manifest_path = self.repo_root / "tests/evaluation/synthetic_hierarchy_manifest.json"
+        annotations_path = self.repo_root / "tests/evaluation/synthetic_hierarchy_ground_truth.json"
+        report = eval_mod.evaluate_corpus(
+            manifest_path=manifest_path, annotations_path=annotations_path, repo_root=self.repo_root,
+            corpus_dir=None, eval_dump_bin=self.eval_dump_bin, pdfinfo_bin=self.pdfinfo_bin,
+            pdftotext_bin=self.pdftotext_bin, repeat_check=True)
+        quality = report["section_b_supported_extraction_quality"]
+        self.assertEqual((quality["tp"], quality["fp"], quality["fn"]), (6, 0, 0))
+        self.assertEqual(quality["field_level_agreement"]["evidence_location"]["matched"], 6)
+        self.assertEqual(report["section_d_reproducibility_and_diagnostics"]["repeat_run_mismatches"], 0)
+        m = json.loads(manifest_path.read_text())
+        case, doc = m["cases"][0], m["documents"][0]
+        cmd = eval_mod.build_dump_command(self.eval_dump_bin, self.pdfinfo_bin, self.pdftotext_bin,
+            self.repo_root / doc["repo_relative_path"], doc, case)
+        dump = json.loads(subprocess.run(cmd, check=True, capture_output=True, encoding="utf-8").stdout)
+        obs = dump["observations"][0]
+        self.assertTrue(eval_mod.context_provenance_matches(dump, obs, case, 2))
+        p = dump["parameter_context_provenance"][0]
+        self.assertEqual(p["raw_child_row_text"], "short V 12")
+        self.assertGreater(p["child_row_box"][1], 140)
+        self.assertLess(p["child_row_box"][3], 155)
+        for field, value in [("parent_evidence_id", "missing"), ("child_evidence_id", "missing"),
+                             ("raw_parent_text", "altered"), ("raw_child_parameter_text", "altered"),
+                             ("parent_box", [0, 0, 1, 1]), ("child_row_box", [0, 0, 0, 0])]:
+            corrupted = copy.deepcopy(dump)
+            corrupted["parameter_context_provenance"][0][field] = value
+            self.assertFalse(eval_mod.context_provenance_matches(corrupted, obs, case, 2), field)
+        corrupted = copy.deepcopy(dump)
+        corrupted["parameter_context_provenance"].append(copy.deepcopy(p))
+        self.assertFalse(eval_mod.context_provenance_matches(corrupted, obs, case, 2))
+        for malformed in ("20,115,210,130|Pulse rating:|-1:short", "20,115,210,130|Pulse rating:|2x:short",
+                          "20,115,210,130,7|Pulse rating:|2:short"):
+            bad_cmd = cmd[:cmd.index("--parent-context")] + ["--parent-context", malformed]
+            self.assertNotEqual(subprocess.run(bad_cmd, capture_output=True).returncode, 0)
+
+
 if __name__ == "__main__":
     unittest.main()
 

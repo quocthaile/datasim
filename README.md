@@ -96,7 +96,7 @@ candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows
    [Phase 4F implementation](docs/PHASE_4F_IMPLEMENTATION.md),
    [Phase 4F validation](docs/PHASE_4F_VALIDATION.md), and
    [ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md).
-9. **Phase 4G deterministic inline value/unit parsing (IMPLEMENTED and VERIFIED on `feat/phase-4g-inline-value-unit-parsing`)**:
+9. **Phase 4G deterministic inline value/unit parsing (merged via PR #11 at `357dc52aa809`; post-merge Windows CI `42052973122`)**:
    caller-configured `InlineValueUnitBinding` and `ValueCellProvenance` inside `datasim_pdf`
    for single-cell numeric value and unit tokens (`200 V`, `0.4 W`, `220 pF`, `10 nF`, `1.0 µF`)
    with strict unit allowlists, unit precedence/conflict rules, intra-cell word bounding-box
@@ -108,6 +108,13 @@ candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows
    [Phase 4G implementation](docs/PHASE_4G_IMPLEMENTATION.md),
    [Phase 4G validation](docs/PHASE_4G_VALIDATION.md), and
    [ADR-0008](docs/decisions/ADR-0008-inline-value-unit-parsing.md).
+
+10. **Phase 4H explicit hierarchical context**: source-verified parent headings and
+   narrowly bounded merged parameter cells, with exact child selection and separate
+   parent/child provenance. Implemented on `feat/phase-4h-hierarchical-table-context`;
+   see [implementation](docs/PHASE_4H_IMPLEMENTATION.md),
+   [validation](docs/PHASE_4H_VALIDATION.md), and
+   [ADR-0009](docs/decisions/ADR-0009-hierarchical-table-context.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON

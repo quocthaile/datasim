@@ -66,3 +66,11 @@ redistribution rights from this ADR. The repository still has no adopted license
 Build and run CTest as documented. Integration skips are not passes. No LLM is a
 numerical authority; manual RC parameters and synthetic fixtures are not
 datasheet-extracted knowledge.
+
+Phase 4G is merged via PR #11 at `357dc52aa809`, with successful post-merge
+Windows CI run `42052973122`. Phase 4H is implemented on
+`feat/phase-4h-hierarchical-table-context`; see [docs/PHASE_4H_VALIDATION.md](docs/PHASE_4H_VALIDATION.md)
+and [ADR-0009](docs/decisions/ADR-0009-hierarchical-table-context.md).
+Preserve explicit parent/child source verification, candidate-only output, and
+legacy extraction with no hierarchy bindings. Phase 4I may start only after Phase
+4H merges and post-merge CI succeeds. Do not merge automatically.

@@ -1,0 +1,1248 @@
+{
+  "scope": "Local Phase 4H evaluation; vendor PDFs and annotations remain untracked. No physical measurement or source authentication claimed.",
+  "baseline_commit": "357dc52aa809dd04402cec543bcf4e635681ad78",
+  "runs": {
+    "baseline15": {
+      "manifest_sha256": "789b931f602b7168982b2826049737020234f8e750287d67c804585f1b292ffe",
+      "annotations_sha256": "20845a11d3b5025d447fcce95b659c241c277c468cb0ac5d5fde7e7cd6d792c3",
+      "environment": {
+        "python_version": "3.14.7",
+        "platform": "win32",
+        "pdfinfo_version": "pdfinfo version 26.10.0",
+        "pdftotext_version": "pdftotext version 26.10.0"
+      },
+      "section_b_supported_extraction_quality": {
+        "tp": 14,
+        "fp": 1,
+        "fn": 1,
+        "precision_numerator": 14,
+        "precision_denominator": 15,
+        "precision": 0.933333,
+        "recall_numerator": 14,
+        "recall_denominator": 15,
+        "recall": 0.933333,
+        "f1_numerator": 28,
+        "f1_denominator": 30,
+        "f1": 0.933333,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 14,
+            "total": 15,
+            "agreement_rate": 0.933333
+          },
+          "operating_conditions": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 15,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      },
+      "cases": [
+        {
+          "case_id": "REAL-CASE-01-MRS16-VOLTAGE-BAND",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5
+        },
+        {
+          "case_id": "REAL-CASE-02-MRS16-MRS25-FULL-TABLE",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-03-CRCW-VOLTAGE-BAND",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-04-CRCW-TCR-MERGED-TABLE",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-05-VJ-MLCC-C0G-MIN-BAND",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-06-VJ-MLCC-FULL-TABLE",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-07-150D-RATINGS-SUBBAND",
+          "document_id": "doc.vishay.150d_tantalum",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-08-MKP1840M-SPECIFIC-REF",
+          "document_id": "doc.vishay.mkp1840m_film",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ]
+    },
+    "disabled15": {
+      "manifest_sha256": "789b931f602b7168982b2826049737020234f8e750287d67c804585f1b292ffe",
+      "annotations_sha256": "20845a11d3b5025d447fcce95b659c241c277c468cb0ac5d5fde7e7cd6d792c3",
+      "environment": {
+        "python_version": "3.14.3",
+        "platform": "win32",
+        "pdfinfo_version": "pdfinfo version 26.10.0",
+        "pdftotext_version": "pdftotext version 26.10.0"
+      },
+      "section_b_supported_extraction_quality": {
+        "tp": 14,
+        "fp": 1,
+        "fn": 1,
+        "precision_numerator": 14,
+        "precision_denominator": 15,
+        "precision": 0.933333,
+        "recall_numerator": 14,
+        "recall_denominator": 15,
+        "recall": 0.933333,
+        "f1_numerator": 28,
+        "f1_denominator": 30,
+        "f1": 0.933333,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 14,
+            "total": 15,
+            "agreement_rate": 0.933333
+          },
+          "operating_conditions": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 15,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      },
+      "cases": [
+        {
+          "case_id": "REAL-CASE-01-MRS16-VOLTAGE-BAND",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 1,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5
+        },
+        {
+          "case_id": "REAL-CASE-02-MRS16-MRS25-FULL-TABLE",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-03-CRCW-VOLTAGE-BAND",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-04-CRCW-TCR-MERGED-TABLE",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-05-VJ-MLCC-C0G-MIN-BAND",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-06-VJ-MLCC-FULL-TABLE",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-07-150D-RATINGS-SUBBAND",
+          "document_id": "doc.vishay.150d_tantalum",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-08-MKP1840M-SPECIFIC-REF",
+          "document_id": "doc.vishay.mkp1840m_film",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ]
+    },
+    "after15": {
+      "manifest_sha256": "1512a6541869ee224c5de22a862bc5046d5e497974268751056731c1785ce4a3",
+      "annotations_sha256": "20845a11d3b5025d447fcce95b659c241c277c468cb0ac5d5fde7e7cd6d792c3",
+      "environment": {
+        "python_version": "3.14.3",
+        "platform": "win32",
+        "pdfinfo_version": "pdfinfo version 26.10.0",
+        "pdftotext_version": "pdftotext version 26.10.0"
+      },
+      "section_b_supported_extraction_quality": {
+        "tp": 15,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 15,
+        "precision_denominator": 15,
+        "precision": 1.0,
+        "recall_numerator": 15,
+        "recall_denominator": 15,
+        "recall": 1.0,
+        "f1_numerator": 30,
+        "f1_denominator": 30,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 15,
+            "total": 15,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 15,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      },
+      "cases": [
+        {
+          "case_id": "REAL-CASE-01-MRS16-VOLTAGE-BAND",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-02-MRS16-MRS25-FULL-TABLE",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-03-CRCW-VOLTAGE-BAND",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-04-CRCW-TCR-MERGED-TABLE",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-05-VJ-MLCC-C0G-MIN-BAND",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-06-VJ-MLCC-FULL-TABLE",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-07-150D-RATINGS-SUBBAND",
+          "document_id": "doc.vishay.150d_tantalum",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-08-MKP1840M-SPECIFIC-REF",
+          "document_id": "doc.vishay.mkp1840m_film",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ]
+    },
+    "baseline22": {
+      "manifest_sha256": "2d623ed9d77295bd0bb7247a544df6feb9552dcfc2d10d430b96fd632838bf33",
+      "annotations_sha256": "1738c46abbc72d942d5fc06d4ffbedcec923ccf1b0a2c3d66e19351b59cf1a38",
+      "environment": {
+        "python_version": "3.14.7",
+        "platform": "win32",
+        "pdfinfo_version": "pdfinfo version 26.10.0",
+        "pdftotext_version": "pdftotext version 26.10.0"
+      },
+      "section_b_supported_extraction_quality": {
+        "tp": 20,
+        "fp": 2,
+        "fn": 2,
+        "precision_numerator": 20,
+        "precision_denominator": 22,
+        "precision": 0.909091,
+        "recall_numerator": 20,
+        "recall_denominator": 22,
+        "recall": 0.909091,
+        "f1_numerator": 40,
+        "f1_denominator": 44,
+        "f1": 0.909091,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 20,
+            "total": 22,
+            "agreement_rate": 0.909091
+          },
+          "operating_conditions": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 22,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 22,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      },
+      "cases": [
+        {
+          "case_id": "REAL-CASE-01-MRS16-VOLTAGE-BAND",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 2,
+          "fp": 2,
+          "fn": 2,
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5
+        },
+        {
+          "case_id": "REAL-CASE-02-MRS16-MRS25-FULL-TABLE",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-03-CRCW-VOLTAGE-BAND",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-04-CRCW-TCR-MERGED-TABLE",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-05-VJ-MLCC-C0G-MIN-BAND",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 10,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-06-VJ-MLCC-FULL-TABLE",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-07-150D-RATINGS-SUBBAND",
+          "document_id": "doc.vishay.150d_tantalum",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-08-MKP1840M-SPECIFIC-REF",
+          "document_id": "doc.vishay.mkp1840m_film",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ]
+    },
+    "disabled22": {
+      "manifest_sha256": "2d623ed9d77295bd0bb7247a544df6feb9552dcfc2d10d430b96fd632838bf33",
+      "annotations_sha256": "1738c46abbc72d942d5fc06d4ffbedcec923ccf1b0a2c3d66e19351b59cf1a38",
+      "environment": {
+        "python_version": "3.14.3",
+        "platform": "win32",
+        "pdfinfo_version": "pdfinfo version 26.10.0",
+        "pdftotext_version": "pdftotext version 26.10.0"
+      },
+      "section_b_supported_extraction_quality": {
+        "tp": 20,
+        "fp": 2,
+        "fn": 2,
+        "precision_numerator": 20,
+        "precision_denominator": 22,
+        "precision": 0.909091,
+        "recall_numerator": 20,
+        "recall_denominator": 22,
+        "recall": 0.909091,
+        "f1_numerator": 40,
+        "f1_denominator": 44,
+        "f1": 0.909091,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 20,
+            "total": 22,
+            "agreement_rate": 0.909091
+          },
+          "operating_conditions": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 22,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 22,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      },
+      "cases": [
+        {
+          "case_id": "REAL-CASE-01-MRS16-VOLTAGE-BAND",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 2,
+          "fp": 2,
+          "fn": 2,
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5
+        },
+        {
+          "case_id": "REAL-CASE-02-MRS16-MRS25-FULL-TABLE",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-03-CRCW-VOLTAGE-BAND",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-04-CRCW-TCR-MERGED-TABLE",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-05-VJ-MLCC-C0G-MIN-BAND",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 10,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-06-VJ-MLCC-FULL-TABLE",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-07-150D-RATINGS-SUBBAND",
+          "document_id": "doc.vishay.150d_tantalum",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-08-MKP1840M-SPECIFIC-REF",
+          "document_id": "doc.vishay.mkp1840m_film",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ]
+    },
+    "after22": {
+      "manifest_sha256": "bc1a8009fcb0edea15386e8803c4297770eae10f4faeed2b9b332353e3fecaa5",
+      "annotations_sha256": "1738c46abbc72d942d5fc06d4ffbedcec923ccf1b0a2c3d66e19351b59cf1a38",
+      "environment": {
+        "python_version": "3.14.3",
+        "platform": "win32",
+        "pdfinfo_version": "pdfinfo version 26.10.0",
+        "pdftotext_version": "pdftotext version 26.10.0"
+      },
+      "section_b_supported_extraction_quality": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision_numerator": 22,
+        "precision_denominator": 22,
+        "precision": 1.0,
+        "recall_numerator": 22,
+        "recall_denominator": 22,
+        "recall": 1.0,
+        "f1_numerator": 44,
+        "f1_denominator": 44,
+        "f1": 1.0,
+        "field_level_agreement": {
+          "raw_value": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "original_unit": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "qualifier": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parameter_label": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "operating_conditions": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "evidence_location": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "footnote_refs": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          },
+          "parsed_scalar": {
+            "matched": 22,
+            "total": 22,
+            "agreement_rate": 1.0
+          }
+        }
+      },
+      "section_c_fail_closed_behavior": {
+        "expected_fail_closed_cases": 4,
+        "actual_fail_closed_cases": 4,
+        "false_accept_cases": 0,
+        "diagnostic_matched_fail_closed_cases": 4,
+        "fail_closed_rate": 1.0,
+        "diagnostic_match_rate": 1.0
+      },
+      "section_d_reproducibility_and_diagnostics": {
+        "repeat_check_enabled": true,
+        "repeat_runs_verified": 8,
+        "repeat_run_mismatches": 0,
+        "total_candidate_observations_inspected": 22,
+        "candidate_only_verified": true,
+        "error_taxonomy_counts": {
+          "unsupported_layout": 0,
+          "missing_selectable_text": 0,
+          "invalid_table_region": 1,
+          "column_assignment_error": 21,
+          "row_segmentation_error": 0,
+          "missing_observation": 0,
+          "spurious_observation": 0,
+          "raw_value_mismatch": 0,
+          "unit_mismatch": 0,
+          "qualifier_mismatch": 0,
+          "condition_mismatch": 5,
+          "evidence_location_mismatch": 0,
+          "ambiguous_numeric": 0,
+          "source_identity_mismatch": 0,
+          "backend_or_environment_failure": 0,
+          "rights_or_document_unavailable": 2
+        }
+      },
+      "cases": [
+        {
+          "case_id": "REAL-CASE-01-MRS16-VOLTAGE-BAND",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-02-MRS16-MRS25-FULL-TABLE",
+          "document_id": "doc.vishay.mrs16_mrs25",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-03-CRCW-VOLTAGE-BAND",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-04-CRCW-TCR-MERGED-TABLE",
+          "document_id": "doc.vishay.crcw_e3",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-05-VJ-MLCC-C0G-MIN-BAND",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 10,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-06-VJ-MLCC-FULL-TABLE",
+          "document_id": "doc.vishay.vj_commercial_mlcc",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "case_id": "REAL-CASE-07-150D-RATINGS-SUBBAND",
+          "document_id": "doc.vishay.150d_tantalum",
+          "status": "evaluated",
+          "has_candidate_bundle": true,
+          "repeat_identical": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        {
+          "case_id": "REAL-CASE-08-MKP1840M-SPECIFIC-REF",
+          "document_id": "doc.vishay.mkp1840m_film",
+          "status": "fail_closed_verified",
+          "has_candidate_bundle": false,
+          "repeat_identical": true,
+          "tp": null,
+          "fp": null,
+          "fn": null,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ]
+    }
+  },
+  "input_hashes": {
+    "build\\corpus\\real_ground_truth.json": "5c585ef7e87570a1477ac84dbac4dcec46330b04c613232ff7ef8a5691ad797a",
+    "build\\corpus\\real_ground_truth_phase4f.json": "2d024e13baa8aa0f592c2ec3d0784fa31511e9ec07ddf7898c51aafde98ee75d",
+    "build\\corpus\\real_ground_truth_phase4f_p2_expanded.json": "e41ae82d6f4d426dd9e63186d370ad47c6481ac98938461acf41759405b1c124",
+    "build\\corpus\\real_ground_truth_phase4g.json": "20845a11d3b5025d447fcce95b659c241c277c468cb0ac5d5fde7e7cd6d792c3",
+    "build\\corpus\\real_ground_truth_phase4g_p2_expanded.json": "1738c46abbc72d942d5fc06d4ffbedcec923ccf1b0a2c3d66e19351b59cf1a38",
+    "build\\corpus\\vishay_150d_tantalum.pdf": "197eeaedf55a47633246a565a73c8c078cc7da3a7246a472f0db4a48dbf523a7",
+    "build\\corpus\\vishay_crcw_e3.pdf": "a10e1cf2bd4f0f6ef85de250077adb463cae243c2e8e0509354e09f050d24a92",
+    "build\\corpus\\vishay_mkp1840m_film.pdf": "11cdd98ae202acb7dfaf013ff4d98e5b4c4a5abd8e1330dbf8471febe9958fe0",
+    "build\\corpus\\vishay_mrs16_mrs25.pdf": "645bb41aaa34f2a72fc19fc71d02ddb14ed400ae97634684ad1745189505f47e",
+    "build\\corpus\\vishay_vj_commercial_mlcc.pdf": "6c9b40c81d312ba6dbe9d0a4e687ae18185efeebf8cb98e6d709020efa550211"
+  }
+}

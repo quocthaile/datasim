@@ -449,6 +449,133 @@ struct TempDirectory {
         std::filesystem::remove_all(path, ignored);
     }
 };
+
+bool overlaps(const SourceBox& a, const SourceBox& b) {
+    return std::max(a.x_min, b.x_min) < std::min(a.x_max, b.x_max) &&
+           std::max(a.y_min, b.y_min) < std::min(a.y_max, b.y_max);
+}
+
+SourceBox word_box(const Word& w) { return {w.x0, w.y0, w.x1, w.y1}; }
+
+bool inside(const SourceBox& a, const SourceBox& b) {
+    return a.x_min >= b.x_min && a.y_min >= b.y_min &&
+           a.x_max <= b.x_max && a.y_max <= b.y_max;
+}
+
+SourceBox row_box(const Row& row) {
+    auto box = word_box(row.words.front());
+    for (const auto& w : row.words) {
+        box.x_min = std::min(box.x_min, w.x0); box.y_min = std::min(box.y_min, w.y0);
+        box.x_max = std::max(box.x_max, w.x1); box.y_max = std::max(box.y_max, w.y1);
+    }
+    return box;
+}
+
+std::vector<Word> without_parents(const Row& row, const ElectricalTableLayout& t) {
+    std::vector<Word> words;
+    for (const auto& w : row.words) {
+        if (std::none_of(t.parent_context_bindings.begin(), t.parent_context_bindings.end(),
+                [&](const auto& b) { return inside(word_box(w), b.parent_box); }))
+            words.push_back(w);
+    }
+    return words;
+}
+
+bool has_values(const Row& row, const ElectricalTableLayout& t) {
+    for (const auto span : {t.minimum_column, t.typical_column, t.maximum_column}) {
+        const auto text = row_cell(row.words, span);
+        if (!text.empty() && text != "-" && text != "\xE2\x80\x94") return true;
+    }
+    return false;
+}
+
+// Verify all associations before emitting any observations. No best-effort fallback.
+std::vector<std::optional<std::size_t>> verify_parent_context(
+        const std::vector<Word>& words, const std::vector<Row>& rows,
+        const ElectricalTableLayout& t) {
+    std::vector<std::optional<std::size_t>> owners(rows.size());
+    const SourceBox region{t.region_x_min, t.region_y_min, t.region_x_max, t.region_y_max};
+    for (std::size_t i = 0; i < t.parent_context_bindings.size(); ++i) {
+        const auto& b = t.parent_context_bindings[i];
+        const auto& box = b.parent_box;
+        if (!std::isfinite(box.x_min) || !std::isfinite(box.y_min) ||
+            !std::isfinite(box.x_max) || !std::isfinite(box.y_max) ||
+            !(box.x_min < box.x_max) || !(box.y_min < box.y_max) || !inside(box, region) ||
+            box.x_min < t.parameter_column.min || box.x_max > t.parameter_column.max ||
+            (std::max(box.y_min, t.header_y_min) < std::min(box.y_max, t.header_y_max)))
+            throw std::runtime_error("parent context box must be finite and inside the non-header parameter region");
+        if (b.expected_parent_text.empty() || b.children.empty())
+            throw std::runtime_error("parent context requires exact text and explicit children");
+        for (std::size_t j = 0; j < i; ++j)
+            if (overlaps(box, t.parent_context_bindings[j].parent_box))
+                throw std::runtime_error("parent context boxes overlap");
+        std::vector<Word> source;
+        for (const auto& w : words) {
+            if (!overlaps(word_box(w), box)) continue;
+            if (!inside(word_box(w), box))
+                throw std::runtime_error("parent context box cuts a source word");
+            source.push_back(w);
+        }
+        if (source.empty() || join_words(source) != b.expected_parent_text)
+            throw std::runtime_error("parent context text mismatch");
+        double low = (source.front().y0 + source.front().y1) / 2.0, high = low;
+        for (std::size_t j = 0; j < source.size(); ++j) {
+            const double y = (source[j].y0 + source[j].y1) / 2.0;
+            low = std::min(low, y); high = std::max(high, y);
+            for (std::size_t k = 0; k < j; ++k)
+                if (std::max(source[j].x0, source[k].x0) < std::min(source[j].x1, source[k].x1))
+                    throw std::runtime_error("parent context has overlapping source words");
+        }
+        if (high - low > t.row_y_tolerance)
+            throw std::runtime_error("parent context must have a single text baseline");
+        bool merged = false;
+        std::vector<std::size_t> targets;
+        for (const auto& child : b.children) {
+            if (child.row_index == 0 || child.row_index > rows.size())
+                throw std::runtime_error("parent context child row is outside selected scope");
+            const auto r = child.row_index - 1U;
+            if (owners[r].has_value()) throw std::runtime_error("parent context has competing child assignments");
+            owners[r] = i;
+            targets.push_back(r);
+            const auto& row = rows[r];
+            if (!has_values(row, t)) throw std::runtime_error("parent context child has no value cell");
+            const auto raw = row_cell(without_parents(row, t), t.parameter_column);
+            if (raw != child.expected_parameter_text)
+                throw std::runtime_error("parent context child text mismatch");
+            const auto rb = row_box(row);
+            if (box.y_max <= rb.y_min) {
+                for (std::size_t between = 0; between < r; ++between) {
+                    const auto middle = row_box(rows[between]);
+                    if (middle.y_min >= box.y_max && !has_values(rows[between], t) &&
+                        !row_cell(rows[between].words, t.parameter_column).empty())
+                        throw std::runtime_error("parent context crosses an intervening parameter heading");
+                }
+            }
+            if (box.y_max > rb.y_min) {
+                merged = true;
+                if (!raw.empty() || rb.y_min < box.y_min || rb.y_max > box.y_max)
+                    throw std::runtime_error("parent context merged cell has competing text or partial child geometry");
+            }
+        }
+        std::sort(targets.begin(), targets.end());
+        if (merged) {
+            for (std::size_t j = 0; j < targets.size(); ++j) {
+                const auto rb = row_box(rows[targets[j]]);
+                if (rb.y_min < box.y_min || rb.y_max > box.y_max ||
+                    !row_cell(without_parents(rows[targets[j]], t), t.parameter_column).empty() ||
+                    (j > 0 && targets[j] != targets[j - 1U] + 1U))
+                    throw std::runtime_error("parent context merged children must be consecutive and wholly bounded");
+            }
+        }
+        for (std::size_t r = 0; r < rows.size(); ++r) {
+            const auto rb = row_box(rows[r]);
+            if (std::max(rb.y_min, box.y_min) < std::min(rb.y_max, box.y_max) &&
+                has_values(rows[r], t) && owners[r] != i)
+                throw std::runtime_error("parent context box touches an unassigned value row");
+        }
+    }
+    return owners;
+}
 }
 
 ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
@@ -517,6 +644,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
             }
         }
         if (rows.empty()) throw std::runtime_error("table selection contains only the configured header row");
+        const auto context_owners = verify_parent_context(words, rows, request.table);
 
         intake::IntakeManifest manifest;
         manifest.origin = request.component.is_synthetic ? intake::IntakeOriginClass::synthetic_fixture
@@ -565,10 +693,21 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         }
 
         std::vector<ValueCellProvenance> cell_provenance;
+        std::vector<ParameterContextProvenance> context_provenance;
         std::size_t row_number = 0;
         for (const auto& row : rows) {
             ++row_number;
             std::string parameter = row_cell(row.words, request.table.parameter_column);
+            const auto owner = context_owners[row_number - 1U];
+            std::string raw_child_parameter = parameter;
+            if (!request.table.parent_context_bindings.empty()) {
+                raw_child_parameter = row_cell(without_parents(row, request.table), request.table.parameter_column);
+                parameter = raw_child_parameter;
+                if (owner.has_value()) {
+                    parameter = request.table.parent_context_bindings[*owner].expected_parent_text;
+                    if (!raw_child_parameter.empty()) parameter += " " + raw_child_parameter;
+                }
+            }
             std::string unit = row_cell(row.words, request.table.unit_column);
             if (parameter.empty()) {
                 result.diagnostics.push_back("row " + std::to_string(row_number) + ": missing parameter cell; row omitted");
@@ -631,8 +770,19 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 parameter_evidence.id = {"ev." + base + ".parameter"};
                 parameter_evidence.cell_or_region = "row=" + std::to_string(row_number) + ";column=parameter/unit";
                 parameter_evidence.footnote_refs.clear();
-                manifest.evidence.push_back({parameter_evidence, parameter, "parameter", false});
+                manifest.evidence.push_back({parameter_evidence, raw_child_parameter, "parameter", false});
                 manifest.evidence.push_back({evidence, parameter, column_name, false});
+                std::optional<component::EvidenceLocation> parent_evidence;
+                if (owner.has_value()) {
+                    const auto& binding = request.table.parent_context_bindings[*owner];
+                    parent_evidence = parameter_evidence;
+                    parent_evidence->id = {"ev." + base + ".parent"};
+                    parent_evidence->cell_or_region = "parent_context=" + std::to_string(*owner + 1U);
+                    manifest.evidence.push_back({*parent_evidence, binding.expected_parent_text, "parent_parameter", false});
+                    context_provenance.push_back({{"obs." + base}, parent_evidence->id,
+                        parameter_evidence.id, row_number, binding.parent_box, row_box(row),
+                        binding.expected_parent_text, raw_child_parameter, join_words(row.words)});
+                }
 
                 VerifiedUnitHeader* matched_unit_header = nullptr;
                 for (auto& uh : unit_headers) {
@@ -742,6 +892,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 observation.category = *request.table.category;
                 if (resolved_conditions.has_value()) observation.operating_conditions = *resolved_conditions;
                 observation.evidence_refs = {parameter_evidence.id, evidence.id};
+                if (parent_evidence.has_value()) observation.evidence_refs.push_back(parent_evidence->id);
                 if (used_header_unit) observation.evidence_refs.push_back(matched_unit_header->evidence.id);
                 if (used_header_condition) observation.evidence_refs.push_back(cond_header_ev->id);
                 observation.extraction_method = component::ExtractionMethod::deterministic_table_parser;
@@ -785,6 +936,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         result.manifest = std::move(manifest);
         result.candidate_bundle = std::move(candidate.bundle);
         result.value_cell_provenance = std::move(cell_provenance);
+        result.parameter_context_provenance = std::move(context_provenance);
     } catch (const std::exception& error) {
         result.diagnostics.push_back(error.what());
     }
