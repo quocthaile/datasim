@@ -36,10 +36,15 @@ verified on synthetic selectable-text PDF fixtures by hosted Windows CI runs
 `42000652152` (PR #7 branch) and `42017272043` (post-merge `main`). Phase 4D
 ([PHASE_4D_PLAN.md](PHASE_4D_PLAN.md), [PHASE_4D_IMPLEMENTATION.md](PHASE_4D_IMPLEMENTATION.md),
 [PHASE_4D_VALIDATION.md](PHASE_4D_VALIDATION.md)) implements the PDF-to-Simulation
-end-to-end validation gate on `feat/phase-4d-pdf-to-simulation-gate`. No
-real-datasheet extraction accuracy or physical measurement is claimed.
+end-to-end validation gate, merged into `main` via PR #8
+(`69aba4df7ff752355a40e394de5d05ac988df34b`) and verified by hosted Windows CI
+run `42025406013`. Phase 4E ([PHASE_4E_PLAN.md](PHASE_4E_PLAN.md),
+[PHASE_4E_CORPUS_PROTOCOL.md](PHASE_4E_CORPUS_PROTOCOL.md),
+[PHASE_4E_VALIDATION.md](PHASE_4E_VALIDATION.md)) implements the offline
+real-datasheet evaluation corpus and benchmark on
+`feat/phase-4e-datasheet-evaluation-corpus`. No physical measurement is claimed.
 Keep the Poppler adapter in `datasim_pdf`, above and depending on `datasim_intake`;
-do not modify existing Phase 2/3/4B public contracts without a demonstrated,
+do not modify existing Phase 2/3/4B/4C/4D public contracts without a demonstrated,
 documented correctness defect. Do not infer licensing rights or commit vendor PDFs.
 
 ## Working practices

@@ -81,6 +81,13 @@ add_executable(rc_study apps/rc_study/main.cpp)
 target_link_libraries(rc_study PRIVATE datasim)
 add_executable(datasheet_extract apps/datasheet_extract/main.cpp)
 target_link_libraries(datasheet_extract PRIVATE datasim_pdf)
+add_executable(datasheet_eval_dump apps/datasheet_eval_dump/main.cpp)
+target_link_libraries(datasheet_eval_dump PRIVATE datasim_pdf)
+if(MSVC)
+    target_compile_options(datasheet_eval_dump PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(datasheet_eval_dump PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 include(CTest)
 if(BUILD_TESTING)
     add_executable(unit_tests tests/unit/main.cpp)
@@ -161,6 +168,16 @@ if(BUILD_TESTING)
     set(DATASIM_NGSPICE "" CACHE FILEPATH "Optional path to ngspice executable")
     add_test(NAME ngspice_rc COMMAND integration_tests "${DATASIM_NGSPICE}")
     set_tests_properties(ngspice_rc PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 45)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_test(
+        NAME pdf_corpus_evaluation
+        COMMAND "${Python3_EXECUTABLE}" -B -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}/tests/evaluation" -v)
+    set_tests_properties(
+        pdf_corpus_evaluation
+        PROPERTIES
+            LABELS integration
+            TIMEOUT 45
+            ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1;DATASIM_EVAL_DUMP_BIN=$<TARGET_FILE:datasheet_eval_dump>;DATASIM_REPO_ROOT=${CMAKE_CURRENT_SOURCE_DIR}")
     set_tests_properties(unit component_model vertical_slice intake intake_handoff backend_errors PROPERTIES LABELS unit TIMEOUT 15)
     set_tests_properties(ngspice_rc PROPERTIES LABELS integration)
 endif()

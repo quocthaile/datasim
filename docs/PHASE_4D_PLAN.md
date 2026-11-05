@@ -1,9 +1,13 @@
 # Phase 4D plan: PDF-to-simulation end-to-end validation gate
 
-Status: **IMPLEMENTED and VERIFIED locally on Windows x64 (MSYS2 UCRT64 GCC 16.2.0,
-Poppler 26.10.0, ngspice-47); awaiting hosted Windows CI verification on the Phase 4D
-pull request.** No real-datasheet extraction accuracy or physical measurement
-(`MEASURED`) is claimed.
+Status: **IMPLEMENTED, MERGED into `main` via PR #8 (`69aba4df7ff752355a40e394de5d05ac988df34b`),
+and VERIFIED on Windows x64 (MSYS2 UCRT64 GCC 16.2.0, Poppler 26.10.0, ngspice-47)
+locally and in hosted Windows CI runs
+[42023680012](https://github.com/quocthaile/datasim/actions/runs/42023680012) (PR #8)
+and [42025406013](https://github.com/quocthaile/datasim/actions/runs/42025406013)
+(post-merge `main`).** No real-datasheet extraction accuracy or physical measurement
+(`MEASURED`) is claimed in Phase 4D (see [Phase 4E validation](PHASE_4E_VALIDATION.md)
+for the subsequent offline real-datasheet pilot benchmark).
 
 ## 1. Objective and baseline
 

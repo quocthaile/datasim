@@ -1,0 +1,436 @@
+{
+  "schema_version": "datasim.phase4e.annotations.v1",
+  "annotation_set_id": "datasim-phase4e-synthetic-ground-truth-v1",
+  "annotator_count": 1,
+  "inter_annotator_agreement_claimed": false,
+  "notes": "Single-annotator engineering ground-truth labels for the in-repo synthetic PDF fixtures. Evaluation labels only; never approved ComponentKnowledge.",
+  "cases": [
+    {
+      "case_id": "SYN-CASE-01-TABLE-R",
+      "document_id": "doc.synthetic.rc",
+      "expected_sha256": "7133e861225318b47982dbf25ee2bb68a55ee5c11aa054675214515ab769cbb8",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_R",
+      "annotation_author": "datasim.phase4e.annotator.1",
+      "review_status": "adjudicated_single_annotator",
+      "adjudication_history": [
+        {
+          "timestamp": "2026-11-05T18:00:00Z",
+          "author": "datasim.phase4e.annotator.1",
+          "action": "initial_annotation_and_coordinate_verification",
+          "notes": "Verified against tests/fixtures/make_synthetic_datasheet_pdf.py page 1."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "GT-R-ROW1-MIN",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=min",
+          "parameter_name": "Resistance",
+          "original_value_text": "9.9",
+          "original_unit_symbol": "kohm",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 9.9,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 1 minimum resistance at 25 degC."
+        },
+        {
+          "entry_id": "GT-R-ROW1-TYP",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=typ",
+          "parameter_name": "Resistance",
+          "original_value_text": "10.0",
+          "original_unit_symbol": "kohm",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 10.0,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 1 typical resistance at 25 degC (conflicts with row 3 typical 10.01 kohm)."
+        },
+        {
+          "entry_id": "GT-R-ROW1-MAX",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=max",
+          "parameter_name": "Resistance",
+          "original_value_text": "10.1",
+          "original_unit_symbol": "kohm",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 10.1,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 1 maximum resistance at 25 degC."
+        },
+        {
+          "entry_id": "GT-R-ROW2-MIN",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=min",
+          "parameter_name": "Resistance",
+          "original_value_text": "9.8",
+          "original_unit_symbol": "kohm",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 9.8,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 2 minimum resistance at 85 degC."
+        },
+        {
+          "entry_id": "GT-R-ROW2-TYP",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=typ",
+          "parameter_name": "Resistance",
+          "original_value_text": "10.0",
+          "original_unit_symbol": "kohm",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 10.0,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 2 unambiguous typical resistance at 85 degC."
+        },
+        {
+          "entry_id": "GT-R-ROW2-MAX",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=max",
+          "parameter_name": "Resistance",
+          "original_value_text": "10.2",
+          "original_unit_symbol": "kohm",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 10.2,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 2 maximum resistance at 85 degC."
+        },
+        {
+          "entry_id": "GT-R-ROW3-MIN",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=min",
+          "parameter_name": "Resistance",
+          "original_value_text": "9.9",
+          "original_unit_symbol": "kohm",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 9.9,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 3 repeated minimum resistance at 25 degC."
+        },
+        {
+          "entry_id": "GT-R-ROW3-TYP",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=typ",
+          "parameter_name": "Resistance",
+          "original_value_text": "10.01",
+          "original_unit_symbol": "kohm",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 10.01,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 3 conflicting typical resistance at 25 degC."
+        },
+        {
+          "entry_id": "GT-R-ROW3-MAX",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=max",
+          "parameter_name": "Resistance",
+          "original_value_text": "10.1",
+          "original_unit_symbol": "kohm",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 10.1,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0},
+            {"parameter_name": "V_DD", "original_value_text": "5", "unit_symbol": "V", "numeric_value": 5.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC; V_DD=5 V",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 3 repeated maximum resistance at 25 degC."
+        }
+      ]
+    },
+    {
+      "case_id": "SYN-CASE-02-TABLE-C",
+      "document_id": "doc.synthetic.rc",
+      "expected_sha256": "7133e861225318b47982dbf25ee2bb68a55ee5c11aa054675214515ab769cbb8",
+      "pdf_page_index": 1,
+      "printed_page_label": "Appendix C-2",
+      "table_id": "TABLE_C",
+      "annotation_author": "datasim.phase4e.annotator.1",
+      "review_status": "adjudicated_single_annotator",
+      "adjudication_history": [
+        {
+          "timestamp": "2026-11-05T18:05:00Z",
+          "author": "datasim.phase4e.annotator.1",
+          "action": "initial_annotation_and_coordinate_verification",
+          "notes": "Verified against tests/fixtures/make_synthetic_datasheet_pdf.py page 2."
+        }
+      ],
+      "observations": [
+        {
+          "entry_id": "GT-C-ROW1-TYP",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=typ",
+          "parameter_name": "Capacitance",
+          "original_value_text": "1,000",
+          "original_unit_symbol": "uF",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": null,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_unparsed_ambiguous",
+          "in_supported_subset": false,
+          "notes": "Locale-ambiguous comma in '1,000' must preserve text with null scalar."
+        },
+        {
+          "entry_id": "GT-C-ROW1-MAX",
+          "row_index": 1,
+          "cell_or_region": "row=1;column=max",
+          "parameter_name": "Capacitance",
+          "original_value_text": "1.1",
+          "original_unit_symbol": "uF",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 1.1,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "25", "unit_symbol": "degC", "numeric_value": 25.0}
+          ],
+          "raw_conditions_text": "T_A=25 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 1 maximum capacitance at 25 degC (min '-' is skipped)."
+        },
+        {
+          "entry_id": "GT-C-ROW2-MIN",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=min",
+          "parameter_name": "Capacitance",
+          "original_value_text": "0.9",
+          "original_unit_symbol": "uF",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 0.9,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 2 minimum capacitance at 85 degC."
+        },
+        {
+          "entry_id": "GT-C-ROW2-TYP",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=typ",
+          "parameter_name": "Capacitance",
+          "original_value_text": "1.0*",
+          "original_unit_symbol": "uF",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": null,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": ["*"],
+          "expected_extraction_outcome": "candidate_unparsed_ambiguous",
+          "in_supported_subset": false,
+          "notes": "Footnote marker '*' preserved in footnote_refs and unparsed numeric value."
+        },
+        {
+          "entry_id": "GT-C-ROW2-MAX",
+          "row_index": 2,
+          "cell_or_region": "row=2;column=max",
+          "parameter_name": "Capacitance",
+          "original_value_text": "1.1",
+          "original_unit_symbol": "uF",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 1.1,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 2 maximum capacitance at 85 degC."
+        },
+        {
+          "entry_id": "GT-C-ROW3-MIN",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=min",
+          "parameter_name": "Capacitance",
+          "original_value_text": "0.9",
+          "original_unit_symbol": "uF",
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": 0.9,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 3 minimum capacitance at 85 degC."
+        },
+        {
+          "entry_id": "GT-C-ROW3-TYP",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=typ",
+          "parameter_name": "Capacitance",
+          "original_value_text": "1.0",
+          "original_unit_symbol": "uF",
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": 1.0,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 3 clean typical capacitance 1.0 uF at 85 degC."
+        },
+        {
+          "entry_id": "GT-C-ROW3-MAX",
+          "row_index": 3,
+          "cell_or_region": "row=3;column=max",
+          "parameter_name": "Capacitance",
+          "original_value_text": "1.1",
+          "original_unit_symbol": "uF",
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": 1.1,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_parsed",
+          "in_supported_subset": true,
+          "notes": "Row 3 maximum capacitance at 85 degC."
+        },
+        {
+          "entry_id": "GT-C-ROW4-MIN",
+          "row_index": 4,
+          "cell_or_region": "row=4;column=min",
+          "parameter_name": "Capacitance",
+          "original_value_text": "0.8",
+          "original_unit_symbol": null,
+          "qualifier": "minimum",
+          "expected_parsed_numeric_value": null,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_unparsed_blank_unit",
+          "in_supported_subset": false,
+          "notes": "Row 4 has blank unit cell; original_unit_symbol and parsed_numeric_value remain null."
+        },
+        {
+          "entry_id": "GT-C-ROW4-TYP",
+          "row_index": 4,
+          "cell_or_region": "row=4;column=typ",
+          "parameter_name": "Capacitance",
+          "original_value_text": "0.9",
+          "original_unit_symbol": null,
+          "qualifier": "typical",
+          "expected_parsed_numeric_value": null,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_unparsed_blank_unit",
+          "in_supported_subset": false,
+          "notes": "Row 4 has blank unit cell; original_unit_symbol and parsed_numeric_value remain null."
+        },
+        {
+          "entry_id": "GT-C-ROW4-MAX",
+          "row_index": 4,
+          "cell_or_region": "row=4;column=max",
+          "parameter_name": "Capacitance",
+          "original_value_text": "1.0",
+          "original_unit_symbol": null,
+          "qualifier": "maximum",
+          "expected_parsed_numeric_value": null,
+          "operating_conditions": [
+            {"parameter_name": "T_A", "original_value_text": "85", "unit_symbol": "degC", "numeric_value": 85.0}
+          ],
+          "raw_conditions_text": "T_A=85 degC",
+          "category": "electrical_characteristic",
+          "footnote_refs": [],
+          "expected_extraction_outcome": "candidate_unparsed_blank_unit",
+          "in_supported_subset": false,
+          "notes": "Row 4 has blank unit cell; original_unit_symbol and parsed_numeric_value remain null."
+        }
+      ]
+    }
+  ]
+}
+

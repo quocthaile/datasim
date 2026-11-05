@@ -36,13 +36,18 @@ and verified on synthetic fixtures by hosted Windows CI runs `42000652152` (PR #
 and `42017272043` (post-merge `main`). Phase 4D ([plan](docs/PHASE_4D_PLAN.md),
 [implementation](docs/PHASE_4D_IMPLEMENTATION.md), [validation](docs/PHASE_4D_VALIDATION.md))
 connects deterministic PDF extraction (`datasim_pdf`) to `datasim_intake`,
-`datasim_component`, `datasim_vertical`, and real `ngspice` on
-`feat/phase-4d-pdf-to-simulation-gate`. Preserve the `datasim_intake` APIs and its
-candidate-only boundary. Keep PDF processing in the isolated `datasim_pdf`
-adapter; do not add OCR, persistence, LLM integration, GUI, semiconductor models,
-or a custom solver. Poppler is a GPL-2.0-or-later executable dependency; do not
-bundle it or infer project redistribution rights from this ADR. The repository
-still has no adopted license.
+`datasim_component`, `datasim_vertical`, and real `ngspice`, merged into `main`
+via PR #8 (`69aba4df7ff752355a40e394de5d05ac988df34b`) and verified by hosted
+Windows CI run `42025406013`. Phase 4E ([plan](docs/PHASE_4E_PLAN.md),
+[corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md),
+[validation](docs/PHASE_4E_VALIDATION.md)) implements the offline evaluation
+corpus and benchmark on `feat/phase-4e-datasheet-evaluation-corpus`. Preserve
+the `datasim_intake` APIs and its candidate-only boundary. Keep PDF processing
+in the isolated `datasim_pdf` adapter; do not add OCR, persistence, LLM
+integration, GUI, semiconductor models, or a custom solver. Do not commit
+manufacturer PDFs or copyrighted table passages to the repository. Poppler is a
+GPL-2.0-or-later executable dependency; do not bundle it or infer project
+redistribution rights from this ADR. The repository still has no adopted license.
 
 Build and run CTest as documented. Integration skips are not passes. No LLM is a
 numerical authority; manual RC parameters and synthetic fixtures are not

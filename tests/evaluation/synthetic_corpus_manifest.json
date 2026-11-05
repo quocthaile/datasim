@@ -1,0 +1,259 @@
+{
+  "schema_version": "datasim.phase4e.corpus.v1",
+  "corpus_id": "datasim-phase4e-synthetic-regression-v1",
+  "description": "Legally distributable synthetic PDF evaluation corpus exercising supported tables, partially supported ambiguous tables, image-only documents, and fail-closed parser/intake/domain boundaries.",
+  "documents": [
+    {
+      "document_id": "doc.synthetic.rc",
+      "manufacturer": "Datasim Synthetic",
+      "publisher": "Datasim Synthetic",
+      "part_numbers": ["SIM-R-10K", "SIM-C-1UF"],
+      "title": "Fictional electrical characteristics",
+      "revision": "fixture-rev-1",
+      "source_url": "https://github.com/quocthaile/datasim/blob/main/tests/fixtures/make_synthetic_datasheet_pdf.py",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "7133e861225318b47982dbf25ee2bb68a55ee5c11aa054675214515ab769cbb8",
+      "repo_relative_path": "tests/fixtures/synthetic_datasheet.pdf",
+      "is_synthetic": true,
+      "page_count": 2,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "supported_single_page_table",
+      "annotation_status": "annotated_single_reviewer",
+      "usage_rights": {
+        "license_identifier": "Datasim-Internal-Synthetic-Fixture",
+        "redistribution_permitted": true,
+        "evaluation_permitted": true,
+        "evidence_notes": "Generated in-repo by tests/fixtures/make_synthetic_datasheet_pdf.py; contains no vendor material."
+      }
+    },
+    {
+      "document_id": "doc.synthetic.image_only",
+      "manufacturer": "Datasim Synthetic",
+      "publisher": "Datasim Synthetic",
+      "part_numbers": ["SIM-R-IMAGE"],
+      "title": "Fictional scanned image-only datasheet",
+      "revision": "fixture-rev-1",
+      "source_url": "https://github.com/quocthaile/datasim/blob/main/tests/fixtures/make_synthetic_datasheet_pdf.py",
+      "retrieval_date": "2026-11-05",
+      "expected_sha256": "82a4c51c353842facc8724e0380846c6a70adc798038963ce1a1c272a4a5cbab",
+      "repo_relative_path": "tests/fixtures/image_only_datasheet.pdf",
+      "is_synthetic": true,
+      "page_count": 1,
+      "eligibility_status": "eligible",
+      "exclusion_reason": null,
+      "layout_category": "image_only_or_scanned",
+      "annotation_status": "annotated_negative_control",
+      "usage_rights": {
+        "license_identifier": "Datasim-Internal-Synthetic-Fixture",
+        "redistribution_permitted": true,
+        "evaluation_permitted": true,
+        "evidence_notes": "Generated in-repo by tests/fixtures/make_synthetic_datasheet_pdf.py; contains 1x1 raster XObject and no selectable text."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "SYN-CASE-01-TABLE-R",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_R",
+      "layout_category": "supported_single_page_table",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.resistor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-10K",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 690.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "SYN-CASE-02-TABLE-C",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 1,
+      "printed_page_label": "Appendix C-2",
+      "table_id": "TABLE_C",
+      "layout_category": "partially_supported_ambiguous",
+      "expected_outcome": "extract_candidates",
+      "component": {
+        "component_id": "cmp.fixture.capacitor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-C-1UF",
+        "package_id": "fixture-package",
+        "family": "capacitor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 690.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "SYN-CASE-03-IMAGE-ONLY",
+      "document_id": "doc.synthetic.image_only",
+      "pdf_page_index": 0,
+      "printed_page_label": "1",
+      "table_id": "TABLE_IMAGE",
+      "layout_category": "image_only_or_scanned",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["selected page has no selectable text; image-only pages are unsupported"],
+      "component": {
+        "component_id": "cmp.fixture.image",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-IMAGE",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 580.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 580.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "SYN-CASE-04-OVERLAPPING-COLUMNS",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_OVERLAP",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["table column spans overlap"],
+      "component": {
+        "component_id": "cmp.fixture.resistor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-10K",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 690.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [210.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "SYN-CASE-05-EMPTY-REGION",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_EMPTY",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["explicit table region contains no selectable text"],
+      "component": {
+        "component_id": "cmp.fixture.resistor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-10K",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 500.0, 690.0, 650.0],
+        "row_y_tolerance": 2.0,
+        "header": [500.0, 520.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "SYN-CASE-06-PAGE-OUT-OF-RANGE",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 9,
+      "printed_page_label": "99",
+      "table_id": "TABLE_OOB",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "expected_diagnostic_substrings": ["selected zero-based PDF page index is outside the document"],
+      "component": {
+        "component_id": "cmp.fixture.resistor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-10K",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 690.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    },
+    {
+      "case_id": "SYN-CASE-07-MPN-MISMATCH",
+      "document_id": "doc.synthetic.rc",
+      "pdf_page_index": 0,
+      "printed_page_label": "5",
+      "table_id": "TABLE_MPN_MISMATCH",
+      "layout_category": "unsupported_complex_layout",
+      "expected_outcome": "fail_closed",
+      "override_doc_part_numbers": ["OTHER-MPN-ONLY"],
+      "expected_domain_codes": ["incompatible_source_document_part_number"],
+      "component": {
+        "component_id": "cmp.fixture.resistor",
+        "manufacturer": "Datasim Synthetic",
+        "part_number": "SIM-R-10K",
+        "package_id": "fixture-package",
+        "family": "resistor"
+      },
+      "table_geometry": {
+        "region": [20.0, 80.0, 690.0, 215.0],
+        "row_y_tolerance": 2.0,
+        "header": [80.0, 110.0],
+        "parameter_column": [20.0, 215.0],
+        "unit_column": [215.0, 285.0],
+        "minimum_column": [285.0, 350.0],
+        "typical_column": [350.0, 420.0],
+        "maximum_column": [420.0, 490.0],
+        "condition_column": [490.0, 690.0],
+        "category": "electrical_characteristic"
+      }
+    }
+  ]
+}
