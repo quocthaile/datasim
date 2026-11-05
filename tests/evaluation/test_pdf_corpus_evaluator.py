@@ -299,6 +299,61 @@ class TestPdfCorpusEvaluator(unittest.TestCase):
         # Also validate that the real-corpus manifest adheres strictly to schema
         real_manifest = json.loads(self.real_manifest_path.read_text(encoding="utf-8"))
         eval_mod.validate_corpus_manifest(real_manifest)
+        real_p4f_path = self.repo_root / "evaluation" / "real_corpus_manifest_phase4f.json"
+        if real_p4f_path.is_file():
+            real_p4f = json.loads(real_p4f_path.read_text(encoding="utf-8"))
+            eval_mod.validate_corpus_manifest(real_p4f)
+
+    def test_phase4f_header_unit_and_condition_bindings(self) -> None:
+        hb_manifest = self.repo_root / "tests" / "evaluation" / "synthetic_header_binding_manifest.json"
+        hb_annotations = self.repo_root / "tests" / "evaluation" / "synthetic_header_binding_ground_truth.json"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            json1 = tmp / "hb1.json"
+            md1 = tmp / "hb1.md"
+            rc = eval_mod.main(
+                [
+                    "--manifest",
+                    str(hb_manifest),
+                    "--annotations",
+                    str(hb_annotations),
+                    "--repo-root",
+                    str(self.repo_root),
+                    "--eval-dump-bin",
+                    str(self.eval_dump_bin),
+                    "--pdfinfo",
+                    str(self.pdfinfo_bin),
+                    "--pdftotext",
+                    str(self.pdftotext_bin),
+                    "--output-json",
+                    str(json1),
+                    "--output-md",
+                    str(md1),
+                ]
+            )
+            self.assertEqual(rc, 0)
+            report = json.loads(json1.read_text(encoding="utf-8"))
+            sec_b = report["section_b_supported_extraction_quality"]
+            self.assertEqual(sec_b["tp"], 13)
+            self.assertEqual(sec_b["fp"], 0)
+            self.assertEqual(sec_b["fn"], 0)
+            self.assertAlmostEqual(sec_b["precision"], 1.0)
+            self.assertAlmostEqual(sec_b["recall"], 1.0)
+            self.assertAlmostEqual(sec_b["f1"], 1.0)
+            for field_name, stats in sec_b["field_level_agreement"].items():
+                self.assertEqual(stats["matched"], 13, f"Field {field_name} mismatch")
+                self.assertEqual(stats["total"], 13)
+
+            sec_c = report["section_c_fail_closed_behavior"]
+            self.assertEqual(sec_c["expected_fail_closed_cases"], 2)
+            self.assertEqual(sec_c["actual_fail_closed_cases"], 2)
+            self.assertEqual(sec_c["false_accept_cases"], 0)
+            self.assertEqual(sec_c["diagnostic_matched_fail_closed_cases"], 2)
+
+            sec_d = report["section_d_reproducibility_and_diagnostics"]
+            self.assertEqual(sec_d["repeat_runs_verified"], 5)
+            self.assertEqual(sec_d["repeat_run_mismatches"], 0)
+            self.assertTrue(sec_d["candidate_only_verified"])
 
 
 if __name__ == "__main__":

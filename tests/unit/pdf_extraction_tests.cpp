@@ -12,6 +12,9 @@
 #ifndef DATASIM_IMAGE_ONLY_PDF_PATH
 #error DATASIM_IMAGE_ONLY_PDF_PATH must be defined
 #endif
+#ifndef DATASIM_HEADER_BINDING_PDF_PATH
+#error DATASIM_HEADER_BINDING_PDF_PATH must be defined
+#endif
 
 namespace {
 int checks = 0;
@@ -196,6 +199,146 @@ int main() {
         require(!image_result.diagnostics.empty() &&
                 image_result.diagnostics.front().find("no selectable text") != std::string::npos,
                 "image-only PDF fails closed with selectable-text diagnostic");
+
+        // Phase 4F synthetic regression tests (Cases A-H):
+        // Case A (unit only in column header), Case B (explicit row unit consistent with header),
+        // Case E (valid condition unit in header + bare numeric condition),
+        // Case F (non-numeric condition code "A" remains unresolved with raw_conditions_text),
+        // Case G (two value columns typ=uF and max=uA bound independently).
+        auto hb_req = request_for(0, "capacitor", "SIM-HB-CAP", "doc.synthetic.hb");
+        hb_req.pdf_path = DATASIM_HEADER_BINDING_PDF_PATH;
+        hb_req.printed_page_label = "HB-1";
+        hb_req.table.table_id = "TABLE_HB_BAND1";
+        hb_req.table.region_x_min = 20; hb_req.table.region_y_min = 85;
+        hb_req.table.region_x_max = 650; hb_req.table.region_y_max = 165;
+        hb_req.table.header_y_min = 85; hb_req.table.header_y_max = 110;
+        hb_req.table.parameter_column = {20, 215};
+        hb_req.table.unit_column = {215, 280};
+        hb_req.table.minimum_column = {280, 340};
+        hb_req.table.typical_column = {340, 425};
+        hb_req.table.maximum_column = {425, 505};
+        hb_req.table.condition_column = pdf::HorizontalSpan{505, 650};
+
+        // Case H check on synthetic_header_binding_datasheet.pdf without header bindings:
+        const auto hb_unbound = pdf::extract_electrical_table(hb_req);
+        require(hb_unbound.candidate_bundle.has_value(), "Case H: unbound extraction yields candidate bundle");
+        require(hb_unbound.manifest->observations.size() == 3U, "Case H: 3 observations extracted without bindings");
+        require(!hb_unbound.manifest->observations[0].observation.original_unit_symbol.has_value() &&
+                !hb_unbound.manifest->observations[0].observation.parsed_numeric_value.has_value(),
+                "Case H: blank row unit without header binding leaves unit and scalar empty");
+        require(hb_unbound.manifest->observations[0].observation.operating_conditions.empty() &&
+                hb_unbound.manifest->observations[0].raw_conditions_text == "100",
+                "Case H: bare condition without header binding remains unresolved with raw text preserved");
+
+        // Configure explicit header unit bindings (Cases A, B, G) and header condition binding (Cases E, F):
+        hb_req.table.header_unit_bindings = {
+            {component::ValueQualifier::typical, {340, 425}, 90, 105, "Capacitance (uF)", "uF"},
+            {component::ValueQualifier::maximum, {425, 505}, 90, 105, "Leakage (uA)", "uA"},
+        };
+        hb_req.table.header_condition_binding = pdf::HeaderConditionBinding{
+            {510, 585}, 90, 105, "VOLTAGE (V)", "VOLTAGE", "V"};
+
+        const auto hb_bound = pdf::extract_electrical_table(hb_req);
+        require(hb_bound.candidate_bundle.has_value(), "Cases A/B/E/F/G: header-bound extraction yields valid candidate bundle");
+        require(hb_bound.manifest->observations.size() == 3U, "Cases A/B/E/F/G: 3 observations extracted");
+        for (const auto& obs : hb_bound.candidate_bundle->observations) {
+            require(obs.review_state == component::ReviewState::candidate && obs.review_history.empty(),
+                    "Cases A/B/E/F/G: all extracted observations remain candidate-only");
+        }
+        // Row 1 typ (Case A + Case E + Case G col 1):
+        const auto& obs_r1_typ = hb_bound.manifest->observations[0].observation;
+        require(obs_r1_typ.parameter_name == "CAPACITANCE_A", "Case A: parameter name preserved");
+        require(obs_r1_typ.original_unit_symbol == "uF", "Case A: typ unit bound from header");
+        require(obs_r1_typ.parsed_numeric_value == 0.22, "Case A: typ scalar parsed after header unit binding");
+        require(obs_r1_typ.operating_conditions.size() == 1U &&
+                obs_r1_typ.operating_conditions[0].parameter_name == "VOLTAGE" &&
+                obs_r1_typ.operating_conditions[0].original_value_text == "100" &&
+                obs_r1_typ.operating_conditions[0].unit_symbol == "V" &&
+                obs_r1_typ.operating_conditions[0].numeric_value == 100.0,
+                "Case E: bare numeric condition cell parsed using bound condition header");
+        require(obs_r1_typ.evidence_refs.size() == 4U,
+                "Cases A+E: observation links to parameter, value, header_unit, and header_condition evidence");
+
+        // Row 1 max (Case G col 2 + Case E):
+        const auto& obs_r1_max = hb_bound.manifest->observations[1].observation;
+        require(obs_r1_max.original_unit_symbol == "uA" && obs_r1_max.parsed_numeric_value == 0.5,
+                "Case G: second value column independently binds its own header unit (uA)");
+        require(obs_r1_max.evidence_refs.size() == 4U,
+                "Case G: max observation links to its own header_unit.max evidence");
+
+        // Row 2 typ (Case B + Case F):
+        const auto& entry_r2_typ = hb_bound.manifest->observations[2];
+        const auto& obs_r2_typ = entry_r2_typ.observation;
+        require(obs_r2_typ.parameter_name == "CAPACITANCE_B", "Case B: row 2 parameter preserved");
+        require(obs_r2_typ.original_unit_symbol == "uF" && obs_r2_typ.parsed_numeric_value == 0.33,
+                "Case B: explicit row unit consistent with header unit succeeds");
+        require(obs_r2_typ.evidence_refs.size() == 2U,
+                "Case B + Case F: explicit row unit takes precedence and unresolved code 'A' does not attach header evidence");
+        require(obs_r2_typ.operating_conditions.empty() && entry_r2_typ.raw_conditions_text == "A" &&
+                entry_r2_typ.ambiguity_notes.has_value(),
+                "Case F: non-numeric condition code 'A' remains unresolved with raw_conditions_text preserved");
+        require(hb_bound.diagnostics.size() == 1U &&
+                hb_bound.diagnostics.front().find("operating condition left unresolved: A") != std::string::npos,
+                "Case F: unresolved condition diagnostic emitted for non-numeric code 'A'");
+
+        // Case C — Row/header unit conflict (Band 2 on Page 1: row unit "nF" vs header unit "uF"):
+        auto hb_conflict = hb_req;
+        hb_conflict.table.table_id = "TABLE_HB_BAND2";
+        hb_conflict.table.region_y_min = 285; hb_conflict.table.region_y_max = 340;
+        hb_conflict.table.header_y_min = 285; hb_conflict.table.header_y_max = 310;
+        hb_conflict.table.header_unit_bindings = {
+            {component::ValueQualifier::typical, {340, 425}, 290, 305, "Capacitance (uF)", "uF"}};
+        hb_conflict.table.header_condition_binding = std::nullopt;
+        const auto conflict_res = pdf::extract_electrical_table(hb_conflict);
+        require(!conflict_res.candidate_bundle.has_value(), "Case C: row/header unit conflict fails closed");
+        require(!conflict_res.diagnostics.empty() &&
+                conflict_res.diagnostics.front().find("conflicts with bound header unit") != std::string::npos,
+                "Case C: conflict diagnostic reports explicit row unit vs bound header unit");
+
+        // Case D — Missing or mismatched header fails closed:
+        auto hb_mismatch = hb_req;
+        hb_mismatch.table.header_unit_bindings = {
+            {component::ValueQualifier::typical, {340, 425}, 90, 105, "Capacitance (pF)", "pF"}};
+        const auto mismatch_res = pdf::extract_electrical_table(hb_mismatch);
+        require(!mismatch_res.candidate_bundle.has_value(), "Case D1: mismatched header text fails closed");
+        require(!mismatch_res.diagnostics.empty() &&
+                mismatch_res.diagnostics.front().find("header binding text mismatch") != std::string::npos,
+                "Case D1: reports header binding text mismatch");
+
+        auto hb_empty_box = hb_req;
+        hb_empty_box.table.header_unit_bindings = {
+            {component::ValueQualifier::minimum, {305, 338}, 90, 105, "Min (uF)", "uF"}};
+        const auto empty_box_res = pdf::extract_electrical_table(hb_empty_box);
+        require(!empty_box_res.candidate_bundle.has_value(), "Case D2: empty header binding box fails closed");
+        require(!empty_box_res.diagnostics.empty() &&
+                empty_box_res.diagnostics.front().find("contains no selectable text") != std::string::npos,
+                "Case D2: reports empty header binding box");
+
+        auto hb_straddle = hb_req;
+        hb_straddle.table.header_unit_bindings = {
+            {component::ValueQualifier::typical, {360, 425}, 90, 105, "Capacitance (uF)", "uF"}};
+        const auto straddle_res = pdf::extract_electrical_table(hb_straddle);
+        require(!straddle_res.candidate_bundle.has_value(), "Case D3: straddling header word fails closed");
+        require(!straddle_res.diagnostics.empty() &&
+                straddle_res.diagnostics.front().find("straddles configured header binding box") != std::string::npos,
+                "Case D3: reports straddling header word");
+
+        // Unicode preservation check (Page 2 of synthetic_header_binding_datasheet.pdf has "(µF)" = \xC2\xB5F):
+        auto hb_unicode = hb_req;
+        hb_unicode.pdf_page_index = 1;
+        hb_unicode.printed_page_label = "HB-2";
+        hb_unicode.table.table_id = "TABLE_HB_UNICODE";
+        hb_unicode.table.typical_column = {340, 445};
+        hb_unicode.table.maximum_column = {445, 505};
+        hb_unicode.table.header_unit_bindings = {
+            {component::ValueQualifier::typical, {340, 440}, 90, 105, "CAPACITANCE (\xC2\xB5" "F)", "\xC2\xB5" "F"}};
+        hb_unicode.table.header_condition_binding = std::nullopt;
+        const auto unicode_res = pdf::extract_electrical_table(hb_unicode);
+        require(unicode_res.candidate_bundle.has_value(), "Unicode header unit binding succeeds");
+        require(unicode_res.manifest->observations.size() == 1U &&
+                unicode_res.manifest->observations.front().observation.original_unit_symbol == std::string("\xC2\xB5" "F") &&
+                unicode_res.manifest->observations.front().observation.parsed_numeric_value == 0.22,
+                "Unicode unit symbol preserved verbatim without ASCII conversion");
 
         std::cout << "PDF extraction checks: " << checks << '\n';
         return 0;

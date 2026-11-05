@@ -72,14 +72,26 @@ candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows
    See [Phase 4D plan](docs/PHASE_4D_PLAN.md),
    [Phase 4D implementation](docs/PHASE_4D_IMPLEMENTATION.md), and
    [Phase 4D validation](docs/PHASE_4D_VALIDATION.md).
-7. **Phase 4E real-datasheet evaluation corpus and offline benchmark (IMPLEMENTED and VERIFIED on `feat/phase-4e-datasheet-evaluation-corpus`)**:
+7. **Phase 4E real-datasheet evaluation corpus and offline benchmark**:
    versioned corpus protocol, ground-truth annotation schema, development-only C++ extraction
    dump adapter (`datasheet_eval_dump`), offline corpus evaluator (`scripts/eval/evaluate_pdf_corpus.py`),
-   and automated determinism/regression suite (`pdf_corpus_evaluation`), verified on the in-repo
-   synthetic regression corpus and locally benchmarked against 5 untracked Vishay resistor and
-   capacitor datasheets in `build/corpus/`. See [Phase 4E plan](docs/PHASE_4E_PLAN.md),
+   and automated determinism/regression suite (`pdf_corpus_evaluation`), merged into `main` via
+   PR #9 at `b45c32224e0316dd9f93b6e9bfc3ab89cd3ceaf4` and verified in hosted Windows CI runs
+   [42031281489](https://github.com/quocthaile/datasim/actions/runs/42031281489),
+   [42031409931](https://github.com/quocthaile/datasim/actions/runs/42031409931) (PR #9), and
+   [42037281172](https://github.com/quocthaile/datasim/actions/runs/42037281172) (post-merge `main`).
+   See [Phase 4E plan](docs/PHASE_4E_PLAN.md),
    [Phase 4E corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md), and
    [Phase 4E validation](docs/PHASE_4E_VALIDATION.md).
+8. **Phase 4F explicit column-header unit and condition binding (IMPLEMENTED and VERIFIED on `feat/phase-4f-explicit-header-binding`)**:
+   caller-configured, source-verified `HeaderUnitBinding` and `HeaderConditionBinding` inside
+   `datasim_pdf` with distinct header `EvidenceLocation` provenance, verified on synthetic
+   regression cases A–H and locally benchmarked on the Phase 4E real-datasheet pilot corpus
+   (`TP = 14/15`, `Precision = 0.9333`, `Recall = 0.9333`, `F1 = 0.9333`, `4/4` unsupported
+   layouts fail-closed). See [Phase 4F plan](docs/PHASE_4F_PLAN.md),
+   [Phase 4F implementation](docs/PHASE_4F_IMPLEMENTATION.md),
+   [Phase 4F validation](docs/PHASE_4F_VALIDATION.md), and
+   [ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
@@ -110,6 +122,7 @@ numerical or review authority.
 - [Phase 4C plan](docs/PHASE_4C_PLAN.md), [implementation](docs/PHASE_4C_IMPLEMENTATION.md), [validation](docs/PHASE_4C_VALIDATION.md), and [ADR-0006](docs/decisions/ADR-0006-deterministic-pdf-table-extraction.md) for the bounded local PDF table adapter
 - [Phase 4D plan](docs/PHASE_4D_PLAN.md), [implementation](docs/PHASE_4D_IMPLEMENTATION.md), and [validation](docs/PHASE_4D_VALIDATION.md) for the PDF-to-Simulation end-to-end validation gate
 - [Phase 4E plan](docs/PHASE_4E_PLAN.md), [corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md), and [validation](docs/PHASE_4E_VALIDATION.md) for the real-datasheet evaluation corpus and offline benchmark
+- [Phase 4F plan](docs/PHASE_4F_PLAN.md), [implementation](docs/PHASE_4F_IMPLEMENTATION.md), [validation](docs/PHASE_4F_VALIDATION.md), and [ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md) for explicit column-header unit and condition bindings
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

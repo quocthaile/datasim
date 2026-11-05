@@ -87,6 +87,78 @@ def build_image_only_pdf():
     return bytes(result)
 
 
+def build_header_binding_pdf():
+    # Page 1: Band 1 (Cases A, B, E, F, G) at y_pdf=700..650; Band 2 (Case C conflict) at y_pdf=500..475
+    page1_lines = [
+        # Band 1 header (y_pdf = 700 -> Poppler y ~ 90.7..103.0)
+        (25, 700, "Parameter"),
+        (220, 700, "Unit"),
+        (285, 700, "Min"),
+        (345, 700, "Capacitance (uF)"),
+        (430, 700, "Leakage (uA)"),
+        (515, 700, "VOLTAGE (V)"),
+        # Band 1 Row 1: blank row unit, two value columns (uF and uA), bare numeric condition 100
+        (25, 675, "CAPACITANCE_A"),
+        (360, 675, "0.22"),
+        (445, 675, "0.5"),
+        (530, 675, "100"),
+        # Band 1 Row 2: explicit consistent row unit "uF" (only typ populated), non-numeric condition code "A"
+        (25, 650, "CAPACITANCE_B"),
+        (225, 650, "uF"),
+        (360, 650, "0.33"),
+        (530, 650, "A"),
+        # Band 2 header (y_pdf = 500 -> Poppler y ~ 290.7..303.0)
+        (25, 500, "Parameter"),
+        (220, 500, "Unit"),
+        (285, 500, "Min"),
+        (345, 500, "Capacitance (uF)"),
+        (430, 500, "Max"),
+        (515, 500, "VOLTAGE (V)"),
+        # Band 2 Row 1: explicit conflicting row unit "nF" vs header "uF"
+        (25, 475, "CAPACITANCE_C"),
+        (225, 475, "nF"),
+        (360, 475, "10.0"),
+        (530, 475, "50"),
+    ]
+    # Page 2: Unicode Greek mu header "(μF)" using Type1 Symbol font (/F2 'm' -> U+03BC)
+    page2_cmds = [
+        "BT /F1 10 Tf 25 700 Td (Parameter) Tj ET",
+        "BT /F1 10 Tf 220 700 Td (Unit) Tj ET",
+        "BT /F1 10 Tf 285 700 Td (Min) Tj ET",
+        "BT /F1 10 Tf 345 700 Td (CAPACITANCE ) Tj (\\() Tj /F2 10 Tf (m) Tj /F1 10 Tf (F\\)) Tj ET",
+        "BT /F1 10 Tf 455 700 Td (Max) Tj ET",
+        "BT /F1 10 Tf 515 700 Td (Condition) Tj ET",
+        "BT /F1 10 Tf 25 675 Td (0.22) Tj ET",
+        "BT /F1 10 Tf 360 675 Td (0.22) Tj ET",
+        "BT /F1 10 Tf 530 675 Td (A) Tj ET",
+    ]
+    p1_stream = make_page(page1_lines)
+    p2_stream = "\n".join(page2_cmds).encode("ascii")
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R 7 0 R] /Count 2 >>",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 700 800] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Symbol >>",
+        b"<< /Length " + str(len(p1_stream)).encode() + b" >>\nstream\n" + p1_stream + b"\nendstream",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 700 800] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 8 0 R >>",
+        b"<< /Length " + str(len(p2_stream)).encode() + b" >>\nstream\n" + p2_stream + b"\nendstream",
+    ]
+    result = bytearray(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
+    offsets = [0]
+    for index, body in enumerate(objects, 1):
+        offsets.append(len(result))
+        result.extend(f"{index} 0 obj\n".encode())
+        result.extend(body)
+        result.extend(b"\nendobj\n")
+    xref = len(result)
+    result.extend(f"xref\n0 {len(offsets)}\n0000000000 65535 f \n".encode())
+    for offset in offsets[1:]:
+        result.extend(f"{offset:010d} 00000 n \n".encode())
+    result.extend(f"trailer\n<< /Size {len(offsets)} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode())
+    return bytes(result)
+
+
 if __name__ == "__main__":
     target = Path(__file__).with_name("synthetic_datasheet.pdf")
     target.write_bytes(build_pdf())
@@ -94,3 +166,6 @@ if __name__ == "__main__":
     image_target = Path(__file__).with_name("image_only_datasheet.pdf")
     image_target.write_bytes(build_image_only_pdf())
     print(f"generated {image_target} ({image_target.stat().st_size} bytes)")
+    hb_target = Path(__file__).with_name("synthetic_header_binding_datasheet.pdf")
+    hb_target.write_bytes(build_header_binding_pdf())
+    print(f"generated {hb_target} ({hb_target.stat().st_size} bytes)")

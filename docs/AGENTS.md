@@ -41,10 +41,16 @@ end-to-end validation gate, merged into `main` via PR #8
 run `42025406013`. Phase 4E ([PHASE_4E_PLAN.md](PHASE_4E_PLAN.md),
 [PHASE_4E_CORPUS_PROTOCOL.md](PHASE_4E_CORPUS_PROTOCOL.md),
 [PHASE_4E_VALIDATION.md](PHASE_4E_VALIDATION.md)) implements the offline
-real-datasheet evaluation corpus and benchmark on
-`feat/phase-4e-datasheet-evaluation-corpus`. No physical measurement is claimed.
+real-datasheet evaluation corpus and benchmark, merged into `main` via PR #9
+(`b45c32224e0316dd9f93b6e9bfc3ab89cd3ceaf4`) and verified by hosted Windows CI
+run `42037281172`. Phase 4F ([PHASE_4F_PLAN.md](PHASE_4F_PLAN.md),
+[PHASE_4F_IMPLEMENTATION.md](PHASE_4F_IMPLEMENTATION.md),
+[PHASE_4F_VALIDATION.md](PHASE_4F_VALIDATION.md),
+[ADR-0007](decisions/ADR-0007-explicit-header-binding.md)) implements explicit,
+source-verified column-header unit and condition bindings inside `datasim_pdf` on
+`feat/phase-4f-explicit-header-binding`. No physical measurement is claimed.
 Keep the Poppler adapter in `datasim_pdf`, above and depending on `datasim_intake`;
-do not modify existing Phase 2/3/4B/4C/4D public contracts without a demonstrated,
+do not modify existing Phase 2/3/4B/4D public contracts without a demonstrated,
 documented correctness defect. Do not infer licensing rights or commit vendor PDFs.
 
 ## Working practices
