@@ -147,8 +147,12 @@ if(BUILD_TESTING)
         tests/unit/vertical_slice_fixtures.cpp
         tests/unit/intake_fixtures.cpp
         tests/integration/intake_integration_fixture.cpp
+        tests/integration/pdf_simulation_gate.cpp
         tests/integration/main.cpp)
-    target_link_libraries(integration_tests PRIVATE datasim_vertical datasim_intake)
+    target_link_libraries(integration_tests PRIVATE datasim_vertical datasim_intake datasim_pdf)
+    target_compile_definitions(integration_tests PRIVATE
+        DATASIM_SYNTHETIC_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_datasheet.pdf"
+        DATASIM_IMAGE_ONLY_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/image_only_datasheet.pdf")
     if(MSVC)
         target_compile_options(integration_tests PRIVATE /W4 /permissive-)
     else()

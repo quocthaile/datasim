@@ -2,8 +2,10 @@
 
 Date: 2026-11-05
 
-Status: **IMPLEMENTED on `feat/phase-4c-deterministic-extraction`; awaiting PR
-review and hosted CI verification.**
+Status: **IMPLEMENTED and MERGED in PR #7 (`1704f726d901f3e1d00f9cdc918e80d352b443ac`),
+VERIFIED on synthetic fixtures in hosted Windows CI runs `42000652152` and
+`42017272043`.** Project licensing and binary redistribution decisions remain
+**PROPOSED**.
 
 ## Context
 

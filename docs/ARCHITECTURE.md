@@ -27,16 +27,19 @@ loader, nonlinear semiconductor device solver, real manufacturer datasheet
 evaluation, physical measurement validation (`MEASURED`), or interactive GUI is
 implemented.
 
-The isolated Phase 4C adapter (`datasim_pdf`) is **IMPLEMENTED** on its feature
-branch. It shells out to local Poppler `pdfinfo` and `pdftotext -bbox-layout`, then
-passes explicitly selected text-cell observations through `datasim_intake`. It does
-not link Poppler into `datasim_intake` or authenticate source identity. Hosted
-verification is pending.
+The isolated Phase 4B intake (`datasim_intake`) and Phase 4C PDF table adapter
+(`datasim_pdf`) are **IMPLEMENTED and VERIFIED** on `main` (PR #6 at `7d9af1c` and
+PR #7 at `1704f726d901f3e1d00f9cdc918e80d352b443ac`, hosted Windows CI runs
+`41995104973`, `42000652152`, and `42017272043`). `datasim_pdf` shells out to local
+Poppler `pdfinfo` and `pdftotext -bbox-layout`, then passes explicitly selected
+text-cell observations through `datasim_intake`. It does not link Poppler into
+`datasim_intake`, claim real-datasheet extraction accuracy, or authenticate source
+identity.
 
 ```mermaid
 flowchart TD
-    DS["Local selectable-text PDF"] --> DP["Explicit Poppler table adapter (Phase 4C IMPLEMENTED; feature branch)"]
-    DP --> CE["Candidate Extracted Data (C++20 Observation Contract VERIFIED)"]
+    DS["Local selectable-text PDF"] --> DP["Explicit Poppler table adapter (Phase 4C VERIFIED on synthetic fixtures)"]
+    DP --> CE["Candidate Extracted Data (C++20 Observation + Intake Contracts VERIFIED)"]
     CE --> VR["Validation and Engineering Review (C++20 Lifecycle VERIFIED)"]
     VR --> CK["Component Knowledge (C++20 Contract VERIFIED)"]
     CK --> MM["Mathematical / Vendor Model (C++20 Metadata + Compatibility Gate VERIFIED)"]
