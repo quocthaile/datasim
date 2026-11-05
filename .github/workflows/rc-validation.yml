@@ -48,7 +48,12 @@ jobs:
       - name: Unit and process tests without backend requirement
         run: ctest --test-dir build/ci -L unit --output-on-failure --output-junit unit.xml
       - name: Required real backend integration
-        run: ctest --test-dir build/ci -L integration --output-on-failure --output-junit integration.xml
+        run: |
+          ctest --test-dir build/ci -L integration --no-tests=error --output-on-failure --output-junit integration.xml
+          if grep -Eq 'Status="notrun"|status="notrun"' integration.xml; then
+            echo "Required integration test was skipped; hosted verification is invalid"
+            exit 1
+          fi
       - name: Convergence and repeatability
         run: ./build/ci/rc_study.exe "$(cygpath -m /ucrt64/bin/ngspice_con.exe)" build/ci-study
       - uses: actions/upload-artifact@v4

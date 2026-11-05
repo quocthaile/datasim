@@ -123,8 +123,15 @@ if(BUILD_TESTING)
     add_executable(integration_tests
         tests/unit/component_fixtures.cpp
         tests/unit/vertical_slice_fixtures.cpp
+        tests/unit/intake_fixtures.cpp
+        tests/integration/intake_integration_fixture.cpp
         tests/integration/main.cpp)
-    target_link_libraries(integration_tests PRIVATE datasim_vertical)
+    target_link_libraries(integration_tests PRIVATE datasim_vertical datasim_intake)
+    if(MSVC)
+        target_compile_options(integration_tests PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(integration_tests PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
     set(DATASIM_NGSPICE "" CACHE FILEPATH "Optional path to ngspice executable")
     add_test(NAME ngspice_rc COMMAND integration_tests "${DATASIM_NGSPICE}")
     set_tests_properties(ngspice_rc PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 45)
