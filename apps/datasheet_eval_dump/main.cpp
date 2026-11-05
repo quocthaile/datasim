@@ -678,6 +678,30 @@ void write_extraction_result_json(std::ostream& out, const datasim::pdf::Extract
         write_box("child_row_box", p.child_row_box);
         out << "}" << (i + 1U < result.parameter_context_provenance.size() ? "," : "") << "\n";
     }
+    out << "  ],\n  \"baseline_text_provenance\": [\n";
+    for (std::size_t i = 0; i < result.baseline_text_provenance.size(); ++i) {
+        const auto& p = result.baseline_text_provenance[i];
+        const auto box = [&](const datasim::pdf::SourceBox& b) {
+            out << "[" << b.x_min << "," << b.y_min << "," << b.x_max << "," << b.y_max << "]";
+        };
+        out << "    {\"observation_id\": \"" << json_escape(p.observation_id.value)
+            << "\", \"evidence_id\": \"" << json_escape(p.evidence_id.value)
+            << "\", \"raw_host_text\": \"" << json_escape(p.raw_host_text)
+            << "\", \"source_text\": \"" << json_escape(p.source_text)
+            << "\", \"display_expression\": \"" << json_escape(p.display_expression) << "\", \"host_box\": ";
+        box(p.host_box);
+        out << ", \"scripts\": [";
+        for (std::size_t j = 0; j < p.scripts.size(); ++j) {
+            const auto& script = p.scripts[j];
+            out << (j ? "," : "") << "{\"text\": \"" << json_escape(script.expected_text)
+                << "\", \"position\": \""
+                << (script.position == datasim::pdf::ScriptPosition::subscript ? "sub" : "super")
+                << "\", \"source_box\": ";
+            box(script.source_box);
+            out << "}";
+        }
+        out << "]}" << (i + 1U < result.baseline_text_provenance.size() ? "," : "") << "\n";
+    }
     out << "  ]\n";
     out << "}\n";
 }
@@ -836,6 +860,8 @@ int main(int argc, char** argv) {
                     parts[3],
                     parts[1],
                     parts[2]};
+            } else if (arg == "--baseline-text") {
+                request.table.baseline_text_bindings.push_back(datasim::pdf::cli::parse_baseline_text(next()));
             } else if (arg == "--parent-context") {
                 request.table.parent_context_bindings.push_back(datasim::pdf::cli::parse_parent_context(next()));
             } else if (arg == "--inline-unit-binding") {

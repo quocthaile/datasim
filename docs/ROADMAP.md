@@ -101,3 +101,7 @@ Phase 4G is now merged via PR #11 (`357dc52aa809`, post-merge CI `42052973122`).
 Phase 4H adds explicit hierarchical context on its separate feature branch; see
 [validation](PHASE_4H_VALIDATION.md). Phase 4I baseline reconstruction and Phase 4J
 release closure remain PROPOSED and gated on preceding merges and hosted CI.
+
+Phase 4H is merged and hosted-verified (PR #12, `864eb56`, run `42058944651`).
+Phase 4I is implemented on its separate branch; see [validation](PHASE_4I_VALIDATION.md).
+Phase 4J release closure remains gated on Phase 4I merge and post-merge CI.

@@ -12,7 +12,14 @@
 
 namespace datasim::pdf {
 namespace {
-struct Word { double x0, y0, x1, y1; std::string text; };
+struct Word {
+    double x0, y0, x1, y1;
+    std::string text;
+    std::optional<std::size_t> baseline_binding = std::nullopt;
+    std::optional<double> anchor_y0 = std::nullopt;
+    std::optional<double> anchor_center = std::nullopt;
+    bool baseline_host = false;
+};
 struct Row { double y = 0.0; std::vector<Word> words; };
 std::atomic<unsigned long long> temp_counter{0};
 
@@ -429,7 +436,10 @@ std::string row_value_cell(const std::vector<Word>& words, HorizontalSpan span, 
         return a.text < b.text;
     });
     for (std::size_t i = 0; i + 1U < selected.size(); ++i) {
-        if (selected[i + 1U].x0 < selected[i].x1) {
+        const bool verified_pair = selected[i].baseline_binding.has_value() &&
+            selected[i].baseline_binding == selected[i + 1U].baseline_binding &&
+            (selected[i].baseline_host != selected[i + 1U].baseline_host);
+        if (selected[i + 1U].x0 < selected[i].x1 && !verified_pair) {
             throw std::runtime_error("row " + std::to_string(row_number) +
                 " value cell has overlapping or duplicate word bounding boxes");
         }
@@ -460,6 +470,123 @@ SourceBox word_box(const Word& w) { return {w.x0, w.y0, w.x1, w.y1}; }
 bool inside(const SourceBox& a, const SourceBox& b) {
     return a.x_min >= b.x_min && a.y_min >= b.y_min &&
            a.x_max <= b.x_max && a.y_max <= b.y_max;
+}
+
+struct VerifiedBaseline {
+    Word host;
+    std::vector<BaselineScriptToken> scripts;
+    SourceBox envelope;
+    std::string source_text;
+    std::string display_expression;
+};
+
+bool valid_box(const SourceBox& b) {
+    return std::isfinite(b.x_min) && std::isfinite(b.y_min) &&
+           std::isfinite(b.x_max) && std::isfinite(b.y_max) &&
+           b.x_min < b.x_max && b.y_min < b.y_max;
+}
+
+bool script_geometry(const Word& host, const Word& token, ScriptPosition position) {
+    const double height = host.y1 - host.y0;
+    const double delta = (token.y0 + token.y1 - host.y0 - host.y1) / 2.0;
+    const double gap = token.x0 - host.x1;
+    return height > 0 && token.y1 > token.y0 && token.y1 - token.y0 <= 0.9 * height &&
+        gap >= -0.1 * height && gap <= 0.75 * height && token.x1 > host.x1 &&
+        std::abs(delta) <= height &&
+        ((position == ScriptPosition::subscript && delta > 0) ||
+         (position == ScriptPosition::superscript && delta < 0));
+}
+
+std::vector<VerifiedBaseline> reconstruct_baselines(std::vector<Word>& words,
+                                                    const ElectricalTableLayout& t) {
+    std::vector<VerifiedBaseline> verified;
+    const SourceBox region{t.region_x_min, t.region_y_min, t.region_x_max, t.region_y_max};
+    auto select_word = [&](const SourceBox& box, const std::string& expected) {
+        if (!valid_box(box) || !inside(box, region) || expected.empty())
+            throw std::runtime_error("baseline binding has invalid source box or text");
+        std::optional<std::size_t> match;
+        for (std::size_t i = 0; i < words.size(); ++i) {
+            if (!inside(word_box(words[i]), box)) continue;
+            if (match.has_value()) throw std::runtime_error("baseline selection contains multiple words");
+            match = i;
+        }
+        if (!match.has_value() || words[*match].text != expected)
+            throw std::runtime_error("baseline source text mismatch or clipped word");
+        return *match;
+    };
+    for (std::size_t b = 0; b < t.baseline_text_bindings.size(); ++b) {
+        const auto& binding = t.baseline_text_bindings[b];
+        if (binding.scripts.empty()) throw std::runtime_error("baseline binding requires script tokens");
+        const auto host_index = select_word(binding.host_box, binding.expected_host_text);
+        const auto host = words[host_index];
+        std::vector<std::size_t> indices{host_index};
+        std::vector<std::pair<std::size_t, ScriptPosition>> scripts;
+        for (const auto& token : binding.scripts) {
+            if (token.expected_text.empty() || token.expected_text.find_first_not_of(
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-.") != std::string::npos)
+                throw std::runtime_error("baseline script text contains unsupported notation or footnote marker");
+            const auto index = select_word(token.source_box, token.expected_text);
+            if (std::find(indices.begin(), indices.end(), index) != indices.end())
+                throw std::runtime_error("baseline binding reuses a source word");
+            if (!script_geometry(host, words[index], token.position))
+                throw std::runtime_error("baseline script geometry or direction is invalid");
+            std::size_t possible_hosts = 0;
+            for (const auto& candidate : words)
+                if (script_geometry(candidate, words[index], token.position)) ++possible_hosts;
+            if (possible_hosts != 1U) throw std::runtime_error("baseline script has ambiguous candidate hosts");
+            indices.push_back(index);
+            scripts.push_back({index, token.position});
+        }
+        std::sort(scripts.begin(), scripts.end(), [&](const auto& a, const auto& c) {
+            return std::tie(words[a.first].x0, words[a.first].x1, words[a.first].text) <
+                   std::tie(words[c.first].x0, words[c.first].x1, words[c.first].text);
+        });
+        VerifiedBaseline v{host, {}, word_box(host), host.text, host.text};
+        double previous_right = host.x0;
+        for (const auto& [index, position] : scripts) {
+            const auto& w = words[index];
+            if (w.x0 < previous_right) throw std::runtime_error("baseline script tokens overlap");
+            previous_right = w.x1;
+            v.scripts.push_back({word_box(w), w.text, position});
+            v.source_text += " " + w.text;
+            v.display_expression += position == ScriptPosition::subscript ? "_{" : "^{";
+            v.display_expression += w.text + "}";
+            v.envelope.x_min = std::min(v.envelope.x_min, w.x0);
+            v.envelope.x_max = std::max(v.envelope.x_max, w.x1);
+            v.envelope.y_min = std::min(v.envelope.y_min, w.y0);
+            v.envelope.y_max = std::max(v.envelope.y_max, w.y1);
+        }
+        std::vector<HorizontalSpan> columns{t.parameter_column, t.unit_column,
+            t.minimum_column, t.typical_column, t.maximum_column};
+        if (t.condition_column) columns.push_back(*t.condition_column);
+        const auto column_count = std::count_if(columns.begin(), columns.end(), [&](const auto& c) {
+            return v.envelope.x_min >= c.min && v.envelope.x_max <= c.max;
+        });
+        if (column_count != 1 ||
+            std::max(v.envelope.y_min, t.header_y_min) < std::min(v.envelope.y_max, t.header_y_max))
+            throw std::runtime_error("baseline expression crosses a column or header boundary");
+        for (const auto& parent : t.parent_context_bindings)
+            if (overlaps(v.envelope, parent.parent_box))
+                throw std::runtime_error("baseline expression overlaps a parent source box");
+        for (const auto& prior : verified)
+            if (overlaps(prior.envelope, v.envelope))
+                throw std::runtime_error("baseline expression regions overlap");
+        for (std::size_t i = 0; i < words.size(); ++i) {
+            const bool selected = std::find(indices.begin(), indices.end(), i) != indices.end();
+            if (!selected && overlaps(word_box(words[i]), v.envelope))
+                throw std::runtime_error("baseline expression intersects unrelated text");
+            if (selected && words[i].baseline_binding.has_value())
+                throw std::runtime_error("baseline binding reuses a source word");
+        }
+        for (const auto index : indices) {
+            words[index].baseline_binding = b;
+            words[index].baseline_host = index == host_index;
+            words[index].anchor_y0 = host.y0;
+            words[index].anchor_center = (host.y0 + host.y1) / 2.0;
+        }
+        verified.push_back(std::move(v));
+    }
+    return verified;
 }
 
 SourceBox row_box(const Row& row) {
@@ -604,8 +731,9 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         if (std::filesystem::file_size(text_file) > 32U * 1024U * 1024U)
             throw std::runtime_error("selected-page text extraction exceeds the 32 MiB safety limit");
         const auto html = detail::read_text_file(text_file);
-        const auto words = parse_words(html);
+        auto words = parse_words(html);
         if (words.empty()) throw std::runtime_error("selected page has no selectable text; image-only pages are unsupported");
+        const auto baselines = reconstruct_baselines(words, request.table);
 
         std::vector<Word> selected;
         for (const auto& word : words) {
@@ -615,7 +743,8 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         }
         if (selected.empty()) throw std::runtime_error("explicit table region contains no selectable text");
         std::sort(selected.begin(), selected.end(), [](const Word& a, const Word& b) {
-            if (a.y0 != b.y0) return a.y0 < b.y0;
+            const auto ay = a.anchor_y0.value_or(a.y0), by = b.anchor_y0.value_or(b.y0);
+            if (ay != by) return ay < by;
             if (a.x0 != b.x0) return a.x0 < b.x0;
             return a.text < b.text;
         });
@@ -633,7 +762,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         std::vector<Row> rows;
         for (const auto& word : selected) {
             if (word.y0 >= request.table.header_y_min && word.y1 <= request.table.header_y_max) continue;
-            const double center = (word.y0 + word.y1) / 2.0;
+            const double center = word.anchor_center.value_or((word.y0 + word.y1) / 2.0);
             if (rows.empty() || std::abs(center - rows.back().y) > request.table.row_y_tolerance)
                 rows.push_back({center, {word}});
             else {
@@ -694,6 +823,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
 
         std::vector<ValueCellProvenance> cell_provenance;
         std::vector<ParameterContextProvenance> context_provenance;
+        std::vector<BaselineTextProvenance> baseline_provenance;
         std::size_t row_number = 0;
         for (const auto& row : rows) {
             ++row_number;
@@ -892,6 +1022,26 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
                 observation.category = *request.table.category;
                 if (resolved_conditions.has_value()) observation.operating_conditions = *resolved_conditions;
                 observation.evidence_refs = {parameter_evidence.id, evidence.id};
+                for (std::size_t b = 0; b < baselines.size(); ++b) {
+                    const auto& v = baselines[b];
+                    const bool used = std::any_of(row.words.begin(), row.words.end(), [&](const auto& w) {
+                        if (w.baseline_binding != b) return false;
+                        const double x = (w.x0 + w.x1) / 2.0;
+                        return contains_x(request.table.parameter_column, x) || contains_x(column, x) ||
+                            contains_x(request.table.unit_column, x) ||
+                            (request.table.condition_column && contains_x(*request.table.condition_column, x));
+                    });
+                    if (!used) continue;
+                    auto baseline_evidence = evidence;
+                    baseline_evidence.id = {"ev." + base + ".baseline." + std::to_string(b + 1U)};
+                    baseline_evidence.cell_or_region = "row=" + std::to_string(row_number) +
+                        ";baseline_text=" + std::to_string(b + 1U);
+                    baseline_evidence.footnote_refs.clear();
+                    manifest.evidence.push_back({baseline_evidence, v.source_text, "baseline_text", false});
+                    observation.evidence_refs.push_back(baseline_evidence.id);
+                    baseline_provenance.push_back({observation.id, baseline_evidence.id, word_box(v.host),
+                        v.host.text, v.scripts, v.source_text, v.display_expression});
+                }
                 if (parent_evidence.has_value()) observation.evidence_refs.push_back(parent_evidence->id);
                 if (used_header_unit) observation.evidence_refs.push_back(matched_unit_header->evidence.id);
                 if (used_header_condition) observation.evidence_refs.push_back(cond_header_ev->id);
@@ -931,12 +1081,18 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
             }
         }
         if (manifest.observations.empty()) throw std::runtime_error("selected region contained no supported min/typ/max value cells");
+        for (const auto& v : baselines)
+            if (std::none_of(baseline_provenance.begin(), baseline_provenance.end(), [&](const auto& p) {
+                    return p.host_box == word_box(v.host);
+                }))
+                throw std::runtime_error("baseline expression belongs to no emitted observation");
         auto candidate = intake::build_candidate_bundle(manifest);
         result.report = std::move(candidate.report);
         result.manifest = std::move(manifest);
         result.candidate_bundle = std::move(candidate.bundle);
         result.value_cell_provenance = std::move(cell_provenance);
         result.parameter_context_provenance = std::move(context_provenance);
+        result.baseline_text_provenance = std::move(baseline_provenance);
     } catch (const std::exception& error) {
         result.diagnostics.push_back(error.what());
     }

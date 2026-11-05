@@ -752,6 +752,123 @@ int main() {
         multi.table.condition_column.reset();
         reject_context(multi, "configured column spans");
 
+        auto baseline = resistor_request;
+        baseline.pdf_path = DATASIM_BASELINE_PDF_PATH;
+        baseline.table.region_y_max = 290;
+        baseline.table.baseline_text_bindings = {
+            {{24,116,34,128}, "P", {{{34,125,42,133}, "70", pdf::ScriptPosition::subscript}}},
+            {{24,166,35,178}, "Q", {{{36,163,40,171}, "2", pdf::ScriptPosition::superscript}}},
+            {{359,216,374,228}, "10", {{{375,213,382,221}, "-4", pdf::ScriptPosition::superscript}}},
+            {{24,266,34,278}, "P", {{{34,275,38,283}, "1", pdf::ScriptPosition::subscript}}},
+            {{99,266,109,278}, "U", {{{110,275,114,283}, "2", pdf::ScriptPosition::subscript}}}};
+        const auto reconstructed = pdf::extract_electrical_table(baseline);
+        require(reconstructed.candidate_bundle.has_value(), "explicit subscript and superscript reconstruction succeeds");
+        require(reconstructed.manifest->observations.size() == 4U, "scripts coalesce into four host rows");
+        require(reconstructed.manifest->observations[0].observation.parameter_name == "P 70", "subscript source tokens preserved");
+        require(reconstructed.manifest->observations[1].observation.parameter_name == "Q 2", "superscript source tokens preserved");
+        require(reconstructed.manifest->observations[2].observation.original_value_text == "10 -4" &&
+                !reconstructed.manifest->observations[2].observation.parsed_numeric_value, "scientific expression stays unparsed");
+        require(reconstructed.manifest->observations[3].observation.parameter_name == "P 1 U 2", "multiple expressions share host row");
+        require(reconstructed.baseline_text_provenance.size() == 5U, "each used expression has provenance");
+        require(reconstructed.baseline_text_provenance[0].display_expression == "P_{70}" &&
+                reconstructed.baseline_text_provenance[1].display_expression == "Q^{2}" &&
+                reconstructed.baseline_text_provenance[2].display_expression == "10^{-4}", "display distinguishes source script roles");
+        const auto repeat_baseline = pdf::extract_electrical_table(baseline);
+        require(reconstructed.candidate_bundle == repeat_baseline.candidate_bundle &&
+                reconstructed.baseline_text_provenance == repeat_baseline.baseline_text_provenance &&
+                reconstructed.diagnostics == repeat_baseline.diagnostics, "baseline-aware extraction deterministic");
+        for (const auto& prov : reconstructed.baseline_text_provenance) {
+            require(prov.host_box.y_min < prov.host_box.y_max && !prov.scripts.empty(), "original source boxes retained");
+            bool resolved = false;
+            for (const auto& entry : reconstructed.manifest->evidence)
+                if (entry.location.id == prov.evidence_id) resolved = entry.row_label == prov.source_text;
+            require(resolved, "baseline evidence resolves to source text");
+            for (const auto& entry : reconstructed.manifest->observations) {
+                if (entry.observation.id != prov.observation_id) continue;
+                require(entry.observation.review_state == component::ReviewState::candidate &&
+                        entry.observation.review_history.empty(), "baseline reconstruction cannot approve");
+                require(std::find(entry.observation.evidence_refs.begin(), entry.observation.evidence_refs.end(), prov.evidence_id)
+                        != entry.observation.evidence_refs.end(), "observation references baseline source");
+            }
+        }
+        auto disabled_baseline = baseline;
+        disabled_baseline.table.baseline_text_bindings.clear();
+        const auto unreconstructed = pdf::extract_electrical_table(disabled_baseline);
+        require(unreconstructed.candidate_bundle.has_value() && unreconstructed.baseline_text_provenance.empty(), "disabled legacy behavior works");
+        require(unreconstructed.manifest->observations[0].observation.parameter_name == "P", "disabled subscript remains separate");
+        auto reject_baseline = [&](const pdf::ExtractionRequest& r, const std::string& diagnostic) {
+            const auto out = pdf::extract_electrical_table(r);
+            require(!out.candidate_bundle && !out.manifest && out.baseline_text_provenance.empty(), "invalid baseline fails atomically");
+            require(std::any_of(out.diagnostics.begin(), out.diagnostics.end(), [&](const auto& d) {
+                return d.find(diagnostic) != std::string::npos;
+            }), "invalid baseline produces expected diagnostic");
+        };
+        auto bad_baseline = baseline;
+        bad_baseline.table.baseline_text_bindings[0].scripts[0].position = pdf::ScriptPosition::superscript;
+        reject_baseline(bad_baseline, "geometry or direction");
+        bad_baseline = baseline;
+        bad_baseline.table.baseline_text_bindings[0].expected_host_text = "R";
+        reject_baseline(bad_baseline, "text mismatch");
+        bad_baseline = baseline;
+        bad_baseline.table.baseline_text_bindings[0].host_box.x_max = 30;
+        reject_baseline(bad_baseline, "clipped word");
+        bad_baseline = baseline;
+        bad_baseline.table.baseline_text_bindings[0].host_box.x_min = std::numeric_limits<double>::infinity();
+        reject_baseline(bad_baseline, "invalid source box");
+        bad_baseline = baseline;
+        bad_baseline.table.baseline_text_bindings.push_back(bad_baseline.table.baseline_text_bindings[0]);
+        reject_baseline(bad_baseline, "regions overlap");
+        bad_baseline = baseline;
+        bad_baseline.table.baseline_text_bindings[0].scripts.push_back(bad_baseline.table.baseline_text_bindings[0].scripts[0]);
+        reject_baseline(bad_baseline, "reuses a source word");
+        bad_baseline = baseline;
+        bad_baseline.table.baseline_text_bindings = {{{24,91,34,103}, "H",
+            {{{35,100,39,108}, "1", pdf::ScriptPosition::subscript}}}};
+        reject_baseline(bad_baseline, "header boundary");
+        bad_baseline = baseline;
+        bad_baseline.table.region_y_min = 350; bad_baseline.table.region_y_max = 390;
+        bad_baseline.table.baseline_text_bindings = {{{24,366,34,378}, "P",
+            {{{34,378,38,386}, "1", pdf::ScriptPosition::subscript}}}};
+        reject_baseline(bad_baseline, "ambiguous candidate hosts");
+        bad_baseline = baseline;
+        bad_baseline.table.region_y_min = 410; bad_baseline.table.region_y_max = 440;
+        bad_baseline.table.baseline_text_bindings = {{{24,416,34,428}, "P",
+            {{{34,425,38,433}, "1", pdf::ScriptPosition::subscript}}}};
+        reject_baseline(bad_baseline, "unrelated text");
+        auto multi_script = baseline;
+        multi_script.table.region_y_min = 310; multi_script.table.region_y_max = 340;
+        multi_script.table.baseline_text_bindings = {{{24,316,34,328}, "X", {
+            {{40,325,45,333}, "b", pdf::ScriptPosition::subscript},
+            {{34,325,38,333}, "a", pdf::ScriptPosition::subscript}}}};
+        const auto multi_script_result = pdf::extract_electrical_table(multi_script);
+        require(multi_script_result.candidate_bundle.has_value() &&
+                multi_script_result.baseline_text_provenance[0].source_text == "X a b", "script ordering follows source x coordinates");
+        auto near_footnote = baseline;
+        near_footnote.table.region_y_min = 460; near_footnote.table.region_y_max = 485;
+        near_footnote.table.baseline_text_bindings = {{{24,466,34,478}, "P",
+            {{{34,475,38,483}, "1", pdf::ScriptPosition::subscript}}}};
+        const auto near_result = pdf::extract_electrical_table(near_footnote);
+        require(near_result.candidate_bundle.has_value() && near_result.baseline_text_provenance.size() == 1U &&
+                near_result.manifest->observations[0].observation.parameter_name == "P 1", "nearby footnote not coalesced");
+        bad_baseline = near_footnote;
+        bad_baseline.table.baseline_text_bindings[0].scripts[0] = {{100,475,109,483}, "(1)", pdf::ScriptPosition::subscript};
+        reject_baseline(bad_baseline, "footnote marker");
+        auto context_baseline = baseline;
+        context_baseline.table.region_y_min = 490; context_baseline.table.region_y_max = 540;
+        context_baseline.table.baseline_text_bindings = {{{24,516,34,528}, "U",
+            {{{35,525,44,533}, "ins", pdf::ScriptPosition::subscript}}}};
+        context_baseline.table.parent_context_bindings = {{{20,490,210,505}, "Fixture group:", {{2, "U ins"}}}};
+        const auto combined = pdf::extract_electrical_table(context_baseline);
+        require(combined.candidate_bundle.has_value() && combined.parameter_context_provenance.size() == 1U &&
+                combined.baseline_text_provenance.size() == 1U &&
+                combined.manifest->observations[0].observation.parameter_name == "Fixture group: U ins", "hierarchy and baseline provenance compose");
+        auto ordinary = baseline;
+        ordinary.table.region_y_min = 560; ordinary.table.region_y_max = 585;
+        ordinary.table.baseline_text_bindings.clear();
+        const auto ordinary_result = pdf::extract_electrical_table(ordinary);
+        require(ordinary_result.candidate_bundle.has_value() &&
+                ordinary_result.manifest->observations[0].observation.parameter_name == "Ordinary", "ordinary text unaffected");
+
         std::cout << "PDF extraction checks: " << checks << '\n';
         return 0;
     } catch (const std::exception& error) {
