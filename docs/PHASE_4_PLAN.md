@@ -1,9 +1,8 @@
 # Phase 4 plan: Deterministic datasheet evidence intake (Phase 4A planning)
 
-Status: **Phase 4A planning plus Phase 4B implementation record.** The original
-planning decisions remain proposals unless explicitly described as implemented in
-[PHASE_4_IMPLEMENTATION.md](PHASE_4_IMPLEMENTATION.md). Phase 4B is implemented on
-the feature branch, but owner approval and merge are not claimed. Test design:
+Status: **Phase 4A design record and Phase 4B implementation record.** Phase 4A
+planning is merged in PR #5; Phase 4B is implemented and merged in PR #6. Design
+decisions that remain open are still proposals. Test design:
 [Phase 4 validation plan](PHASE_4_VALIDATION_PLAN.md).
 
 ## 1. Baseline and Phase 3 release-gate evidence
@@ -129,7 +128,7 @@ The six boundaries map to six distinct data holders:
 5. **Selected models**: `ModelArtifactDescriptor`, `ModelValidationRecord`.
 6. **Execution**: `datasim_vertical` and `datasim`.
 
-## 4. Intake interface (implemented on the Phase 4B feature branch)
+## 4. Intake interface (implemented and merged in Phase 4B)
 
 ```text
 module   datasim_intake            (IMPLEMENTED)  links datasim_component only
@@ -147,7 +146,7 @@ validate_intake_manifest(...)      (IMPLEMENTED)  -> IntakeReport (domain Valida
 build_candidate_bundle(...)        (IMPLEMENTED)  -> optional ComponentDomainBundle plus report
 ```
 
-Guarantees of `build_candidate_bundle` (PROPOSED): every observation is `candidate`
+Guarantees of `build_candidate_bundle` (IMPLEMENTED): every observation is `candidate`
 with empty `review_history` and null `superseded_by`; `knowledge`, `models`,
 `model_validations` empty; `validate_domain_bundle` is invoked and must be valid;
 identifiers are preserved exactly as supplied; no field is defaulted from another
@@ -207,13 +206,15 @@ Every candidate must satisfy, in addition to `validate_domain_bundle`:
    different values) are reported as conflict candidates and **not merged**; formal
    `ParameterConflict` records are created only during review/promotion.
 
-## 8. Minimal feature scope
+## 8. Phase 4B implementation scope
 
-In scope for a later authorized Phase 4B: the intake structures, validation, candidate
-bundle builder, synthetic fixtures, tests listed in the validation plan, and
-documentation. Out of scope: PDF/OCR, automated ingestion, LLM/Ollama, database or
-persistence, general JSON serialization, GUI, new solvers or semiconductor models, GPU,
-unit-conversion engine, changes to `datasim`, `datasim_component`, or `datasim_vertical`.
+The intake structures, validation, candidate bundle builder, synthetic fixtures,
+handoff tests, and documentation are implemented and merged. Phase 4C separately
+authorizes only the bounded local selectable-text PDF adapter recorded in
+[PHASE_4C_PLAN.md](PHASE_4C_PLAN.md) and ADR-0006. OCR, LLM/Ollama, persistence,
+general JSON serialization, GUI, new solvers or semiconductor models, GPU, a
+unit-conversion engine, and changes to `datasim`, `datasim_component`, or
+`datasim_vertical` remain out of scope.
 
 ## 9. Work packages (planning level)
 
@@ -223,7 +224,7 @@ unit-conversion engine, changes to `datasim`, `datasim_component`, or `datasim_v
 | 4A-WP-B | Scope and contract inventory (§2–§7) | Done (documentation only) |
 | 4A-WP-C | Intake boundary design (ADR-0005) | Done, `PROPOSED` |
 | 4A-WP-D | Validation design ([plan](PHASE_4_VALIDATION_PLAN.md)) | Done, `PROPOSED` |
-| 4B-1 … 4B-7 | Implementation sequence (§12) | **No — needs owner acceptance** |
+| 4B-1 … 4B-7 | Implementation sequence (§12) | **Completed and merged in PR #6** |
 
 ## 10. Technical alternatives and trade-offs
 
@@ -243,13 +244,15 @@ legal vs no real-world signal).
 - Security: document-derived strings are data; intake must not execute, evaluate, or
   interpolate them; strings with control characters or newlines are rejected by
   existing single-line checks. No hash/signature authenticity.
-- Reproducibility: intake is a pure function of its input structures (no clock,
+- Reproducibility: Phase 4B intake is a pure function of its input structures (no clock,
   network, or filesystem access); `extracted_at` is caller-supplied. No accuracy claim
   for real documents is made or measurable with synthetic fixtures. Phase 1/1.5
   numerical results (0.05 V tolerance; results.csv SHA-256 `9c923c4d…26f9`) and Phase
-  2/3 suites (92 / 270 / 1483 checks) must remain unchanged.
+  2/3 suites (92 / 270 / 1483 checks) remain unchanged. Phase 4C is a separate local
+  filesystem adapter whose deterministic behavior is scoped to its pinned Poppler
+  build and explicit table configuration (ADR-0006).
 
-## 12. Incremental implementation sequence (for a later authorized task)
+## 12. Phase 4B incremental implementation sequence (completed)
 
 1. **4B-0**: owner decisions D1–D6; optional hardening task for F2/F3 if D2 selects
    domain-level fix (separate PR, Phase 2 suite must stay green).
@@ -266,8 +269,8 @@ legal vs no real-world signal).
    rejected.
 8. **4B-7**: documentation, hosted CI run, Phase 1.5 non-regression evidence.
 
-Each step is a separate reviewable commit; no step may modify existing library
-sources unless D2 explicitly authorizes it.
+The implementation followed this sequence across reviewable commits and merged in
+PR #6. Existing Phase 2/3 sources were not modified.
 
 ## 13. Unresolved decisions requiring owner approval
 
@@ -279,8 +282,8 @@ sources unless D2 explicitly authorizes it.
 | D4 | Add `declared_pdf_page_count` to `SourceDocument` (contract change) or keep in manifest? | Manifest only. |
 | D5 | Require curator ≠ approver (four-eyes) policy? | **Owner decision pending.** Current 4B records the curator but does not enforce or claim curator/reviewer separation as approved policy. |
 | D6 | Adopt a repository license and a fixture license identifier. | Owner decision; blocks nothing in 4B-1…4B-4. |
-| D7 | Fix F4 (skip detection in CI) in a separate task? | Yes, separate authorization. |
-| D8 | Root `AGENTS.md` status text (Phase 3 branch wording; Phase 4 authorization). | Owner edit; not changed here. |
+| D7 | Fix F4 (skip detection in CI) in a separate task? | Implemented in the Phase 4B release-gate workflow; hosted integration step rejects skipped tests. |
+| D8 | Root `AGENTS.md` status text (Phase 3 branch wording; Phase 4 authorization). | Updated to current Phase 4 merge and verification status. |
 
 Related: [ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md),
 [Phase 4 validation plan](PHASE_4_VALIDATION_PLAN.md),

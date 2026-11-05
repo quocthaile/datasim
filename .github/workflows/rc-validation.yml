@@ -18,6 +18,17 @@ jobs:
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-poppler
+      - name: Verify pinned Poppler extraction backend
+        run: |
+          curl --fail --location https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-poppler-26.10.0-1-any.pkg.tar.zst -o poppler.pkg.tar.zst
+          echo '29971b323692b327aeacbf643180c129af23219b8aaa0b5cbcffc05e95a6334a  poppler.pkg.tar.zst' | sha256sum --check
+          pacman --noconfirm -U poppler.pkg.tar.zst
+          pdftotext -v 2>&1 | tee pdf-backend-version.txt
+          grep -q 'pdftotext version 26.10.0' pdf-backend-version.txt
+          pdfinfo -v 2>&1 | tee pdfinfo-version.txt
+          grep -q 'pdfinfo version 26.10.0' pdfinfo-version.txt
+          python tests/fixtures/make_synthetic_datasheet_pdf.py
       - name: Install pinned ngspice release
         run: |
           curl --fail --location https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-ngspice-47-1-any.pkg.tar.zst -o ngspice.pkg.tar.zst
@@ -62,6 +73,8 @@ jobs:
           name: rc-verification-windows
           path: |
             backend-version.txt
+            pdf-backend-version.txt
+            pdfinfo-version.txt
             build/runtime-config/
             build/ci/Testing/
             build/ci/*.xml

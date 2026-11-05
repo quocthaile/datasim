@@ -26,18 +26,21 @@ implement PDF parsing, OCR, datasheet ingestion, UI, database/persistent storage
 general-purpose JSON serialization, automatic unit conversion, LLM/Ollama integration,
 semiconductor simulation, or a custom solver.
 
-Phase 4A ([PHASE_4_PLAN.md](PHASE_4_PLAN.md),
-[PHASE_4_VALIDATION_PLAN.md](PHASE_4_VALIDATION_PLAN.md),
-[ADR-0005](decisions/ADR-0005-evidence-intake-boundary.md)) remains the proposed
-design record. The bounded Phase 4B source implementation exists only on its
-feature branch and remains subject to owner review; it must not be represented as
-merged, hosted-verified, or owner-approved until those checks occur.
+Phase 4A and Phase 4B are merged into `main` by PRs #5 and #6; Phase 4B's P-07
+real-ngspice release gate passed hosted Windows CI run `41995104973`. Phase 4C
+(`PHASE_4C_PLAN.md`, `PHASE_4C_IMPLEMENTATION.md`,
+`PHASE_4C_VALIDATION.md`, and ADR-0006) is implemented and hosted-verified by run
+`42000652152` on `feat/phase-4c-deterministic-extraction`; PR #7 remains open and
+unmerged.
+Keep the Poppler adapter in `datasim_pdf`, above and depending on `datasim_intake`;
+do not modify existing Phase 2/3/4B public contracts without a demonstrated,
+documented correctness defect. Do not infer licensing rights or commit vendor PDFs.
 
 ## Working practices
 
 - Inspect Git status, branches, recent commits, and existing files before editing.
 - Preserve user changes and historical branches/evidence. Use a feature/fix branch
-  (such as `fix/phase3-validation-hardening`) branched from `origin/main`; do not
+  branched from `origin/main`; do not
   commit directly to `main` or merge pull requests.
 - Keep documentation links relative within the repository. Use stable original
   URLs and identifiers for research, with matching BibTeX keys.

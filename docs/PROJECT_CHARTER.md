@@ -35,11 +35,19 @@ storage, general-purpose JSON serialization, automatic unit conversion, LLM
 integration, external SPICE subcircuits, semiconductor models, and UI. The following
 paragraphs preserve the original initialization scope record.
 
+Phase 4 update: Phase 4A planning and the Phase 4B in-memory candidate intake are
+merged into `main`; Phase 4B is hosted-verified by run `41995104973`. Phase 4C
+implements a separate, bounded local selectable-text PDF table adapter on its
+feature branch. OCR, persistence, LLM integration, approval automation and real
+datasheet accuracy claims remain out of scope or unverified; see the Phase 4C plan,
+implementation and validation records.
+
 PROPOSED capabilities include document processing, evidence-linked parameter
 extraction, engineering review, component knowledge management, model association,
 deterministic simulation, and interactive explanation. The immediate PLANNED
 deliverable is a reviewable documentation foundation. No application capability
-is IMPLEMENTED, VERIFIED, or MEASURED by this documentation task.
+was IMPLEMENTED, VERIFIED, or MEASURED by the original documentation task; current
+phase-specific status is recorded in the Phase 1–4 documents.
 
 This task excludes implementation, backend installation, dependency selection,
 training or integrating an LLM, UI construction, database creation, and copying

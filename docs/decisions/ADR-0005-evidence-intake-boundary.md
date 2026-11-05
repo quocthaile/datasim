@@ -2,8 +2,8 @@
 
 Date: 2026-11-04
 
-Status: **PROPOSED decision record with an IMPLEMENTED feature-branch slice**.
-Owner approval and merge are not claimed. The bounded in-memory contracts and
+Status: **IMPLEMENTED and MERGED in PR #6**, with the open policy choices below
+remaining **PROPOSED**. The bounded in-memory contracts and
 validation described in [PHASE_4_IMPLEMENTATION.md](../PHASE_4_IMPLEMENTATION.md)
 are implemented without changing the existing domain modules. Related plan:
 [Phase 4 plan](../PHASE_4_PLAN.md); test design:
@@ -137,9 +137,10 @@ no parsed value is asserted and an error when a parsed value is asserted. These
 are implementation details of the feature branch, not claims that the owner has
 accepted every open decision above.
 
-The bounded 4B implementation and its synthetic P-07 test now exist on the
-feature branch. The P-07 result remains **NOT VERIFIED** until real ngspice runs
-without a CTest skip.
+The bounded 4B implementation and synthetic P-07 test are merged. Hosted run
+[41995104973](https://github.com/quocthaile/datasim/actions/runs/41995104973)
+executed the real ngspice path without a skip. Remaining policy choices in this
+ADR are not implied to have been approved by that verification.
 
 Metadata review is an owner decision: the current human review records metadata
 acceptance for a candidate, but does not authenticate a source, hash, reviewer

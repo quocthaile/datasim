@@ -2,3 +2,5 @@
 examples/rc_transient/phase15-evidence/**/*.csv text eol=lf
 # Keep archived runtime snapshots byte-identical, including original whitespace.
 examples/rc_transient/hosted-ci/**/runtime-config/** -text -whitespace
+# Synthetic PDF fixtures are binary; do not rewrite PDF stream bytes on checkout.
+tests/fixtures/*.pdf -text -whitespace

@@ -1,8 +1,9 @@
 # Phase 4B validation
 
-Status: **IMPLEMENTED; locally VERIFIED for the checks listed below**. P-07 is
-implemented but remains **NOT VERIFIED** locally unless real ngspice executes
-without a CTest skip. These results are for the current working tree on Windows
+Status: **IMPLEMENTED and VERIFIED** on the Phase 4B merge commit by hosted Windows CI
+[run 41995104973](https://github.com/quocthaile/datasim/actions/runs/41995104973).
+The local results below remain **NOT VERIFIED** for real ngspice because CTest
+skipped it. These local results are for Windows
 x64 with MSYS2 UCRT GCC
 16.1.0, CMake 4.3.2, and the `MinGW Makefiles` generator.
 
@@ -32,7 +33,8 @@ was configured, so real-backend integration, the six-run study, and numerical
 SHA-256 non-regression were not rerun here. Historical Phase 3 evidence remains
 the reference for those checks.
 
-No hosted CI result is claimed by this document.
+Hosted run 41995104973 completed its real backend integration and convergence steps
+successfully. The workflow fails if the required integration test is skipped.
 
 ## Hardening coverage
 

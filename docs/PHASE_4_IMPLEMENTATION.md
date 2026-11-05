@@ -1,7 +1,9 @@
 # Phase 4B implementation: deterministic evidence intake
 
-Status: **IMPLEMENTED** on `feat/phase-4b-evidence-intake`; owner acceptance and
-merge into `main` remain **PROPOSED**. This document describes the bounded
+Status: **IMPLEMENTED and VERIFIED** on `main` after PR #6 at
+`7d9af1c88929fe3c29d55e1c2438e8d2041acb2a`, hosted run
+[41995104973](https://github.com/quocthaile/datasim/actions/runs/41995104973).
+This document describes the bounded
 in-memory intake implementation; it does not claim datasheet extraction
 accuracy, source authenticity, or physical measurement.
 
