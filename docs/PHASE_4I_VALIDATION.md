@@ -1,7 +1,15 @@
 # Phase 4I validation
 
-Status: IMPLEMENTED and locally VERIFIED for explicitly selected word associations.
-Hosted Phase 4I CI: pending branch/PR execution. Phase 4J has not started.
+Status: IMPLEMENTED and VERIFIED locally and in hosted Windows CI for explicitly
+selected word associations. [PR #13](https://github.com/quocthaile/datasim/pull/13)
+is open for owner review. Phase 4J has not started.
+
+Hosted [push run 42063445953](https://github.com/quocthaile/datasim/actions/runs/42063445953)
+passed for implementation commit `6564f34b8751cc1fe8ff1f3942d577603038a8bb`.
+The connected job endpoint confirmed successful clean build, unit tests, required
+real backend integration, and convergence/repeatability. This is branch CI, not
+post-merge main verification. The following documentation-only commit records
+that evidence without changing tested source or fixtures.
 Branch: `feat/phase-4i-baseline-aware-text`. Date: 2026-11-05.
 
 ## Verified prerequisite
