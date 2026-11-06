@@ -34,6 +34,13 @@ void WaveformWidget::set_error(QString message) {
     update();
 }
 
+void WaveformWidget::clear() {
+    samples_.clear();
+    source_.clear();
+    error_.clear();
+    update();
+}
+
 void WaveformWidget::set_show_input(bool show) {
     show_input_ = show;
     update();

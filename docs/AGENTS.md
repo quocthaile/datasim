@@ -117,3 +117,12 @@ temporary-workspace safety fix recorded in
 [PHASE_4_FINAL_VALIDATION.md](PHASE_4_FINAL_VALIDATION.md). Hosted run `42148338325` passed; validation is VERIFIED. Require successful
 hosted branch CI for any later code changes. Do not implement parser features or
 merge automatically.
+
+Phase 5A desktop visualization is merged via PR #15 at
+`483e4c7f4c43d5e78839dc92a4e1be59ae45660a` and hosted-verified by post-merge
+Windows run `42155239727`. Phase 5B extends only the optional Qt application with
+manual ideal-RC configuration and asynchronous use of the existing `datasim`
+execution contract. Preserve all five production library APIs, `check_config()`
+constraints, numerical validation, read-only CSV behavior, and failure artifacts.
+Require hosted feature-branch CI before review completion. Do not merge
+automatically.

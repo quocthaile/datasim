@@ -95,7 +95,11 @@ if(DATASIM_BUILD_DESKTOP)
     add_executable(datasim_viewer
         apps/datasim_viewer/main.cpp
         apps/datasim_viewer/read_only_samples.cpp
-        apps/datasim_viewer/waveform_widget.cpp)
+        apps/datasim_viewer/waveform_widget.cpp
+        apps/datasim_viewer/workbench_service.cpp
+        apps/datasim_viewer/simulation_worker.cpp
+        apps/datasim_viewer/simulation_worker.hpp)
+    set_target_properties(datasim_viewer PROPERTIES AUTOMOC ON)
     target_include_directories(datasim_viewer PRIVATE apps/datasim_viewer)
     target_link_libraries(datasim_viewer PRIVATE datasim Qt6::Widgets)
     if(MSVC)
@@ -214,5 +218,34 @@ if(BUILD_TESTING)
         target_link_libraries(viewer_sample_tests PRIVATE datasim)
         add_test(NAME viewer_sample_loading COMMAND viewer_sample_tests "${CMAKE_CURRENT_BINARY_DIR}")
         set_tests_properties(viewer_sample_loading PROPERTIES LABELS desktop TIMEOUT 15)
+        add_executable(viewer_workbench_tests
+            apps/datasim_viewer/workbench_service.cpp
+            apps/datasim_viewer/read_only_samples.cpp
+            tests/desktop/viewer_workbench_tests.cpp)
+        target_include_directories(viewer_workbench_tests PRIVATE apps/datasim_viewer)
+        target_link_libraries(viewer_workbench_tests PRIVATE datasim)
+        if(MSVC)
+            target_compile_options(viewer_workbench_tests PRIVATE /W4 /permissive-)
+        else()
+            target_compile_options(viewer_workbench_tests PRIVATE -Wall -Wextra -Wpedantic)
+        endif()
+        add_test(NAME viewer_workbench COMMAND viewer_workbench_tests
+            "${DATASIM_NGSPICE}" "${CMAKE_CURRENT_BINARY_DIR}/viewer-workbench-tests")
+        set_tests_properties(viewer_workbench PROPERTIES LABELS desktop TIMEOUT 90 SKIP_RETURN_CODE 77)
+        add_executable(viewer_worker_tests
+            apps/datasim_viewer/simulation_worker.cpp
+            apps/datasim_viewer/simulation_worker.hpp
+            tests/desktop/viewer_worker_tests.cpp)
+        set_target_properties(viewer_worker_tests PROPERTIES AUTOMOC ON)
+        target_include_directories(viewer_worker_tests PRIVATE apps/datasim_viewer)
+        target_link_libraries(viewer_worker_tests PRIVATE datasim Qt6::Core)
+        if(MSVC)
+            target_compile_options(viewer_worker_tests PRIVATE /W4 /permissive-)
+        else()
+            target_compile_options(viewer_worker_tests PRIVATE -Wall -Wextra -Wpedantic)
+        endif()
+        add_test(NAME viewer_worker COMMAND viewer_worker_tests
+            "${DATASIM_NGSPICE}" "${CMAKE_CURRENT_BINARY_DIR}/viewer-worker-tests")
+        set_tests_properties(viewer_worker PROPERTIES LABELS desktop TIMEOUT 60 SKIP_RETURN_CODE 77)
     endif()
 endif()
