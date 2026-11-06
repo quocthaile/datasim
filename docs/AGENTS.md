@@ -114,6 +114,6 @@ and [ADR-0010](decisions/ADR-0010-baseline-aware-text-reconstruction.md).
 Do not change global row tolerance or numeric grammar to interpret typography.
 Phase 4J is limited to final validation, release documentation, and the isolated
 temporary-workspace safety fix recorded in
-[PHASE_4_FINAL_VALIDATION.md](PHASE_4_FINAL_VALIDATION.md). Require successful
-hosted branch CI before marking it VERIFIED. Do not implement parser features or
+[PHASE_4_FINAL_VALIDATION.md](PHASE_4_FINAL_VALIDATION.md). Hosted run `42148338325` passed; validation is VERIFIED. Require successful
+hosted branch CI for any later code changes. Do not implement parser features or
 merge automatically.
