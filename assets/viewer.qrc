@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/datasim">
+    <file alias="branding/datasim-mark.svg">branding/datasim-mark.svg</file>
+  </qresource>
+</RCC>

@@ -20,6 +20,7 @@ jobs:
             mingw-w64-ucrt-x86_64-ninja
             mingw-w64-ucrt-x86_64-poppler
             mingw-w64-ucrt-x86_64-qt6-base
+            mingw-w64-ucrt-x86_64-qt6-pdf
       - name: Verify pinned Poppler extraction backend
         run: |
           curl --fail --location https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-poppler-26.10.0-1-any.pkg.tar.zst -o poppler.pkg.tar.zst
@@ -75,6 +76,11 @@ jobs:
           cmake -S . -B build/desktop -G Ninja -DCMAKE_BUILD_TYPE=Release -DDATASIM_BUILD_DESKTOP=ON -DDATASIM_NGSPICE="$(cygpath -m /ucrt64/bin/ngspice_con.exe)"
           cmake --build build/desktop
           ctest --test-dir build/desktop --output-on-failure --no-tests=error
+      - name: Build and test optional Qt PDF evidence workbench
+        run: |
+          cmake -S . -B build/pdf-workbench -G Ninja -DCMAKE_BUILD_TYPE=Release -DDATASIM_BUILD_DESKTOP=ON -DDATASIM_BUILD_PDF_WORKBENCH=ON -DDATASIM_NGSPICE="$(cygpath -m /ucrt64/bin/ngspice_con.exe)"
+          cmake --build build/pdf-workbench
+          QT_QPA_PLATFORM=offscreen ctest --test-dir build/pdf-workbench --output-on-failure --no-tests=error
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -85,6 +91,8 @@ jobs:
             pdfinfo-version.txt
             build/runtime-config/
             build/ci/Testing/
+            build/desktop/Testing/
+            build/pdf-workbench/Testing/
             build/ci/*.xml
             build/ci/integration run */
             build/ci/fault tests/

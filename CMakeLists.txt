@@ -14,7 +14,7 @@ if(NOT DATASIM_GIT_REVISION)
     set(DATASIM_GIT_REVISION "source-export")
 endif()
 file(GLOB_RECURSE identity_files CONFIGURE_DEPENDS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
-    src/* apps/* tests/* cmake/* scripts/ci/* .github/workflows/*)
+    src/* apps/* tests/* cmake/* scripts/ci/* .github/workflows/* assets/*)
 list(APPEND identity_files CMakeLists.txt)
 list(SORT identity_files)
 set(identity "")
@@ -105,8 +105,21 @@ else()
 endif()
 
 option(DATASIM_BUILD_DESKTOP "Build the optional read-only desktop waveform viewer" OFF)
+option(DATASIM_BUILD_PDF_WORKBENCH "Build the optional Qt PDF datasheet evidence workbench" OFF)
+if(DATASIM_BUILD_PDF_WORKBENCH AND NOT DATASIM_BUILD_DESKTOP)
+    message(FATAL_ERROR "DATASIM_BUILD_PDF_WORKBENCH=ON requires DATASIM_BUILD_DESKTOP=ON")
+endif()
 if(DATASIM_BUILD_DESKTOP)
-    find_package(Qt6 6.11 REQUIRED COMPONENTS Widgets)
+    if(DATASIM_BUILD_PDF_WORKBENCH)
+        find_package(Qt6 6.11 REQUIRED COMPONENTS Widgets Pdf PdfWidgets)
+        foreach(required_target Qt6::Pdf Qt6::PdfWidgets)
+            if(NOT TARGET ${required_target})
+                message(FATAL_ERROR "Qt PDF workbench requires CMake target ${required_target} (Qt 6.11.x)")
+            endif()
+        endforeach()
+    else()
+        find_package(Qt6 6.11 REQUIRED COMPONENTS Widgets)
+    endif()
     add_executable(datasim_viewer
         apps/datasim_viewer/main.cpp
         apps/datasim_viewer/read_only_samples.cpp
@@ -116,6 +129,18 @@ if(DATASIM_BUILD_DESKTOP)
         apps/datasim_viewer/simulation_worker.hpp
         apps/datasim_viewer/csv_load_worker.cpp
         apps/datasim_viewer/csv_load_worker.hpp)
+    if(DATASIM_BUILD_PDF_WORKBENCH)
+        set(CMAKE_AUTORCC ON)
+        target_sources(datasim_viewer PRIVATE
+            apps/datasim_viewer/evidence_workbench.cpp
+            apps/datasim_viewer/evidence_workbench.hpp
+            apps/datasim_viewer/extraction_worker.cpp
+            apps/datasim_viewer/extraction_worker.hpp
+            assets/viewer.qrc)
+        set_target_properties(datasim_viewer PROPERTIES AUTORCC ON)
+        target_link_libraries(datasim_viewer PRIVATE datasim_pdf Qt6::Pdf Qt6::PdfWidgets)
+        target_compile_definitions(datasim_viewer PRIVATE DATASIM_PDF_WORKBENCH=1)
+    endif()
     set_target_properties(datasim_viewer PROPERTIES AUTOMOC ON)
     target_include_directories(datasim_viewer PRIVATE apps/datasim_viewer)
     target_link_libraries(datasim_viewer PRIVATE datasim Qt6::Widgets)
@@ -276,5 +301,22 @@ if(BUILD_TESTING)
         add_test(NAME viewer_worker COMMAND viewer_worker_tests
             "${DATASIM_NGSPICE}" "${CMAKE_CURRENT_BINARY_DIR}/viewer-worker-tests")
         set_tests_properties(viewer_worker PROPERTIES LABELS desktop TIMEOUT 60 SKIP_RETURN_CODE 77)
+        if(DATASIM_BUILD_PDF_WORKBENCH)
+            add_executable(evidence_workbench_tests
+                apps/datasim_viewer/evidence_workbench.cpp
+                apps/datasim_viewer/evidence_workbench.hpp
+                apps/datasim_viewer/extraction_worker.cpp
+                apps/datasim_viewer/extraction_worker.hpp
+                tests/desktop/evidence_workbench_tests.cpp
+                assets/viewer.qrc)
+            set_target_properties(evidence_workbench_tests PROPERTIES AUTOMOC ON AUTORCC ON)
+            target_include_directories(evidence_workbench_tests PRIVATE apps/datasim_viewer)
+            target_link_libraries(evidence_workbench_tests PRIVATE datasim_pdf Qt6::Widgets Qt6::Pdf Qt6::PdfWidgets)
+            target_compile_definitions(evidence_workbench_tests PRIVATE
+                DATASIM_SYNTHETIC_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_datasheet.pdf"
+                DATASIM_IMAGE_ONLY_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/image_only_datasheet.pdf")
+            add_test(NAME evidence_workbench COMMAND evidence_workbench_tests)
+            set_tests_properties(evidence_workbench PROPERTIES LABELS desktop TIMEOUT 60 ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+        endif()
     endif()
 endif()
