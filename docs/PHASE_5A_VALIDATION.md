@@ -1,10 +1,7 @@
 # Phase 5A validation
 
-**Status:** Local Windows x64 validation complete. Hosted Phase 5A release workflow
-run [42153482651](https://github.com/quocthaile/datasim/actions/runs/42153482651)
-passed on feature commit `5c0aa75ae3af34f2025b763cecf6573f4fd6439b`. This workflow
-uses the default Qt-off build; the optional GUI build and inspection are established
-by the separate local evidence below.
+**Status:** Local Windows x64 validation complete. Hosted feature-branch workflow
+status is tracked on the review PR and is separate from these local results.
 
 ## Baseline
 
@@ -45,18 +42,12 @@ cmake --fresh -S . -B build/phase5a-core -G 'MinGW Makefiles' `
   -DCMAKE_BUILD_TYPE=Release `
   -DDATASIM_NGSPICE=C:/msys64/ucrt64/bin/ngspice_con.exe
 cmake --build build/phase5a-core -j 4
+ctest --test-dir build/phase5a-core --output-on-failure
 cmake --fresh -S . -B build/phase5a-desktop -G 'MinGW Makefiles' `
   -DCMAKE_BUILD_TYPE=Release `
   -DDATASIM_BUILD_DESKTOP=ON `
   -DDATASIM_NGSPICE=C:/msys64/ucrt64/bin/ngspice_con.exe
 cmake --build build/phase5a-desktop -j 4
-New-Item -ItemType Directory -Force -Path `
-  build/phase5a-core/test-temp,build/phase5a-desktop/test-temp | Out-Null
-$env:TEMP = (Resolve-Path build/phase5a-core/test-temp).Path
-$env:TMP = $env:TEMP
-ctest --test-dir build/phase5a-core --output-on-failure
-$env:TEMP = (Resolve-Path build/phase5a-desktop/test-temp).Path
-$env:TMP = $env:TEMP
 ctest --test-dir build/phase5a-desktop --output-on-failure
 build/phase5a-core/rc_study.exe `
   C:/msys64/ucrt64/bin/ngspice_con.exe build/phase5a-core/phase5a-study
@@ -75,7 +66,6 @@ No fixture bytes or other source-tree inputs changed.
 | Default Qt-off clean Release configure/build | **PASS** | `build/phase5a-core`; `DATASIM_BUILD_DESKTOP=OFF`; no `Qt6_DIR` in cache. |
 | Core CTest suites | **9 passed, 0 failed, 0 skipped** | Unit, component model, vertical slice, intake, intake handoff, PDF extraction, backend errors, real `ngspice_rc`, and PDF corpus evaluation. |
 | Qt-enabled clean Release configure/build | **PASS** | `build/phase5a-desktop`; `datasim_viewer.exe` linked against Qt 6.11.1 Widgets and `datasim`. |
-| Hosted Windows core release workflow | **PASS** | Run [42153482651](https://github.com/quocthaile/datasim/actions/runs/42153482651) succeeded on feature commit `5c0aa75ae3af34f2025b763cecf6573f4fd6439b`; real backend integration and convergence/repeatability steps passed. It builds the default Qt-off configuration. |
 | Desktop CTest suites | **10 passed, 0 failed, 0 skipped** | The same nine core suites plus `viewer_sample_loading`; the real `ngspice_rc` path passed. |
 | Loader behavior | **PASS** | Automated test accepted a valid 2-row CSV; rejected malformed/non-finite `nan` and a missing file with explicit error strings; valid source bytes were identical before/after loading. |
 | Fresh ngspice reference run | **PASS** | `rc_demo.exe` wrote 640 samples to `build/phase5a-desktop/viewer-demo/results.csv`; run validation passed with max absolute error `6.31105602105e-05 V` against the existing ideal-RC analytical reference. This is simulated output and a software validation result, not a physical measurement. |
