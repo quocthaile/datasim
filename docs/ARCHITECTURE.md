@@ -24,8 +24,13 @@ Status: PROPOSED end-to-end application architecture, with three slices now
 
 No OCR pipeline, persistent database, LLM runtime, external SPICE subcircuit
 loader, nonlinear semiconductor device solver, real manufacturer datasheet
-evaluation, physical measurement validation (`MEASURED`), or interactive GUI is
-implemented.
+evaluation, or physical measurement validation (`MEASURED`) is implemented.
+The optional Qt 6 `datasim_viewer` provides read-only CSV visualization
+(Phase 5A) and manual ideal-RC execution through existing `datasim` contracts
+(Phase 5B). CSV loading is worker-threaded with bounded input/sample limits,
+and dense waveform painting uses a display-only extrema envelope. It is not a
+general circuit editor or approval workflow. See the [Phase 5B hardening audit](PHASE_5B_HARDENING_AUDIT.md)
+for local evidence and pending hosted Linux/sanitizer gates.
 
 The isolated Phase 4B intake (`datasim_intake`), Phase 4C PDF table adapter
 (`datasim_pdf`), and Phase 4D PDF-to-Simulation integration gate are **IMPLEMENTED

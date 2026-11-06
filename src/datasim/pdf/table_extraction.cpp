@@ -1,6 +1,7 @@
 #include "datasim/pdf/table_extraction.hpp"
 #include "datasim/intake/numeric/raw_numeric.hpp"
 #include "process_capture.hpp"
+#include "table_extraction_test.hpp"
 #include <algorithm>
 #include <atomic>
 #include <cmath>
@@ -37,10 +38,17 @@ std::string decode_html(std::string text) {
 }
 
 double attribute_number(const std::string& attributes, const char* key) {
-    const std::regex expression(std::string("\\b") + key + "=\"([0-9.+-]+)\"");
+    const std::regex expression(std::string("\\b") + key + "=\"([^\\\"]*)\"");
     std::smatch match;
     if (!std::regex_search(attributes, match, expression)) throw std::runtime_error("missing PDF word coordinate");
-    return std::stod(match[1].str());
+    const auto token = match[1].str();
+    std::size_t consumed = 0;
+    double value = 0.0;
+    try { value = std::stod(token, &consumed); }
+    catch (...) { throw std::runtime_error("malformed PDF word coordinate"); }
+    if (consumed != token.size() || !std::isfinite(value))
+        throw std::runtime_error("malformed PDF word coordinate");
+    return value;
 }
 
 std::vector<Word> parse_words(const std::string& html) {
@@ -51,9 +59,12 @@ std::vector<Word> parse_words(const std::string& html) {
         if (result.size() >= 100000U) throw std::runtime_error("selected PDF page contains too many text words");
         const auto match = *it;
         const auto attributes = match[1].str();
-        result.push_back({attribute_number(attributes, "xMin"), attribute_number(attributes, "yMin"),
-                          attribute_number(attributes, "xMax"), attribute_number(attributes, "yMax"),
-                          decode_html(match[2].str())});
+        Word word{attribute_number(attributes, "xMin"), attribute_number(attributes, "yMin"),
+                  attribute_number(attributes, "xMax"), attribute_number(attributes, "yMax"),
+                  decode_html(match[2].str())};
+        if (!(word.x1 > word.x0 && word.y1 > word.y0))
+            throw std::runtime_error("invalid PDF word bounding box geometry");
+        result.push_back(std::move(word));
     }
     return result;
 }
@@ -725,7 +736,13 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
         validate_request(request);
         TempDirectory temp;
         const auto info_file = temp.path / "pdfinfo.txt";
-        if (detail::run_capture(request.pdfinfo_path, {path_utf8(request.pdf_path)}, info_file) != 0)
+        const auto info_status = detail::run_capture(request.pdfinfo_path,
+            {path_utf8(request.pdf_path)}, info_file, 1024U * 1024U);
+        if (info_status == detail::process_timeout_status)
+            throw std::runtime_error("pdfinfo exceeded the 30-second process timeout");
+        if (info_status == detail::output_limit_status)
+            throw std::runtime_error("pdfinfo output exceeded the 1 MiB runtime limit");
+        if (info_status != 0)
             throw std::runtime_error("pdfinfo could not read the selected PDF");
         const auto info = detail::read_text_file(info_file);
         std::smatch page_match;
@@ -736,9 +753,15 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
             throw std::out_of_range("selected zero-based PDF page index is outside the document");
         const auto text_file = temp.path / "page.html";
         const auto page_one_based = std::to_string(request.pdf_page_index + 1U);
-        if (detail::run_capture(request.pdftotext_path,
+        const auto text_status = detail::run_capture(request.pdftotext_path,
                 {"-bbox-layout", "-f", page_one_based, "-l", page_one_based,
-                 path_utf8(request.pdf_path), path_utf8(text_file)}, temp.path / "pdftotext.log") != 0)
+                 path_utf8(request.pdf_path), "-"}, text_file,
+                33U * 1024U * 1024U);
+        if (text_status == detail::process_timeout_status)
+            throw std::runtime_error("pdftotext exceeded the 30-second process timeout");
+        if (text_status == detail::output_limit_status)
+            throw std::runtime_error("pdftotext output exceeded the 33 MiB runtime limit");
+        if (text_status != 0)
             throw std::runtime_error("pdftotext failed to extract selectable text");
         if (std::filesystem::file_size(text_file) > 32U * 1024U * 1024U)
             throw std::runtime_error("selected-page text extraction exceeds the 32 MiB safety limit");
@@ -1111,3 +1134,9 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
     return result;
 }
 } // namespace datasim::pdf
+
+namespace datasim::pdf::detail {
+void validate_poppler_bbox_markup(const std::string& markup) {
+    (void)datasim::pdf::parse_words(markup);
+}
+}

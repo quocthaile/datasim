@@ -8,6 +8,37 @@
 #include <cmath>
 
 namespace datasim_viewer {
+std::vector<std::size_t> display_sample_indices(
+    const datasim::Samples& samples, std::size_t pixel_width, bool include_input) {
+    // Each bin retains source-order extrema, so time order and local voltage peaks
+    // remain represented while paint-path construction is O(pixel_width).
+    if (samples.size() <= pixel_width * 2U || pixel_width == 0U) {
+        std::vector<std::size_t> all(samples.size());
+        for (std::size_t i = 0; i < all.size(); ++i) all[i] = i;
+        return all;
+    }
+    std::vector<std::size_t> indices;
+    indices.reserve(pixel_width * (include_input ? 4U : 2U) + 2U);
+    indices.push_back(0U);
+    for (std::size_t bin = 0; bin < pixel_width; ++bin) {
+        const auto begin = bin * samples.size() / pixel_width;
+        const auto end = std::max(begin + 1U, (bin + 1U) * samples.size() / pixel_width);
+        std::size_t out_min = begin, out_max = begin, in_min = begin, in_max = begin;
+        for (std::size_t i = begin + 1U; i < end; ++i) {
+            if (samples[i].vout_V < samples[out_min].vout_V) out_min = i;
+            if (samples[i].vout_V > samples[out_max].vout_V) out_max = i;
+            if (samples[i].vin_V < samples[in_min].vin_V) in_min = i;
+            if (samples[i].vin_V > samples[in_max].vin_V) in_max = i;
+        }
+        std::vector<std::size_t> extrema{out_min, out_max};
+        if (include_input) { extrema.push_back(in_min); extrema.push_back(in_max); }
+        std::sort(extrema.begin(), extrema.end());
+        for (const auto index : extrema)
+            if (indices.back() != index) indices.push_back(index);
+    }
+    if (indices.back() != samples.size() - 1U) indices.push_back(samples.size() - 1U);
+    return indices;
+}
 namespace {
 constexpr int left_margin = 82;
 constexpr int right_margin = 28;
@@ -31,6 +62,13 @@ void WaveformWidget::set_error(QString message) {
     samples_.clear();
     source_.clear();
     error_ = std::move(message);
+    update();
+}
+
+void WaveformWidget::clear() {
+    samples_.clear();
+    source_.clear();
+    error_.clear();
     update();
 }
 
@@ -104,18 +142,22 @@ void WaveformWidget::paintEvent(QPaintEvent*) {
     painter.drawText(QRectF(-plot.height() / 2, -12, plot.height(), 24), Qt::AlignCenter, tr("Voltage (V)"));
     painter.restore();
 
+    const auto display_indices = display_sample_indices(samples_,
+        static_cast<std::size_t>(std::max(1.0, plot.width())), show_input_);
     QPainterPath output_path;
-    for (std::size_t i = 0; i < samples_.size(); ++i) {
-        const auto p = point(samples_[i].time_s, samples_[i].vout_V);
-        if (i == 0) output_path.moveTo(p); else output_path.lineTo(p);
+    for (std::size_t j = 0; j < display_indices.size(); ++j) {
+        const auto& sample = samples_[display_indices[j]];
+        const auto p = point(sample.time_s, sample.vout_V);
+        if (j == 0) output_path.moveTo(p); else output_path.lineTo(p);
     }
     painter.setPen(QPen(QColor(30, 100, 210), 2));
     painter.drawPath(output_path);
     if (show_input_) {
         QPainterPath input_path;
-        for (std::size_t i = 0; i < samples_.size(); ++i) {
-            const auto p = point(samples_[i].time_s, samples_[i].vin_V);
-            if (i == 0) input_path.moveTo(p); else input_path.lineTo(p);
+        for (std::size_t j = 0; j < display_indices.size(); ++j) {
+            const auto& sample = samples_[display_indices[j]];
+            const auto p = point(sample.time_s, sample.vin_V);
+            if (j == 0) input_path.moveTo(p); else input_path.lineTo(p);
         }
         painter.setPen(QPen(QColor(210, 90, 35), 2));
         painter.drawPath(input_path);
