@@ -1,8 +1,13 @@
 # Phase 4I validation
 
-Status: IMPLEMENTED and VERIFIED locally and in hosted Windows CI for explicitly
-selected word associations. [PR #13](https://github.com/quocthaile/datasim/pull/13)
-is open for owner review. Phase 4J has not started.
+Status: IMPLEMENTED, MERGED, and VERIFIED locally and in hosted Windows CI for
+explicitly selected word associations. PR #13 merged into `main` at
+`fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`; post-merge Windows CI
+[run 42065262568](https://github.com/quocthaile/datasim/actions/runs/42065262568)
+completed successfully. The local Phase 4I evidence below remains the original
+Phase 4I run and was not rewritten as a Phase 4J measurement. See
+[Phase 4 final validation](PHASE_4_FINAL_VALIDATION.md) for the separate closure
+run.
 
 Hosted [push run 42063445953](https://github.com/quocthaile/datasim/actions/runs/42063445953)
 passed for implementation commit `6564f34b8751cc1fe8ff1f3942d577603038a8bb`.
@@ -143,5 +148,7 @@ preserved separately; no implicit conversion or approval. No vendor PDF or raw
 annotation is committed or uploaded as CI artifacts. Poppler is not bundled, and
 the project still has no adopted license.
 
-Phase 4J is not implemented on this branch. It requires owner merge of this PR
-and successful hosted post-merge CI before a separate release-closure branch.
+At the time this validation was recorded, Phase 4J had not started and required
+the Phase 4I merge plus successful post-merge CI. That gate is now satisfied;
+Phase 4J release closure is documented separately in
+[PHASE_4_FINAL_VALIDATION.md](PHASE_4_FINAL_VALIDATION.md).

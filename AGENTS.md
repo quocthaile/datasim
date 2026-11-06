@@ -76,9 +76,14 @@ legacy extraction with no hierarchy bindings. Phase 4I may start only after Phas
 4H merges and post-merge CI succeeds. Do not merge automatically.
 
 Phase 4H is merged via PR #12 at `864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`
-and hosted-verified by post-merge Windows run `42058944651`. Phase 4I implements
-explicit baseline-aware word association on `feat/phase-4i-baseline-aware-text`;
-see [validation](docs/PHASE_4I_VALIDATION.md) and
-[ADR-0010](docs/decisions/ADR-0010-baseline-aware-text-reconstruction.md).
+and hosted-verified by post-merge Windows run `42058944651`. Phase 4I is merged
+via PR #13 at `fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5` and hosted-verified by
+post-merge Windows run `42065262568`; see [validation](docs/PHASE_4I_VALIDATION.md)
+and [ADR-0010](docs/decisions/ADR-0010-baseline-aware-text-reconstruction.md).
 Do not change global row tolerance or numeric grammar to interpret typography.
-Phase 4J remains gated on Phase 4I merge and successful hosted post-merge CI.
+Phase 4J final validation and release closure are under review on
+`chore/phase-4j-final-validation`; see
+[final validation](docs/PHASE_4_FINAL_VALIDATION.md) and
+[release summary](docs/PHASE_4_RELEASE_SUMMARY.md). Do not mark Phase 4J VERIFIED
+until its own hosted branch CI has completed successfully. Do not merge PRs
+automatically.

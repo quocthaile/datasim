@@ -148,7 +148,12 @@ if(BUILD_TESTING)
         target_compile_options(pdf_extraction_tests PRIVATE -Wall -Wextra -Wpedantic)
     endif()
     add_test(NAME pdf_extraction COMMAND pdf_extraction_tests)
-    set_tests_properties(pdf_extraction PROPERTIES LABELS integration TIMEOUT 30)
+    set(DATASIM_PDF_TEST_TEMP_DIR "${CMAKE_CURRENT_BINARY_DIR}/pdf-extraction-temp")
+    file(MAKE_DIRECTORY "${DATASIM_PDF_TEST_TEMP_DIR}")
+    set_tests_properties(pdf_extraction PROPERTIES
+        LABELS integration
+        TIMEOUT 30
+        ENVIRONMENT "TMP=${DATASIM_PDF_TEST_TEMP_DIR};TEMP=${DATASIM_PDF_TEST_TEMP_DIR};DATASIM_PDF_TEST_TEMP_ROOT=${DATASIM_PDF_TEST_TEMP_DIR}")
     add_executable(backend_fixture tests/unit/backend_fixture.cpp)
     add_executable(backend_error_tests tests/unit/backend_errors.cpp)
     target_link_libraries(backend_error_tests PRIVATE datasim)
