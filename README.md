@@ -4,10 +4,12 @@
 
 Datasim has a verified ideal-RC simulation slice, in-memory component and model
 contracts, candidate-only intake, and bounded selectable-text PDF extraction.
-Phase 4A–4I are merged into `main`; Phase 4J is the final validation and release
-closure under review. Current local and historical hosted evidence is summarized
-in [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md) and the
-[release summary](docs/PHASE_4_RELEASE_SUMMARY.md).
+Phases 4A–4J are merged into `main`; Phase 4J closed via PR #14 at
+`3fb583a0eb81640de421bc9049db9c0b80102e50`. Its validation and historical hosted
+evidence are summarized in [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md)
+and the [release summary](docs/PHASE_4_RELEASE_SUMMARY.md). Phase 5A adds an
+optional read-only waveform viewer on `feat/phase-5a-desktop-visualization`;
+verification status is tracked in [Phase 5A validation](docs/PHASE_5A_VALIDATION.md).
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
@@ -134,16 +136,27 @@ in [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md) and the
    numerical, PDF, corpus, provenance, rights, and documentation review on
    `chore/phase-4j-final-validation`, including an isolated PDF temporary-directory
    collision fix with regression coverage. Local Windows Release validation passed;
-   hosted Windows run `42148338325` passed on commit `c631abc5f578a269b8748b39c631b7aa06b87768`; validation is VERIFIED and the PR awaits owner review. Treat
+   hosted Windows run `42148338325` passed on commit `c631abc5f578a269b8748b39c631b7aa06b87768`; validation is VERIFIED. PR #14 merged into `main` at `3fb583a0eb81640de421bc9049db9c0b80102e50`. Treat
    Phase 4J as VERIFIED beyond the documented scope. See
    [final validation](docs/PHASE_4_FINAL_VALIDATION.md) and
    [release summary](docs/PHASE_4_RELEASE_SUMMARY.md).
+
+13. **Phase 5A desktop visualization foundation**: optional `datasim_viewer` on
+   `feat/phase-5a-desktop-visualization`, using Qt 6 Widgets and existing
+   `datasim::read_csv()` / `datasim::Samples` for read-only waveform display.
+   GUI build, sample-loader tests, core release gates, and interactive inspection
+   results are recorded in [Phase 5A validation](docs/PHASE_5A_VALIDATION.md).
+   This branch does not claim `main` integration or physical measurement accuracy.
+   See [plan](docs/PHASE_5A_PLAN.md), [architecture](docs/PHASE_5A_ARCHITECTURE.md),
+   and [ADR-0011](docs/decisions/ADR-0011-desktop-visualization-foundation.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
 serialization, automatic unit conversion, LLM integration, external SPICE subcircuit
 loading, semiconductor models, physical measurement validation (`MEASURED`), and
-interactive visualization remain **PROPOSED**. Real-datasheet extraction is evaluated
+general visualization workflows remain **PROPOSED**. The scoped Phase 5A read-only
+viewer is implemented on a review branch; see its validation record for which
+functions are verified. Real-datasheet extraction is evaluated
 offline only within the bounded Phase 4E pilot corpus (`docs/PHASE_4E_VALIDATION.md`);
 general multi-layout vendor datasheet accuracy is not claimed.
 
@@ -173,6 +186,7 @@ numerical or review authority.
 - [Phase 4H implementation](docs/PHASE_4H_IMPLEMENTATION.md), [validation](docs/PHASE_4H_VALIDATION.md), and [ADR-0009](docs/decisions/ADR-0009-hierarchical-table-context.md) for explicit hierarchical context
 - [Phase 4I implementation](docs/PHASE_4I_IMPLEMENTATION.md), [validation](docs/PHASE_4I_VALIDATION.md), and [ADR-0010](docs/decisions/ADR-0010-baseline-aware-text-reconstruction.md) for explicit baseline-aware text reconstruction
 - [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md) and [release summary](docs/PHASE_4_RELEASE_SUMMARY.md) for release closure
+- [Phase 5A plan](docs/PHASE_5A_PLAN.md), [architecture](docs/PHASE_5A_ARCHITECTURE.md), [validation](docs/PHASE_5A_VALIDATION.md), and [ADR-0011](docs/decisions/ADR-0011-desktop-visualization-foundation.md) for the optional read-only waveform viewer
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

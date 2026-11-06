@@ -88,6 +88,23 @@ if(MSVC)
 else()
     target_compile_options(datasheet_eval_dump PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
+option(DATASIM_BUILD_DESKTOP "Build the optional read-only desktop waveform viewer" OFF)
+if(DATASIM_BUILD_DESKTOP)
+    find_package(Qt6 6.11 REQUIRED COMPONENTS Widgets)
+    add_executable(datasim_viewer
+        apps/datasim_viewer/main.cpp
+        apps/datasim_viewer/read_only_samples.cpp
+        apps/datasim_viewer/waveform_widget.cpp)
+    target_include_directories(datasim_viewer PRIVATE apps/datasim_viewer)
+    target_link_libraries(datasim_viewer PRIVATE datasim Qt6::Widgets)
+    if(MSVC)
+        target_compile_options(datasim_viewer PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(datasim_viewer PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
     add_executable(unit_tests tests/unit/main.cpp)
@@ -189,4 +206,13 @@ if(BUILD_TESTING)
             ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1;DATASIM_EVAL_DUMP_BIN=$<TARGET_FILE:datasheet_eval_dump>;DATASIM_REPO_ROOT=${CMAKE_CURRENT_SOURCE_DIR}")
     set_tests_properties(unit component_model vertical_slice intake intake_handoff backend_errors PROPERTIES LABELS unit TIMEOUT 15)
     set_tests_properties(ngspice_rc PROPERTIES LABELS integration)
+    if(DATASIM_BUILD_DESKTOP)
+        add_executable(viewer_sample_tests
+            apps/datasim_viewer/read_only_samples.cpp
+            tests/desktop/viewer_sample_tests.cpp)
+        target_include_directories(viewer_sample_tests PRIVATE apps/datasim_viewer)
+        target_link_libraries(viewer_sample_tests PRIVATE datasim)
+        add_test(NAME viewer_sample_loading COMMAND viewer_sample_tests "${CMAKE_CURRENT_BINARY_DIR}")
+        set_tests_properties(viewer_sample_loading PROPERTIES LABELS desktop TIMEOUT 15)
+    endif()
 endif()
