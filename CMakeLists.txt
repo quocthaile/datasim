@@ -233,6 +233,7 @@ if(BUILD_TESTING)
             "${DATASIM_NGSPICE}" "${CMAKE_CURRENT_BINARY_DIR}/viewer-workbench-tests")
         set_tests_properties(viewer_workbench PROPERTIES LABELS desktop TIMEOUT 90 SKIP_RETURN_CODE 77)
         add_executable(viewer_worker_tests
+            apps/datasim_viewer/workbench_service.cpp
             apps/datasim_viewer/simulation_worker.cpp
             apps/datasim_viewer/simulation_worker.hpp
             tests/desktop/viewer_worker_tests.cpp)

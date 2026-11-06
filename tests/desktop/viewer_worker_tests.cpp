@@ -1,4 +1,5 @@
 #include "simulation_worker.hpp"
+#include "workbench_service.hpp"
 
 #include <QCoreApplication>
 #include <QEventLoop>
@@ -12,7 +13,9 @@ int main(int argc, char** argv) {
         QCoreApplication app(argc, argv);
         if (argc != 3) throw std::runtime_error("expected ngspice executable and isolated output directory");
         if (std::string(argv[1]).empty() || !std::filesystem::exists(argv[1])) return 77;
-        const auto output = std::filesystem::path(argv[2]) / "worker-run";
+        const auto parent = std::filesystem::path(argv[2]);
+        std::filesystem::create_directories(parent);
+        const auto output = datasim_viewer::fresh_run_directory(parent);
         QThread thread;
         QEventLoop completion;
         bool succeeded = false;
