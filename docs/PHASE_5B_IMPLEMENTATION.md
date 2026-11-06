@@ -1,6 +1,6 @@
 # Phase 5B implementation record
 
-**Status:** IMPLEMENTED on `feat/phase-5b-rc-simulation-workbench`; this record does not claim hosted CI or manual GUI verification until those checks complete.
+**Status:** IMPLEMENTED on `feat/phase-5b-rc-simulation-workbench`; hosted CI passed as recorded in [validation](PHASE_5B_VALIDATION.md). Manual GUI inspection remains NOT VERIFIED.
 
 ## Implemented
 

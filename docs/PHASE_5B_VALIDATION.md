@@ -1,6 +1,6 @@
 # Phase 5B validation
 
-**Status:** Local Windows x64 Release builds and automated tests passed on the implementation worktree. GUI launch and interactive behavior remain pending/NOT VERIFIED until approval and direct inspection complete. Hosted feature-branch CI is pending.
+**Status:** Local Windows x64 Release builds and automated tests passed. Hosted Windows run [42158153332](https://github.com/quocthaile/datasim/actions/runs/42158153332) passed on implementation commit `2e59968aa33e524b9fb838aa7473e31fcf05d9c2`. GUI launch and interactive behavior remain NOT VERIFIED because the computer-use tool denied the launch after user approval.
 
 ## Baseline
 
@@ -46,9 +46,9 @@ ctest --test-dir build/phase5b-desktop --output-on-failure
 | Qt-enabled CTest | **12 passed, 0 failed, 0 skipped** | Same nine core suites plus CSV loading, workbench, and worker-event-loop tests; real `ngspice_rc` passed. |
 | Workbench automated test | PASS | Default/custom config parsing, malformed/locale-ambiguous/non-finite rejection, `check_config()` constraints, existing-parent enforcement, distinct uncreated run paths, two real ngspice runs, returned waveform vs `results.csv` sample count, artifact presence, validation metric field presence, and existing-directory sentinel preservation. |
 | Worker event-loop test | PASS | Real run through `SimulationWorker` on `QThread`; queued callback confirmed on the main event thread after core validation passed. |
-| GUI launch / interaction | **NOT VERIFIED** | Awaiting permission to launch the built executable through UI automation. Compilation and service tests do not prove visual correctness, GUI responsiveness, or close-during-run behavior. |
+| GUI launch / interaction | **NOT VERIFIED** | The user approved launching the local executable, but the computer-use tool still denied launching `datasim_viewer.exe`. Compilation and service tests do not prove visual correctness, GUI responsiveness, or close-during-run behavior. |
 | Six-run RC convergence/repeatability study | PASS | Four timestep refinements had max errors `6.31106e-05`, `1.78925e-05`, `6.00291e-06`, `2.66873e-06 V`; runs 0, 4, and 5 at `1e-5 s` matched at `6.31106e-05 V`. |
-| Hosted Phase 5B CI | Pending | Workflow updated to build/test both Qt-off core and optional Qt-on target. |
+| Hosted Phase 5B CI | **PASS** | Run [42158153332](https://github.com/quocthaile/datasim/actions/runs/42158153332) succeeded on final code commit `2e59968aa33e524b9fb838aa7473e31fcf05d9c2`; includes Qt-off core gates, real Poppler/ngspice integration, six-run study, Qt-on build, and 12 desktop/core CTest suites. |
 
 ## Limits
 
