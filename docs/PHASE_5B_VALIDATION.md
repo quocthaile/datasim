@@ -81,9 +81,9 @@ reproduction procedures for F-01 through F-07 are in
 | GUI interaction | VERIFIED, bounded | Launched, selected ngspice, ran default RC, inspected metrics/artifacts, toggled Vin, opened generated `results.csv` as read-only. Invalid-input visible state, backend failure presentation, close-during-run, and manual dense repaint remain NOT VERIFIED. |
 | Six-run convergence/repeatability | VERIFIED | Current `build/hardening-core/rc_study.exe`: four timestep refinements had max errors `6.31106e-05`, `1.78925e-05`, `6.00291e-06`, `2.66873e-06 V`; runs 0, 4, and 5 at `1e-5 s` repeated at `6.31106e-05 V`. This matches the retained numerical reference. |
 | `DATASIM_SOURCE_SHA256` mutation matrix | VERIFIED | `scripts/ci/verify_source_fingerprint.py`: unchanged stable; viewer header mutation and selected synthetic PDF mutation changed the identity; build-directory probe excluded; exact restore returned to baseline `e8d69bb77c84d6dac3f844f379ce0142030868fd63c447d1f804ee0480adc07d`. |
-| Linux core / POSIX process tests | NOT VERIFIED locally | WSL environment has no compiler/CMake/ngspice and no noninteractive admin installation. Linux hosted workflow is configured; result is pending branch CI. |
-| ASan/UBSan | NOT VERIFIED | Hosted sanitizer workflow is configured; no run result yet. |
-| Hosted hardening-branch CI | NOT VERIFIED | Awaiting push and hosted workflow completion. |
+| Linux core / POSIX process tests | VERIFIED | Ubuntu 24.04 hosted run [42170539048](https://github.com/quocthaile/datasim/actions/runs/42170539048): 11/11 passed, 0 failed, 0 skipped; includes Poppler, ngspice, timeout, process group, quotas, parser and corpus tests. |
+| ASan/UBSan | VERIFIED | Same run: 11/11 passed, 0 failed, 0 skipped; ASan leak detection and UBSan halt-on-error were enabled. |
+| Hosted hardening-branch CI | VERIFIED | Same run: Windows UCRT, Linux core and Linux sanitizer jobs all succeeded on commit `1dfc510a71b44369b24eeb34cb171f863ec69331`. |
 
 The Qt-enabled build was rerun after closing the manually launched viewer, which
 had locked the executable during the first link attempt. The successful rerun
@@ -117,4 +117,20 @@ Corrective local Windows UCRT64 validation on the PR update:
 | `pdf_extraction` | VERIFIED; real Poppler synthetic extraction passed using Windows PATH discovery. |
 | `pdf_process` | VERIFIED; exact quota, excess stdout/stderr, missing executable, nonzero exit, timeout, and concurrent isolation passed. |
 | Real ngspice and six-run refinement/repeatability | VERIFIED; included in both core/desktop CTest and prior branch study. |
-| Linux core / ASan/UBSan | NOT VERIFIED yet; rerun pending after push to PR #17. |
+| Linux core / ASan/UBSan | VERIFIED in hosted run [42170539048](https://github.com/quocthaile/datasim/actions/runs/42170539048); each CTest suite 11/11 passed, 0 failed, 0 skipped. |
+
+Hosted correction run [42170539048](https://github.com/quocthaile/datasim/actions/runs/42170539048)
+completed successfully on `1dfc510a71b44369b24eeb34cb171f863ec69331`:
+
+| Hosted job | Result |
+|---|---|
+| `windows-ucrt` | VERIFIED; unit/process CTest 8/8 passed, real integration 3/3 passed, Qt-enabled CTest 14/14 passed. `pdf_extraction` and `pdf_process` passed. |
+| `linux-core` | VERIFIED; 11/11 passed, 0 failed, 0 skipped. Real Poppler and ngspice integration passed. |
+| `linux-sanitizers` | VERIFIED; 11/11 passed, 0 failed, 0 skipped with ASan and UBSan enabled. No sanitizer report occurred. |
+
+Both Ubuntu jobs passed the workflow's JUnit `notrun` rejection guard. On Linux,
+`pdf_process` verified exact-limit output, excessive stdout and stderr limits,
+missing and non-executable path reporting, nonzero exit preservation, timeout,
+descendant cleanup, and concurrent process isolation. `pdf_extraction` found
+unsuffixed Poppler executables using colon-separated PATH and passed real
+synthetic extraction.
