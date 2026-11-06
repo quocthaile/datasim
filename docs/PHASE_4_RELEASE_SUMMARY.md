@@ -1,7 +1,7 @@
-﻿# Datasim Phase 4 Release Summary
+# Datasim Phase 4 Release Summary
 
 **Release scope:** bounded Phase 4B–4I evidence intake, extraction, evaluation, provenance, and synthetic integration.
-**Phase 4J disposition:** local final validation passed, including an isolated temporary-workspace safety fix; hosted branch CI and owner review remain pending.
+**Phase 4J disposition:** local final validation passed, including an isolated temporary-workspace safety fix; hosted CI passed; owner review remains pending.
 **Phase 4J branch:** `chore/phase-4j-final-validation`.
 
 ## Delivered Phase 4 scope
@@ -14,7 +14,7 @@ Phase 4 extends Datasim's ideal-RC/component contracts with a deterministic, can
 - The Phase 4D integration fixture connects a synthetic PDF through the existing candidate, review, model-validation, vertical-slice and real ngspice flow, retaining run provenance.
 - Existing review, model-validation, execution-policy, and synthetic-classification gates remain intact. There is no automatic approval or model promotion.
 
-Phase 4H merged through PR #12 at `864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`; post-merge Windows CI run `42058944651` succeeded. Phase 4I merged through PR #13 at `fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`; post-merge Windows CI run `42065262568` succeeded. Phase 4J performed a fresh local Windows Release build and full verification at that integrated source baseline. The security audit also fixed a temporary-directory collision in the PDF adapter with exclusive directory creation and a sentinel-preservation regression test; extraction behavior and public APIs are unchanged. Phase 4J's required hosted CI is still a review gate, so Phase 4J is not yet VERIFIED.
+Phase 4H merged through PR #12 at `864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`; post-merge Windows CI run `42058944651` succeeded. Phase 4I merged through PR #13 at `fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`; post-merge Windows CI run `42065262568` succeeded. Phase 4J performed a fresh local Windows Release build and full verification at that integrated source baseline. The security audit also fixed a temporary-directory collision in the PDF adapter with exclusive directory creation and a sentinel-preservation regression test; extraction behavior and public APIs are unchanged. Phase 4J hosted Windows workflow run `42148338325` succeeded on commit `c631abc5f578a269b8748b39c631b7aa06b87768`; Phase 4J is VERIFIED for this validation scope. The PR remains open for owner review.
 
 ## Final local verification snapshot
 

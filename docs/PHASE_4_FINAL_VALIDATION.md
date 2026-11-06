@@ -1,13 +1,13 @@
-﻿# Phase 4 Final Validation and Release Closure
+# Phase 4 Final Validation and Release Closure
 
 **Milestone:** Phase 4J, final validation only
-**Status:** Local validation completed; hosted branch CI and owner review pending.
+**Status:** Local validation completed; hosted branch CI passed; owner review pending.
 **Branch:** `chore/phase-4j-final-validation`
 **Source baseline tested:** `fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5` (`main`)
 **Main hosted status:** successful Windows run [42065262568](https://github.com/quocthaile/datasim/actions/runs/42065262568) for that exact commit.
 **Scope:** integrated verification, documentation, and one isolated temporary-workspace safety fix with a regression test.
 
-This report distinguishes the Phase 4J local execution from earlier phase evidence and from the still-required hosted workflow for the Phase 4J pull request. Phase 4J is **not marked VERIFIED** until that branch's own hosted CI has completed successfully.
+This report distinguishes the Phase 4J local execution from earlier phase evidence and records the completed hosted workflow for the Phase 4J pull request. Phase 4J is **VERIFIED** for the documented validation scope: its own hosted Windows workflow run `42148338325` completed successfully on branch commit `c631abc5f578a269b8748b39c631b7aa06b87768`. Owner review and merge remain separate.
 
 ## 1. Baseline and working tree
 
@@ -267,7 +267,7 @@ Open owner decisions:
 | --- | --- |
 | Main, PR #13 and prior hosted evidence reconciled | PASS; exact merge SHAs and successful post-merge runs recorded. |
 | Clean Release build and all mandatory CTest targets | PASS locally; 9/9 with zero skips. |
-| Real Poppler and ngspice integration | PASS locally with Poppler 26.10.0 and ngspice-47; hosted Phase 4J run pending. |
+| Real Poppler and ngspice integration | PASS locally with Poppler 26.10.0 and ngspice-47; hosted Phase 4J run `42148338325` succeeded on commit `c631abc5f578a269b8748b39c631b7aa06b87768`. |
 | RC numerical references and repeatability | PASS locally; six runs and retained byte-level reference comparisons recorded. |
 | Candidate/review/model trust boundaries | PASS within existing metadata contract and synthetic tests; no authentication claim. |
 | Historical fixtures and benchmark evidence preserved | PASS; no source/test fixture or historical aggregate changed. |
@@ -275,9 +275,9 @@ Open owner decisions:
 | New real corpus rerun has provenance, denominator and limits | NOT VERIFIED; files unavailable, historical figures labeled historical. |
 | Restricted assets or license decision added | PASS; none added, decisions remain with owner. Public artifacts use synthetic data; local diagnostics may echo source tokens and remain subject to source rights. |
 | Documentation consistent | Local link/status/diff review passed; final PR head remains subject to owner review. |
-| Phase 4J hosted CI | PENDING; required before VERIFIED/release acceptance. |
+| Phase 4J hosted CI | PASS; run `42148338325` succeeded on the Phase 4J branch commit. |
 
-**Review disposition:** ready for owner review as a documentation and evidence PR. Phase 4J release acceptance remains pending successful hosted CI on this branch and owner review; do not merge automatically.
+**Review disposition:** ready for owner review as a documentation and evidence PR. Phase 4J validation is VERIFIED on the tested branch commit. The PR remains open for owner review; do not merge automatically.
 
 ## 12. Technical references
 

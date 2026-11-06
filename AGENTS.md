@@ -81,7 +81,7 @@ via PR #13 at `fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5` and hosted-verified by
 post-merge Windows run `42065262568`; see [validation](docs/PHASE_4I_VALIDATION.md)
 and [ADR-0010](docs/decisions/ADR-0010-baseline-aware-text-reconstruction.md).
 Do not change global row tolerance or numeric grammar to interpret typography.
-Phase 4J final validation and release closure are under review on
+Phase 4J final validation and release closure are VERIFIED for run `42148338325` and under owner review on
 `chore/phase-4j-final-validation`; see
 [final validation](docs/PHASE_4_FINAL_VALIDATION.md) and
 [release summary](docs/PHASE_4_RELEASE_SUMMARY.md). Do not mark Phase 4J VERIFIED

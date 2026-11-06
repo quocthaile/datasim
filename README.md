@@ -134,8 +134,8 @@ in [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md) and the
    numerical, PDF, corpus, provenance, rights, and documentation review on
    `chore/phase-4j-final-validation`, including an isolated PDF temporary-directory
    collision fix with regression coverage. Local Windows Release validation passed;
-   hosted CI for this branch is pending PR creation and completion. Do not treat
-   Phase 4J as VERIFIED until that hosted run succeeds. See
+   hosted Windows run `42148338325` passed on commit `c631abc5f578a269b8748b39c631b7aa06b87768`; validation is VERIFIED and the PR awaits owner review. Treat
+   Phase 4J as VERIFIED beyond the documented scope. See
    [final validation](docs/PHASE_4_FINAL_VALIDATION.md) and
    [release summary](docs/PHASE_4_RELEASE_SUMMARY.md).
 
