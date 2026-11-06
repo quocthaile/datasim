@@ -454,6 +454,20 @@ std::string row_value_cell(const std::vector<Word>& words, HorizontalSpan span, 
 
 struct TempDirectory {
     std::filesystem::path path;
+    TempDirectory() {
+        for (unsigned int attempt = 0; attempt < 1024U; ++attempt) {
+            const auto candidate = std::filesystem::temp_directory_path() /
+                ("datasim_pdf_" + std::to_string(temp_counter.fetch_add(1)));
+            std::error_code error;
+            if (std::filesystem::create_directory(candidate, error)) {
+                path = candidate;
+                return;
+            }
+            if (error && error != std::errc::file_exists)
+                throw std::runtime_error("cannot create isolated PDF extraction workspace");
+        }
+        throw std::runtime_error("cannot allocate a unique PDF extraction workspace");
+    }
     ~TempDirectory() {
         std::error_code ignored;
         std::filesystem::remove_all(path, ignored);
@@ -709,9 +723,7 @@ ExtractionResult extract_electrical_table(const ExtractionRequest& request) {
     ExtractionResult result;
     try {
         validate_request(request);
-        TempDirectory temp{std::filesystem::temp_directory_path() /
-            ("datasim_pdf_" + std::to_string(temp_counter.fetch_add(1)))};
-        std::filesystem::create_directories(temp.path);
+        TempDirectory temp;
         const auto info_file = temp.path / "pdfinfo.txt";
         if (detail::run_capture(request.pdfinfo_path, {path_utf8(request.pdf_path)}, info_file) != 0)
             throw std::runtime_error("pdfinfo could not read the selected PDF");

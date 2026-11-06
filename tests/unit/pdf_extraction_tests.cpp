@@ -1,6 +1,7 @@
 #include "datasim/pdf/table_extraction.hpp"
 #include <cstdlib>
 #include <algorithm>
+#include <fstream>
 #include <limits>
 #include <filesystem>
 #include <iostream>
@@ -79,12 +80,27 @@ datasim::pdf::ExtractionRequest request_for(std::size_t page,
 }
 
 int main() {
+    std::filesystem::path collision_test_root;
     try {
         using namespace datasim;
+        const char* configured_temp_root = std::getenv("DATASIM_PDF_TEST_TEMP_ROOT");
+        if (configured_temp_root == nullptr || *configured_temp_root == '\0')
+            throw std::runtime_error("DATASIM_PDF_TEST_TEMP_ROOT must be configured by CTest");
+        collision_test_root = configured_temp_root;
+        std::filesystem::create_directories(collision_test_root);
+        const auto occupied_workspace = collision_test_root / "datasim_pdf_0";
+        if (!std::filesystem::create_directory(occupied_workspace))
+            throw std::runtime_error("cannot create colliding temporary-directory regression fixture");
+        const auto sentinel = occupied_workspace / "preserve-me.txt";
+        { std::ofstream marker(sentinel); marker << "pre-existing user data\n"; }
+        require(std::filesystem::equivalent(std::filesystem::temp_directory_path(), collision_test_root),
+                "isolated temporary directory selected for collision regression");
         auto resistor_request = request_for(0, "resistor", "SIM-R-10K", "doc.synthetic.rc");
         require(!resistor_request.pdfinfo_path.empty(), "pdfinfo executable found on PATH");
         require(!resistor_request.pdftotext_path.empty(), "pdftotext executable found on PATH");
         const auto first = pdf::extract_electrical_table(resistor_request);
+        require(std::filesystem::exists(sentinel),
+                "pre-existing colliding temporary workspace is never reused or removed");
         require(first.candidate_bundle.has_value(), "resistor table yields validated candidate bundle");
         require(first.manifest.has_value(), "intake manifest retained");
         require(first.manifest->declared_pdf_page_count == 2U, "actual PDF page count read");
@@ -870,8 +886,14 @@ int main() {
                 ordinary_result.manifest->observations[0].observation.parameter_name == "Ordinary", "ordinary text unaffected");
 
         std::cout << "PDF extraction checks: " << checks << '\n';
+        std::error_code cleanup_error;
+        std::filesystem::remove_all(collision_test_root, cleanup_error);
         return 0;
     } catch (const std::exception& error) {
+        if (!collision_test_root.empty()) {
+            std::error_code cleanup_error;
+            std::filesystem::remove_all(collision_test_root, cleanup_error);
+        }
         std::cerr << "PDF extraction failure after " << checks << " checks: " << error.what() << '\n';
         return 1;
     }

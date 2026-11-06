@@ -1,9 +1,13 @@
 # Datasim
 
-**Datasheet-driven electronic component modeling, simulation, and visualization.**
+**Datasheet-driven electronic component modeling and simulation.**
 
-Datasim comprises three verified numerical/domain modules, the verified Phase 4B
-candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows x64:
+Datasim has a verified ideal-RC simulation slice, in-memory component and model
+contracts, candidate-only intake, and bounded selectable-text PDF extraction.
+Phase 4A–4I are merged into `main`; Phase 4J is the final validation and release
+closure under review. Current local and historical hosted evidence is summarized
+in [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md) and the
+[release summary](docs/PHASE_4_RELEASE_SUMMARY.md).
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
@@ -119,9 +123,21 @@ candidate intake, and the verified Phase 4C bounded PDF table adapter on Windows
 
 11. **Phase 4I baseline-aware text reconstruction**: opt-in, source-verified
    host/subscript/superscript association with original word geometry and separate
-   display provenance. Implemented on `feat/phase-4i-baseline-aware-text`; see
-   [implementation](docs/PHASE_4I_IMPLEMENTATION.md) and
-   [validation](docs/PHASE_4I_VALIDATION.md). Numerical interpretation is unchanged.
+   display provenance. Merged via PR #13 at
+   `fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`; post-merge Windows CI run
+   `42065262568` succeeded. See [implementation](docs/PHASE_4I_IMPLEMENTATION.md),
+   [validation](docs/PHASE_4I_VALIDATION.md), and
+   [ADR-0010](docs/decisions/ADR-0010-baseline-aware-text-reconstruction.md).
+   Numerical interpretation is unchanged.
+
+12. **Phase 4J final validation and release closure**: integrated architecture,
+   numerical, PDF, corpus, provenance, rights, and documentation review on
+   `chore/phase-4j-final-validation`, including an isolated PDF temporary-directory
+   collision fix with regression coverage. Local Windows Release validation passed;
+   hosted Windows run `42148338325` passed on commit `c631abc5f578a269b8748b39c631b7aa06b87768`; validation is VERIFIED and the PR awaits owner review. Treat
+   Phase 4J as VERIFIED beyond the documented scope. See
+   [final validation](docs/PHASE_4_FINAL_VALIDATION.md) and
+   [release summary](docs/PHASE_4_RELEASE_SUMMARY.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
@@ -154,6 +170,9 @@ numerical or review authority.
 - [Phase 4E plan](docs/PHASE_4E_PLAN.md), [corpus protocol](docs/PHASE_4E_CORPUS_PROTOCOL.md), and [validation](docs/PHASE_4E_VALIDATION.md) for the real-datasheet evaluation corpus and offline benchmark
 - [Phase 4F plan](docs/PHASE_4F_PLAN.md), [implementation](docs/PHASE_4F_IMPLEMENTATION.md), [validation](docs/PHASE_4F_VALIDATION.md), and [ADR-0007](docs/decisions/ADR-0007-explicit-header-binding.md) for explicit column-header unit and condition bindings
 - [Phase 4G plan](docs/PHASE_4G_PLAN.md), [implementation](docs/PHASE_4G_IMPLEMENTATION.md), [validation](docs/PHASE_4G_VALIDATION.md), and [ADR-0008](docs/decisions/ADR-0008-inline-value-unit-parsing.md) for deterministic inline value/unit parsing
+- [Phase 4H implementation](docs/PHASE_4H_IMPLEMENTATION.md), [validation](docs/PHASE_4H_VALIDATION.md), and [ADR-0009](docs/decisions/ADR-0009-hierarchical-table-context.md) for explicit hierarchical context
+- [Phase 4I implementation](docs/PHASE_4I_IMPLEMENTATION.md), [validation](docs/PHASE_4I_VALIDATION.md), and [ADR-0010](docs/decisions/ADR-0010-baseline-aware-text-reconstruction.md) for explicit baseline-aware text reconstruction
+- [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md) and [release summary](docs/PHASE_4_RELEASE_SUMMARY.md) for release closure
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

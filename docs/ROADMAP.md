@@ -68,7 +68,7 @@ and post-merge `main` run
 | 2: Backend evaluation | PROPOSED | Evaluate ngspice first and compare alternatives such as Xyce; record compatibility, licensing, embedding/process options, and reproducible reference cases in an ADR. (ADR-0002 selected ngspice executable integration for Phase 1 ideal RC only.) |
 | 3: Knowledge contracts | VERIFIED (in-memory C++20; persistence PROPOSED) | In-memory C++20 evidence, observation, deterministic review lifecycle, component knowledge, conflict visibility, and model metadata/validation contracts verified on synthetic Resistor and Capacitor fixtures ([Phase 2 validation](PHASE_2_VALIDATION.md)). Persistent storage, interchange serialization, and curve series remain PROPOSED. |
 | 4: Deterministic vertical slice | VERIFIED (ideal-RC transient slice; general multi-analysis/subcircuit PROPOSED) | Approved `ComponentKnowledge` and explicitly selected `ModelArtifactDescriptor` instances connected via `CircuitAssembly`, SI parameter resolution, model/backend compatibility gate, `RcConfig` adapter, and `provenance_metadata.json` ([Phase 3 validation](PHASE_3_VALIDATION.md)). External subcircuits and nonlinear device models remain PROPOSED. |
-| 5: Evidence intake and bounded extraction | Phase 4B, Phase 4C, Phase 4D, Phase 4E, and Phase 4F VERIFIED on `main`; Phase 4G inline value/unit parsing IMPLEMENTED and VERIFIED on `feat/phase-4g-inline-value-unit-parsing` | Candidate-only in-memory intake (PR #6), the selected-PDF table adapter (PR #7, `1704f726d901f3e1d00f9cdc918e80d352b443ac`), the PDF-to-Simulation gate (PR #8, `69aba4df7ff752355a40e394de5d05ac988df34b`), the offline evaluation corpus and benchmark (PR #9, `b45c32224e0316dd9f93b6e9bfc3ab89cd3ceaf4`, hosted CI run [42037281172](https://github.com/quocthaile/datasim/actions/runs/42037281172)), and explicit column-header unit and condition bindings (PR #10, `9f3c115d13a40204d3d7f83382a50c107b14b803`, hosted CI run [42044651168](https://github.com/quocthaile/datasim/actions/runs/42044651168)) are merged and hosted-verified; Phase 4G ([PHASE_4G_VALIDATION.md](PHASE_4G_VALIDATION.md), [ADR-0008](decisions/ADR-0008-inline-value-unit-parsing.md)) adds bounded inline value/unit cell parsing with `ValueCellProvenance`. OCR, arbitrary layout parsing, LLM assistance, and persistent storage remain PROPOSED. |
+| 5: Evidence intake and bounded extraction | Phase 4B–4I IMPLEMENTED, MERGED, and VERIFIED on `main`; Phase 4J final closure VERIFIED on PR #14 | Phase 4B candidate-only intake (PR #6); Phase 4C selected-page extraction (PR #7); Phase 4D synthetic PDF-to-simulation gate (PR #8); Phase 4E offline corpus (PR #9); Phase 4F explicit header bindings (PR #10); Phase 4G inline value/unit bindings (PR #11); Phase 4H hierarchical context (PR #12, `864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`, hosted run [42058944651](https://github.com/quocthaile/datasim/actions/runs/42058944651)); and Phase 4I baseline-aware associations (PR #13, `fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`, hosted run [42065262568](https://github.com/quocthaile/datasim/actions/runs/42065262568)) are merged and verified. Phase 4J adds final validation and reconciled documentation plus an isolated PDF temporary-workspace safety correction; its hosted Windows PR run `42148338325` succeeded on commit `c631abc5f578a269b8748b39c631b7aa06b87768`, so the validation is VERIFIED; the PR remains in owner review. OCR, arbitrary layout parsing, LLM assistance, and persistent storage remain PROPOSED. See [final validation](PHASE_4_FINAL_VALIDATION.md) and [release summary](PHASE_4_RELEASE_SUMMARY.md). |
 | 6: Visualization and validation | PROPOSED | Present results and evidence with units, warnings and assumptions; conduct separately scoped physical validation if equipment/data are available. |
 
 ## Phase 4C limits and follow-on decisions
@@ -97,11 +97,14 @@ and Phase 2 establishes the dependency-free C++20 in-memory component domain con
 ([ADR-0003](decisions/ADR-0003-component-domain-model.md)). No choice of Qt, OpenGL,
 Python runtime dependency, SQLite, JSON library, or custom SPICE solver is made.
 
-Phase 4G is now merged via PR #11 (`357dc52aa809`, post-merge CI `42052973122`).
-Phase 4H adds explicit hierarchical context on its separate feature branch; see
-[validation](PHASE_4H_VALIDATION.md). Phase 4I baseline reconstruction and Phase 4J
-release closure remain PROPOSED and gated on preceding merges and hosted CI.
-
-Phase 4H is merged and hosted-verified (PR #12, `864eb56`, run `42058944651`).
-Phase 4I is implemented on its separate branch; see [validation](PHASE_4I_VALIDATION.md).
-Phase 4J release closure remains gated on Phase 4I merge and post-merge CI.
+Phase 4G is merged via PR #11 (`357dc52aa809`, post-merge CI `42052973122`).
+Phase 4H is merged via PR #12 (`864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`,
+post-merge CI `42058944651`). Phase 4I is merged via PR #13
+(`fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`, post-merge CI `42065262568`).
+These supersede the earlier pending-merge statements above. Phase 4J is the
+current final validation and documentation closure on
+`chore/phase-4j-final-validation`; its clean local Release suite passed, and the
+hosted PR run remains a release-review gate. See
+[PHASE_4_FINAL_VALIDATION.md](PHASE_4_FINAL_VALIDATION.md) and
+[PHASE_4_RELEASE_SUMMARY.md](PHASE_4_RELEASE_SUMMARY.md). Do not claim VERIFIED
+until that branch's hosted workflow succeeds.

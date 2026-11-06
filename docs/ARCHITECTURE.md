@@ -51,6 +51,20 @@ out to local Poppler `pdfinfo` and `pdftotext -bbox-layout`, then passes
 explicitly selected text-cell observations through `datasim_intake`. It does not
 link Poppler into `datasim_intake` or authenticate source identity.
 
+Phases 4E–4I are bounded extensions of `datasim_pdf`: the offline evaluator,
+explicit header unit/condition bindings, inline value/unit bindings, hierarchical
+parent/child associations, and baseline-aware host/script associations. Phase 4H
+merged via PR #12 (`864eb56c1712470180cc1ecb9d9dbef3b5fd05ff`) and Phase 4I via
+PR #13 (`fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`); post-merge Windows CI
+runs `42058944651` and `42065262568` succeeded. The CMake dependency graph is
+`datasim_vertical -> datasim_component + datasim`,
+`datasim_intake -> datasim_component`, and `datasim_pdf -> datasim_intake`;
+`datasim` and `datasim_component` remain independent base libraries. Phase 4J
+does not change the dependency graph or public contracts; its isolated fix makes
+PDF temporary-workspace creation exclusive and protects pre-existing paths. Its
+local evidence and hosted PR gate are in
+[final validation](PHASE_4_FINAL_VALIDATION.md).
+
 ```mermaid
 flowchart TD
     DS["Local selectable-text PDF"] --> DP["Explicit Poppler table adapter (Phase 4C VERIFIED on synthetic fixtures)"]
