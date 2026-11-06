@@ -12,10 +12,13 @@ PR #15 at `483e4c7f4c43d5e78839dc92a4e1be59ae45660a`; post-merge Windows run
 `42155239727` succeeded. Phase 5B merged via PR #17 at
 `5756e53446b7e3b4296a13493ab23b26802a7caa`; post-merge hosted CI run
 [42176199308](https://github.com/quocthaile/datasim/actions/runs/42176199308)
-succeeded on Windows UCRT64, Ubuntu Linux, and Linux sanitizers. Phase 5C adds
-an optional Qt PDF evidence workbench on a review branch; its current local and
-hosted verification status is recorded in
-[Phase 5C validation](docs/PHASE_5C_VALIDATION.md).
+succeeded on Windows UCRT64, Ubuntu Linux, and Linux sanitizers. Phase 5C merged
+via PR #18 at `4fe5e2712ceef949f0c38903cf2a301360c739ed`; post-merge hosted
+workflow `42182564491` passed Windows UCRT, Ubuntu Linux, and Linux ASan/UBSan.
+Phase 5D adds application-owned in-memory review on the current feature branch.
+Its local PDF-enabled Windows build passed; hosted branch CI and full manual GUI
+lifecycle remain NOT VERIFIED. See [Phase 5C validation](docs/PHASE_5C_VALIDATION.md)
+and [Phase 5D validation](docs/PHASE_5D_VALIDATION.md).
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
@@ -159,22 +162,30 @@ hosted verification status is recorded in
    post-merge CI [42176199308](https://github.com/quocthaile/datasim/actions/runs/42176199308)
    passed Windows UCRT64, Ubuntu Linux, and Linux sanitizers. See
    [Phase 5B validation](docs/PHASE_5B_VALIDATION.md).
-15. **Phase 5C Datasheet Evidence Workbench**: implemented on the current review
-   branch with optional Qt PDF display, explicit-coordinate Poppler extraction,
-   and candidate-only presentation. Local Qt 6.11.1 build and 15/15 CTest suites
-   passed; GUI and hosted branch checks are NOT VERIFIED. See
+15. **Phase 5C Datasheet Evidence Workbench**: merged via PR #18 at
+   `4fe5e2712ceef949f0c38903cf2a301360c739ed`; post-merge workflow `42182564491`
+   passed Windows UCRT, Ubuntu Linux and Linux ASan/UBSan. See
    [plan](docs/PHASE_5C_PLAN.md), [architecture](docs/PHASE_5C_ARCHITECTURE.md),
    [implementation](docs/PHASE_5C_IMPLEMENTATION.md),
    [validation](docs/PHASE_5C_VALIDATION.md), and
    [ADR-0013](docs/decisions/ADR-0013-datasheet-evidence-workbench.md).
+16. **Phase 5D in-memory evidence review**: implemented on the current feature
+   branch using an application-owned `ReviewSession` and the existing domain
+   review lifecycle. Local PDF-enabled Windows/UCRT build and 15/15 CTest suites
+   passed; hosted branch CI and full manual GUI lifecycle are NOT VERIFIED.
+   Review metadata is volatile and unauthenticated. See [plan](docs/PHASE_5D_PLAN.md),
+   [architecture](docs/PHASE_5D_ARCHITECTURE.md),
+   [implementation](docs/PHASE_5D_IMPLEMENTATION.md),
+   [validation](docs/PHASE_5D_VALIDATION.md), and
+   [ADR-0014](docs/decisions/ADR-0014-in-memory-evidence-review.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
 serialization, automatic unit conversion, LLM integration, external SPICE subcircuit
 loading, semiconductor models, physical measurement validation (`MEASURED`), and
-general visualization workflows remain **PROPOSED**. Phase 5A and Phase 5B are
-merged; Phase 5C remains under review and its validation record scopes verified
-functions.
+general visualization workflows remain **PROPOSED**. Phase 5A, 5B, and 5C are
+merged. Phase 5D remains under review; its validation record scopes locally
+verified functions and outstanding hosted/manual GUI checks.
 Real-datasheet extraction is evaluated
 offline only within the bounded Phase 4E pilot corpus (`docs/PHASE_4E_VALIDATION.md`);
 general multi-layout vendor datasheet accuracy is not claimed.
@@ -208,6 +219,7 @@ numerical or review authority.
 - [Phase 5A plan](docs/PHASE_5A_PLAN.md), [architecture](docs/PHASE_5A_ARCHITECTURE.md), [validation](docs/PHASE_5A_VALIDATION.md), and [ADR-0011](docs/decisions/ADR-0011-desktop-visualization-foundation.md) for the optional read-only waveform viewer
 - [Phase 5B plan](docs/PHASE_5B_PLAN.md), [architecture](docs/PHASE_5B_ARCHITECTURE.md), [implementation](docs/PHASE_5B_IMPLEMENTATION.md), [validation](docs/PHASE_5B_VALIDATION.md), and [ADR-0012](docs/decisions/ADR-0012-interactive-rc-workbench.md) for the optional manual ideal-RC workbench
 - [Phase 5C plan](docs/PHASE_5C_PLAN.md), [architecture](docs/PHASE_5C_ARCHITECTURE.md), [implementation](docs/PHASE_5C_IMPLEMENTATION.md), [validation](docs/PHASE_5C_VALIDATION.md), and [ADR-0013](docs/decisions/ADR-0013-datasheet-evidence-workbench.md) for the optional PDF evidence workbench
+- [Phase 5D plan](docs/PHASE_5D_PLAN.md), [architecture](docs/PHASE_5D_ARCHITECTURE.md), [implementation](docs/PHASE_5D_IMPLEMENTATION.md), [validation](docs/PHASE_5D_VALIDATION.md), and [ADR-0014](docs/decisions/ADR-0014-in-memory-evidence-review.md) for the volatile human evidence review session
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

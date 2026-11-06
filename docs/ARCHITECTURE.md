@@ -34,10 +34,15 @@ for Phase 5B hardening evidence and historical gate details. Phase 5B is merged
 and post-merge verified (PR #17, hosted run `42176199308`). Phase 5C adds an
 optional Qt PDF evidence workspace at the application layer. Qt PDF is used for
 document display; existing Poppler-backed `datasim_pdf` remains responsible for
-bounded extraction. The application passes complete explicit requests and
-renders candidate evidence only; no automatic engineering approval occurs.
-See [Phase 5C architecture](PHASE_5C_ARCHITECTURE.md) and
-[ADR-0013](decisions/ADR-0013-datasheet-evidence-workbench.md).
+bounded extraction. Phase 5C merged via PR #18 and post-merge workflow
+`42182564491` succeeded on Windows UCRT, Ubuntu Linux, and Linux ASan/UBSan.
+Phase 5D adds an application-owned volatile `ReviewSession` using copied
+observations and the existing domain review lifecycle. It does not change
+candidate extraction or promote approved observations to knowledge or models.
+Local checks are recorded; hosted branch and manual GUI lifecycle checks remain
+NOT VERIFIED. See [Phase 5C architecture](PHASE_5C_ARCHITECTURE.md),
+[Phase 5D architecture](PHASE_5D_ARCHITECTURE.md), and
+[ADR-0014](decisions/ADR-0014-in-memory-evidence-review.md).
 
 The isolated Phase 4B intake (`datasim_intake`), Phase 4C PDF table adapter
 (`datasim_pdf`), and Phase 4D PDF-to-Simulation integration gate are **IMPLEMENTED

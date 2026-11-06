@@ -21,6 +21,7 @@ jobs:
             mingw-w64-ucrt-x86_64-poppler
             mingw-w64-ucrt-x86_64-qt6-base
             mingw-w64-ucrt-x86_64-qt6-pdf
+            mingw-w64-ucrt-x86_64-qt6-svg
       - name: Verify pinned Poppler extraction backend
         run: |
           curl --fail --location https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-poppler-26.10.0-1-any.pkg.tar.zst -o poppler.pkg.tar.zst
