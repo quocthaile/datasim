@@ -9,7 +9,10 @@ Phase 5A added optional `datasim_viewer`, gated by `DATASIM_BUILD_DESKTOP=OFF`,
 and the Qt 6 Widgets application dependency. The five production libraries and
 their public interfaces are unchanged. The viewer loads local CSV with
 `datasim::read_csv()` into `datasim::Samples` and draws it with the existing
-`WaveformWidget`.
+`WaveformWidget`. Phase 5B hardening moves CSV reading/parsing to
+`CsvLoadWorker` and bounds the desktop adapter to 16 MiB and one million
+samples. Dense plotting selects source-ordered per-pixel extrema for drawing
+while preserving the full validated sample vector.
 
 `datasim::RcConfig` is the manual ideal-RC input contract. `check_config()` is
 the authoritative constraint check, and `time_constant()` returns R*C only

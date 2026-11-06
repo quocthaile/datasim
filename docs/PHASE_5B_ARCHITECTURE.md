@@ -15,7 +15,11 @@ datasim_component (independent)
 The existing application target `datasim_viewer` is optional behind
 `DATASIM_BUILD_DESKTOP=OFF`. It links `datasim` and Qt 6 Widgets. Phase 5A reads
 CSV through `datasim::read_csv()` into `datasim::Samples` and paints those
-samples in the existing `WaveformWidget`.
+samples in the existing `WaveformWidget`. CSV file reading and parsing now run
+in `CsvLoadWorker` on a `QThread`, with 16 MiB and one million sample limits.
+For dense data, the widget uses source-ordered per-pixel extrema indices to
+bound path construction by plot width; retained `datasim::Samples` are not
+downsampled or mutated.
 
 `datasim::RcConfig` fields and defaults remain the source of configuration
 semantics: resistance 1000 ohm, capacitance 1e-6 F, source 5 V, initial voltage
@@ -43,7 +47,8 @@ flowchart LR
     E --> R[RunResult and existing artifacts]
     R --> Q[Queued GUI-thread delivery]
     Q --> X[Existing WaveformWidget and metrics panel]
-    CSV[Open CSV] --> L[datasim::read_csv]
+    CSV[Open CSV] --> CW[CsvLoadWorker on QThread]
+    CW --> L[datasim::read_csv]
     L --> X
 ```
 

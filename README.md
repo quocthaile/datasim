@@ -9,9 +9,13 @@ Phases 4A–4J are merged into `main`; Phase 4J closed via PR #14 at
 evidence are summarized in [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md)
 and the [release summary](docs/PHASE_4_RELEASE_SUMMARY.md). Phase 5A merged via
 PR #15 at `483e4c7f4c43d5e78839dc92a4e1be59ae45660a`; post-merge Windows run
-`42155239727` succeeded. Phase 5B extends the optional viewer with a manual
-ideal-RC workbench on `feat/phase-5b-rc-simulation-workbench`; see its validation
-record for local and hosted evidence.
+`42155239727` succeeded. Phase 5B adds a manual ideal-RC workbench and is being
+completed on `fix/phase-5b-completion-and-hardening`, based on verified
+`483e4c7`. This branch preserves the original Phase 5B commits and adds
+correctness, resource-limit, CSV-responsiveness, and Linux CI hardening. Windows
+core/desktop builds and the primary interactive workflow are locally VERIFIED;
+Linux and sanitizer CI await the hosted branch run. See the
+[Phase 5B hardening audit](docs/PHASE_5B_HARDENING_AUDIT.md).
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid

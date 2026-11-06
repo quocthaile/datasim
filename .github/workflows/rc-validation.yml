@@ -90,3 +90,75 @@ jobs:
             build/ci/fault tests/
             build/ci-study/
           if-no-files-found: warn
+  linux-core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Linux validation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes g++ cmake ninja-build python3 poppler-utils ngspice
+          g++ --version | head -1
+          cmake --version | head -1
+          pdfinfo -v 2>&1 | head -1
+          pdftotext -v 2>&1 | head -1
+          ngspice --version | head -3
+      - name: Generate committed synthetic PDFs
+        run: |
+          python3 -B tests/fixtures/make_synthetic_datasheet_pdf.py
+          python3 -B tests/fixtures/make_hierarchy_pdf.py
+          python3 -B tests/fixtures/make_baseline_pdf.py
+      - name: Configure and build Linux core
+        run: |
+          cmake -S . -B build/linux -G Ninja -DCMAKE_BUILD_TYPE=Release -DDATASIM_NGSPICE="$(command -v ngspice)"
+          cmake --build build/linux --parallel 4
+      - name: Run Linux core and real integrations
+        run: |
+          ctest --test-dir build/linux --output-on-failure --output-junit build/linux/ctest.xml
+          if grep -Eiq 'status="notrun"|Status="notrun"' build/linux/ctest.xml; then
+            echo "A required Linux test was skipped"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rc-verification-linux
+          path: build/linux/ctest.xml
+          if-no-files-found: warn
+  linux-sanitizers:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Linux sanitizer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes g++ cmake ninja-build python3 poppler-utils ngspice
+          g++ --version | head -1
+      - name: Generate committed synthetic PDFs
+        run: |
+          python3 -B tests/fixtures/make_synthetic_datasheet_pdf.py
+          python3 -B tests/fixtures/make_hierarchy_pdf.py
+          python3 -B tests/fixtures/make_baseline_pdf.py
+      - name: Configure AddressSanitizer and UndefinedBehaviorSanitizer build
+        run: |
+          cmake -S . -B build/sanitizers -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+            -DDATASIM_NGSPICE="$(command -v ngspice)"
+          cmake --build build/sanitizers --parallel 4
+      - name: Run sanitizer tests and required integrations
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: |
+          ctest --test-dir build/sanitizers --output-on-failure --output-junit build/sanitizers/ctest.xml
+          if grep -Eiq 'status="notrun"|Status="notrun"' build/sanitizers/ctest.xml; then
+            echo "A sanitizer test or required integration was skipped"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rc-verification-linux-sanitizers
+          path: build/sanitizers/ctest.xml
+          if-no-files-found: warn

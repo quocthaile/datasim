@@ -1,6 +1,6 @@
 # Phase 5B plan: interactive ideal-RC workbench
 
-**Status:** IMPLEMENTED on `feat/phase-5b-rc-simulation-workbench`; verification is recorded in [validation](PHASE_5B_VALIDATION.md).
+**Status:** Original workbench IMPLEMENTED on `feat/phase-5b-rc-simulation-workbench`; incremental hardening is implemented on `fix/phase-5b-completion-and-hardening`. Local Windows verification is recorded in [validation](PHASE_5B_VALIDATION.md); hosted Linux and sanitizer runs remain NOT VERIFIED pending CI.
 
 ## Objective
 
@@ -21,7 +21,22 @@ read-only display of returned samples, metrics, and run artifacts.
 5. On success, inspect Vout, optional Vin, returned validation metrics, timing,
    and the exact directory/artifact list. All run directories are retained.
 6. Use Open CSV to inspect an existing result separately; this remains a
-   read-only view and is labeled as a manually loaded CSV.
+   read-only view and is labeled as a manually loaded CSV. Loading runs on a
+   worker thread with limits of 16 MiB and one million samples.
+
+## Resource and display policies
+
+The desktop adapter reads at most 16 MiB into a bounded buffer before calling
+`datasim::read_csv()`. A pre-parse line count rejects inputs above one million
+samples. The byte limit bounds growth while reading; the sample limit bounds
+retained `datasim::Samples`. These application limits do not change the core
+parser contract.
+
+`WaveformWidget` retains the original validated `datasim::Samples`. For dense
+traces, painting selects source indices from per-pixel extrema bins, preserving
+source order and local voltage extrema while bounding path construction by plot
+width. Display points are a rendering approximation; simulation data and CSV
+remain unchanged.
 
 ## Supported configuration envelope
 

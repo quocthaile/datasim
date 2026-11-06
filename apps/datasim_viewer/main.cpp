@@ -1,5 +1,6 @@
 #include "read_only_samples.hpp"
 #include "simulation_worker.hpp"
+#include "csv_load_worker.hpp"
 #include "waveform_widget.hpp"
 #include "workbench_service.hpp"
 
@@ -52,7 +53,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent* event) override {
-        if (thread_) {
+        if (thread_ || csv_thread_) {
             close_when_idle_ = true;
             state_label_->setText("Running — waiting for ngspice and validation to finish before closing");
             event->ignore();
@@ -276,21 +277,42 @@ private:
         const auto file = QFileDialog::getOpenFileName(this, "Open existing Datasim results.csv", {},
                                                        "CSV files (*.csv);;All files (*)");
         if (file.isEmpty()) return;
-        const std::filesystem::path path(file.toStdWString());
-        try {
-            auto loaded = datasim_viewer::load_samples_csv(path);
-            const auto count = loaded.samples.size();
-            plot_->set_data(std::move(loaded.samples), loaded.source_path);
+        start_csv_load(std::filesystem::path(file.toStdWString()));
+    }
+
+    void start_csv_load(const std::filesystem::path& path) {
+        set_busy(true);
+        set_state("Validating", "loading and validating the selected CSV in a worker thread");
+        auto* thread = new QThread(this);
+        auto* worker = new datasim_viewer::CsvLoadWorker(path);
+        worker->moveToThread(thread);
+        csv_thread_ = thread;
+        qRegisterMetaType<datasim::Samples>("datasim::Samples");
+        connect(thread, &QThread::started, worker, &datasim_viewer::CsvLoadWorker::execute);
+        connect(worker, &datasim_viewer::CsvLoadWorker::loaded, this,
+                [this](datasim::Samples samples, const QString& source) {
+            const auto count = samples.size();
+            plot_->set_data(std::move(samples), std::filesystem::path(source.toStdWString()));
             info_label_->setText(QString("Loaded CSV in read-only mode; this is not a newly executed simulation.\n"
                                          "Source: %1\nSamples: %2")
-                                     .arg(to_qstring(loaded.source_path)).arg(static_cast<qulonglong>(count)));
-            set_state("Idle", "CSV loaded read-only; it is not labeled as a simulation result from this session");
+                                     .arg(source).arg(static_cast<qulonglong>(count)));
             tau_label_->setText("RC time constant: (run manual configuration to calculate)");
-        } catch (const std::exception& error) {
-            plot_->set_error(QString::fromUtf8(error.what()));
+            set_state("Idle", "CSV loaded read-only; it is not labeled as a simulation result from this session");
+        }, Qt::QueuedConnection);
+        connect(worker, &datasim_viewer::CsvLoadWorker::failed, this, [this](const QString& message) {
+            plot_->set_error(message);
             info_label_->setText("CSV load failed; source was opened read-only.");
-            set_state("Failed", QString::fromUtf8(error.what()));
-        }
+            set_state("Failed", message);
+        }, Qt::QueuedConnection);
+        connect(worker, &datasim_viewer::CsvLoadWorker::finished, thread, &QThread::quit);
+        connect(thread, &QThread::finished, worker, &QObject::deleteLater);
+        connect(thread, &QThread::finished, this, [this, thread] {
+            if (csv_thread_ == thread) csv_thread_ = nullptr;
+            set_busy(false);
+            thread->deleteLater();
+            if (close_when_idle_) close();
+        });
+        thread->start();
     }
 
     std::array<QLineEdit*, 11> field_edits_{};
@@ -306,6 +328,7 @@ private:
     QLabel* info_label_ = nullptr;
     datasim_viewer::WaveformWidget* plot_ = nullptr;
     QThread* thread_ = nullptr;
+    QThread* csv_thread_ = nullptr;
     bool close_when_idle_ = false;
     datasim::RcConfig last_config_{};
 };
