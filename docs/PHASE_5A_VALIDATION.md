@@ -1,7 +1,10 @@
 # Phase 5A validation
 
-**Status:** Local Windows x64 validation complete. Hosted feature-branch workflow
-status is tracked on the review PR and is separate from these local results.
+**Status:** Local Windows x64 validation complete. Hosted Phase 5A release workflow
+run [42153482651](https://github.com/quocthaile/datasim/actions/runs/42153482651)
+passed on feature commit `5c0aa75ae3af34f2025b763cecf6573f4fd6439b`. This workflow
+uses the default Qt-off build; the optional GUI build and inspection are established
+by the separate local evidence below.
 
 ## Baseline
 
@@ -72,6 +75,7 @@ No fixture bytes or other source-tree inputs changed.
 | Default Qt-off clean Release configure/build | **PASS** | `build/phase5a-core`; `DATASIM_BUILD_DESKTOP=OFF`; no `Qt6_DIR` in cache. |
 | Core CTest suites | **9 passed, 0 failed, 0 skipped** | Unit, component model, vertical slice, intake, intake handoff, PDF extraction, backend errors, real `ngspice_rc`, and PDF corpus evaluation. |
 | Qt-enabled clean Release configure/build | **PASS** | `build/phase5a-desktop`; `datasim_viewer.exe` linked against Qt 6.11.1 Widgets and `datasim`. |
+| Hosted Windows core release workflow | **PASS** | Run [42153482651](https://github.com/quocthaile/datasim/actions/runs/42153482651) succeeded on feature commit `5c0aa75ae3af34f2025b763cecf6573f4fd6439b`; real backend integration and convergence/repeatability steps passed. It builds the default Qt-off configuration. |
 | Desktop CTest suites | **10 passed, 0 failed, 0 skipped** | The same nine core suites plus `viewer_sample_loading`; the real `ngspice_rc` path passed. |
 | Loader behavior | **PASS** | Automated test accepted a valid 2-row CSV; rejected malformed/non-finite `nan` and a missing file with explicit error strings; valid source bytes were identical before/after loading. |
 | Fresh ngspice reference run | **PASS** | `rc_demo.exe` wrote 640 samples to `build/phase5a-desktop/viewer-demo/results.csv`; run validation passed with max absolute error `6.31105602105e-05 V` against the existing ideal-RC analytical reference. This is simulated output and a software validation result, not a physical measurement. |
