@@ -14,6 +14,7 @@ public:
     explicit WaveformWidget(QWidget* parent = nullptr);
     void set_data(datasim::Samples samples, std::filesystem::path source);
     void set_error(QString message);
+    void clear();
     void set_show_input(bool show);
 
 protected:

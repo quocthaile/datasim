@@ -69,7 +69,7 @@ and post-merge `main` run
 | 3: Knowledge contracts | VERIFIED (in-memory C++20; persistence PROPOSED) | In-memory C++20 evidence, observation, deterministic review lifecycle, component knowledge, conflict visibility, and model metadata/validation contracts verified on synthetic Resistor and Capacitor fixtures ([Phase 2 validation](PHASE_2_VALIDATION.md)). Persistent storage, interchange serialization, and curve series remain PROPOSED. |
 | 4: Deterministic vertical slice | VERIFIED (ideal-RC transient slice; general multi-analysis/subcircuit PROPOSED) | Approved `ComponentKnowledge` and explicitly selected `ModelArtifactDescriptor` instances connected via `CircuitAssembly`, SI parameter resolution, model/backend compatibility gate, `RcConfig` adapter, and `provenance_metadata.json` ([Phase 3 validation](PHASE_3_VALIDATION.md)). External subcircuits and nonlinear device models remain PROPOSED. |
 | 5: Evidence intake and bounded extraction | Phase 4B–4J IMPLEMENTED, MERGED, and VERIFIED on `main` | Phase 4B–4I evidence remains recorded above. Phase 4J final validation and release closure passed hosted run `42148338325` on branch commit `c631abc5f578a269b8748b39c631b7aa06b87768`; PR #14 merged to `main` at `3fb583a0eb81640de421bc9049db9c0b80102e50`. See [final validation](PHASE_4_FINAL_VALIDATION.md) and [release summary](PHASE_4_RELEASE_SUMMARY.md). |
-| 6: Visualization and validation | Phase 5A IMPLEMENTED on review branch; verification tracked separately | Optional `datasim_viewer` reads existing `results.csv` through `datasim::read_csv()` and displays `Samples`. It does not make physical measurement claims. General evidence explanation, review workflows, and separately scoped physical validation remain PROPOSED. See [Phase 5A plan](PHASE_5A_PLAN.md), [architecture](PHASE_5A_ARCHITECTURE.md), [validation](PHASE_5A_VALIDATION.md), and [ADR-0011](decisions/ADR-0011-desktop-visualization-foundation.md). |
+| 6: Visualization and validation | Phase 5A MERGED and VERIFIED; Phase 5B IMPLEMENTED on review branch | Phase 5A adds optional read-only CSV waveform display and merged via PR #15 at `483e4c7f4c43d5e78839dc92a4e1be59ae45660a`, with post-merge hosted Windows run `42155239727` successful. Phase 5B adds manual ideal-RC configuration and execution through existing validated `datasim` APIs; no physical measurement claim. See [Phase 5A validation](PHASE_5A_VALIDATION.md) and [Phase 5B plan](PHASE_5B_PLAN.md), [architecture](PHASE_5B_ARCHITECTURE.md), [implementation](PHASE_5B_IMPLEMENTATION.md), [validation](PHASE_5B_VALIDATION.md), and [ADR-0012](decisions/ADR-0012-interactive-rc-workbench.md). |
 
 ## Phase 4C limits and follow-on decisions
 
@@ -104,6 +104,7 @@ post-merge CI `42058944651`). Phase 4I is merged via PR #13
 (`fb35ae1fc5a58dcd6b9f89d7a6807c3198ab99a5`, post-merge CI `42065262568`).
 These supersede the earlier pending-merge statements above. Phase 4J closed via
 PR #14 and merged to `main` at `3fb583a0eb81640de421bc9049db9c0b80102e50` after
-hosted verification. Phase 5A implementation is on a separate review branch;
-build, test, and GUI verification status must follow
-[PHASE_5A_VALIDATION.md](PHASE_5A_VALIDATION.md).
+hosted verification. Phase 5A merged through PR #15 and passed post-merge hosted
+Windows run `42155239727`. Phase 5B is on a separate review branch; build, test,
+and GUI verification status must follow
+[PHASE_5B_VALIDATION.md](PHASE_5B_VALIDATION.md).
