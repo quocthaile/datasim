@@ -117,17 +117,17 @@ private:
         auto* backend_layout = new QHBoxLayout(backend_row);
         backend_layout->setContentsMargins(0, 0, 0, 0);
         executable_edit_ = new QLineEdit(qEnvironmentVariable("DATASIM_NGSPICE", "ngspice"), backend_row);
-        auto* executable_button = new QPushButton("Browse…", backend_row);
+        executable_button_ = new QPushButton("Browse…", backend_row);
         backend_layout->addWidget(executable_edit_);
-        backend_layout->addWidget(executable_button);
+        backend_layout->addWidget(executable_button_);
         backend_form->addRow("ngspice executable", backend_row);
         auto* output_row = new QWidget(backend_box);
         auto* output_layout = new QHBoxLayout(output_row);
         output_layout->setContentsMargins(0, 0, 0, 0);
         output_parent_edit_ = new QLineEdit(QDir::homePath(), output_row);
-        auto* output_button = new QPushButton("Browse…", output_row);
+        output_button_ = new QPushButton("Browse…", output_row);
         output_layout->addWidget(output_parent_edit_);
-        output_layout->addWidget(output_button);
+        output_layout->addWidget(output_button_);
         backend_form->addRow("Output parent", output_row);
         side->addWidget(backend_box);
 
@@ -160,11 +160,11 @@ private:
         connect(input_checkbox_, &QCheckBox::toggled, plot_, [this](bool show) { plot_->set_show_input(show); });
         connect(run_button_, &QPushButton::clicked, this, [this] { start_run(); });
         connect(open_button_, &QPushButton::clicked, this, [this] { open_csv(); });
-        connect(executable_button, &QPushButton::clicked, this, [this] {
+        connect(executable_button_, &QPushButton::clicked, this, [this] {
             const auto path = QFileDialog::getOpenFileName(this, "Select ngspice executable", executable_edit_->text());
             if (!path.isEmpty()) executable_edit_->setText(path);
         });
-        connect(output_button, &QPushButton::clicked, this, [this] {
+        connect(output_button_, &QPushButton::clicked, this, [this] {
             const auto path = QFileDialog::getExistingDirectory(this, "Select existing output parent", output_parent_edit_->text());
             if (!path.isEmpty()) output_parent_edit_->setText(path);
         });
@@ -182,6 +182,8 @@ private:
         for (auto* edit : field_edits_) edit->setEnabled(!busy);
         executable_edit_->setEnabled(!busy);
         output_parent_edit_->setEnabled(!busy);
+        executable_button_->setEnabled(!busy);
+        output_button_->setEnabled(!busy);
     }
 
     std::array<std::string, 11> field_values() const {
@@ -296,6 +298,8 @@ private:
     QLineEdit* output_parent_edit_ = nullptr;
     QPushButton* run_button_ = nullptr;
     QPushButton* open_button_ = nullptr;
+    QPushButton* executable_button_ = nullptr;
+    QPushButton* output_button_ = nullptr;
     QCheckBox* input_checkbox_ = nullptr;
     QLabel* tau_label_ = nullptr;
     QLabel* state_label_ = nullptr;
