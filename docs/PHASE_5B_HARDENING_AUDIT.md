@@ -32,3 +32,31 @@ Linux POSIX process behavior and ASan/UBSan are pending hosted checks. These
 gaps prevent a merge-ready assessment; submit the integrated PR as draft until
 the checks complete. No physical measurement, vendor datasheet, or new
 licensing claim is made.
+
+## PR #17 Linux CI failure follow-up
+
+The first integrated hosted run, [42165152332](https://github.com/quocthaile/datasim/actions/runs/42165152332),
+compiled all three jobs. `windows-ucrt` succeeded; `linux-core` and
+`linux-sanitizers` each failed two CTest cases. The failures were test/process
+contract defects rather than PDF interpretation or sanitizer findings:
+
+1. `tests/unit/pdf_extraction_tests.cpp::locate()` split `PATH` only on `;`
+   and searched only for `.exe` tools, so Ubuntu's colon-separated PATH and
+   `pdfinfo`/`pdftotext` names were never found.
+2. `tests/unit/pdf_process_tests.cpp` required an exception for a nonexistent
+   executable. POSIX `execv()` instead failed in the child and returned status
+   127, while Windows `CreateProcessW()` threw. The contract was inconsistent.
+
+The correction makes `locate()` use `;` plus `.exe` on Windows and `:` with
+unsuffixed executable names on POSIX. `run_capture()` now validates that the
+executable is a regular file before process setup and, on POSIX, checks
+`X_OK`; both platforms throw for a missing path, and POSIX throws for a
+non-executable file. A successfully launched program's exit status remains
+unchanged, including nonzero exits. Timeout/process-group handling and runtime
+quotas are retained. Tests also cover excessive stdout as well as stderr.
+
+Corrective Windows results are VERIFIED: core 11/11 and Qt-enabled 14/14
+passed with zero skips, including Poppler extraction and the expanded process
+quota/startup regression. These results and the Linux rerun status are tracked
+in [PHASE_5B_VALIDATION.md](PHASE_5B_VALIDATION.md); hosted Linux and
+ASan/UBSan verification remain pending the updated PR workflow.

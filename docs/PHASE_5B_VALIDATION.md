@@ -88,3 +88,33 @@ reproduction procedures for F-01 through F-07 are in
 The Qt-enabled build was rerun after closing the manually launched viewer, which
 had locked the executable during the first link attempt. The successful rerun
 and all 14 desktop tests completed without skips.
+
+## PR #17 Linux CI correction
+
+Hosted run [42165152332](https://github.com/quocthaile/datasim/actions/runs/42165152332)
+was the initial integrated baseline: `windows-ucrt` succeeded, while
+`linux-core` and `linux-sanitizers` each failed 2 of 11 tests. Both failures
+were reproducible portability/contract defects:
+
+- `pdf_extraction` could not find `pdfinfo` because its test helper used a
+  Windows-only `;` PATH separator and unconditional `.exe` suffixes.
+- `pdf_process` reported “missing executable was not reported” because the
+  POSIX child returned 127 after `execv()` failed while Windows threw from
+  `CreateProcessW()`.
+
+The fix uses platform-specific PATH parsing and executable names, prevalidates
+regular executable files in `run_capture()`, and throws consistently for a
+missing path (plus non-executable POSIX files). Launched process exit codes,
+timeouts, process-tree cleanup and output quotas retain their prior semantics.
+Additional regression coverage checks both stdout and stderr over-quota output.
+
+Corrective local Windows UCRT64 validation on the PR update:
+
+| Check | Result |
+|---|---|
+| Core Release build / CTest | VERIFIED; 11/11 passed, 0 failed, 0 skipped. |
+| Qt-enabled desktop build / CTest | VERIFIED; 14/14 passed, 0 failed, 0 skipped. |
+| `pdf_extraction` | VERIFIED; real Poppler synthetic extraction passed using Windows PATH discovery. |
+| `pdf_process` | VERIFIED; exact quota, excess stdout/stderr, missing executable, nonzero exit, timeout, and concurrent isolation passed. |
+| Real ngspice and six-run refinement/repeatability | VERIFIED; included in both core/desktop CTest and prior branch study. |
+| Linux core / ASan/UBSan | NOT VERIFIED yet; rerun pending after push to PR #17. |

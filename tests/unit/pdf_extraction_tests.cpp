@@ -33,11 +33,25 @@ std::filesystem::path locate(const char* name) {
     const char* environment = std::getenv("PATH");
     if (environment == nullptr) return {};
     const std::string paths(environment);
+    const auto separator =
+#ifdef _WIN32
+        ';';
+#else
+        ':';
+#endif
+    std::string executable_name(name);
+#ifdef _WIN32
+    executable_name += ".exe";
+#endif
     std::size_t start = 0;
     while (start <= paths.size()) {
-        const auto end = paths.find(';', start);
-        auto candidate = std::filesystem::path(paths.substr(start, end - start)) / name;
-        if (std::filesystem::exists(candidate)) return candidate;
+        const auto end = paths.find(separator, start);
+        const auto directory = paths.substr(start, end - start);
+        if (!directory.empty()) {
+            const auto candidate = std::filesystem::path(directory) / executable_name;
+            std::error_code error;
+            if (std::filesystem::is_regular_file(candidate, error) && !error) return candidate;
+        }
         if (end == std::string::npos) break;
         start = end + 1U;
     }
@@ -51,8 +65,8 @@ datasim::pdf::ExtractionRequest request_for(std::size_t page,
     using namespace datasim;
     pdf::ExtractionRequest request;
     request.pdf_path = DATASIM_SYNTHETIC_PDF_PATH;
-    request.pdfinfo_path = locate("pdfinfo.exe");
-    request.pdftotext_path = locate("pdftotext.exe");
+    request.pdfinfo_path = locate("pdfinfo");
+    request.pdftotext_path = locate("pdftotext");
     request.pdf_page_index = page;
     request.printed_page_label = page == 0 ? "5" : "Appendix C-2";
     request.curator = {"fixture-curator", component::ActorKind::human_engineer, std::nullopt};

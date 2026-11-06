@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <atomic>
+#include <system_error>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -68,6 +69,13 @@ int run_capture(const std::filesystem::path& executable,
                 const std::filesystem::path& monitored_output,
                 std::chrono::milliseconds process_timeout) {
     constexpr auto poll_interval = std::chrono::milliseconds(10);
+    std::error_code executable_error;
+    if (!std::filesystem::is_regular_file(executable, executable_error) || executable_error)
+        throw std::runtime_error("PDF backend executable does not exist or is not a regular file");
+#ifndef _WIN32
+    if (::access(executable.c_str(), X_OK) != 0)
+        throw std::runtime_error("PDF backend file is not executable");
+#endif
 #ifdef _WIN32
     std::wstring command = quote_windows(executable.wstring());
     for (const auto& argument : arguments) command += L" " + quote_windows(widen(argument));

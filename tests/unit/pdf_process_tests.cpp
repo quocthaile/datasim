@@ -27,6 +27,12 @@ int main(int argc, char** argv) {
         require(datasim::pdf::detail::run_capture(fixture, {"--stderr", "1048576"}, excessive, 1024) != 0,
                 "excessive stderr must fail");
         require(fs::file_size(excessive) == 1024, "stderr capture did not persist exactly the configured quota");
+        const auto excessive_stdout = root / "excessive-stdout.bin";
+        require(datasim::pdf::detail::run_capture(fixture, {"--write", "1048576"},
+                    excessive_stdout, 1024) != 0,
+                "excessive stdout must fail");
+        require(fs::file_size(excessive_stdout) == 1024,
+                "stdout capture did not persist exactly the configured quota");
         const auto failed = root / "failed.bin";
         require(datasim::pdf::detail::run_capture(fixture, {"--exit"}, failed) == 9,
                 "normal nonzero exit code was not preserved");
@@ -34,6 +40,16 @@ int main(int argc, char** argv) {
         try { (void)datasim::pdf::detail::run_capture(root / "missing-executable", {}, root / "missing.log"); }
         catch (const std::exception&) { missing_rejected = true; }
         require(missing_rejected, "missing executable was not reported");
+#ifndef _WIN32
+        const auto non_executable = root / "non-executable";
+        { std::ofstream file(non_executable); file << "not executable\n"; }
+        fs::permissions(non_executable, fs::perms::owner_read | fs::perms::owner_write,
+                        fs::perm_options::replace);
+        bool permission_rejected = false;
+        try { (void)datasim::pdf::detail::run_capture(non_executable, {}, root / "non-executable.log"); }
+        catch (const std::exception&) { permission_rejected = true; }
+        require(permission_rejected, "non-executable file was not reported before launch");
+#endif
         const auto started = std::chrono::steady_clock::now();
         require(datasim::pdf::detail::run_capture(fixture, {"--hang"}, root / "hang.log", 1024, {},
                     std::chrono::milliseconds(150)) == 124, "hung child did not report timeout");
