@@ -9,13 +9,13 @@ Phases 4A–4J are merged into `main`; Phase 4J closed via PR #14 at
 evidence are summarized in [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md)
 and the [release summary](docs/PHASE_4_RELEASE_SUMMARY.md). Phase 5A merged via
 PR #15 at `483e4c7f4c43d5e78839dc92a4e1be59ae45660a`; post-merge Windows run
-`42155239727` succeeded. Phase 5B adds a manual ideal-RC workbench and is being
-completed on `fix/phase-5b-completion-and-hardening`, based on verified
-`483e4c7`. This branch preserves the original Phase 5B commits and adds
-correctness, resource-limit, CSV-responsiveness, and Linux CI hardening. Windows
-core/desktop builds and the primary interactive workflow are locally VERIFIED;
-Linux and sanitizer CI await the hosted branch run. See the
-[Phase 5B hardening audit](docs/PHASE_5B_HARDENING_AUDIT.md).
+`42155239727` succeeded. Phase 5B merged via PR #17 at
+`5756e53446b7e3b4296a13493ab23b26802a7caa`; post-merge hosted CI run
+[42176199308](https://github.com/quocthaile/datasim/actions/runs/42176199308)
+succeeded on Windows UCRT64, Ubuntu Linux, and Linux sanitizers. Phase 5C adds
+an optional Qt PDF evidence workbench on a review branch; its current local and
+hosted verification status is recorded in
+[Phase 5C validation](docs/PHASE_5C_VALIDATION.md).
 
 1. **Phase 1 / 1.5 ideal-RC simulation spike (`datasim`)**: manual ideal-RC
    configuration, ngspice-47 batch execution, CSV/JSON run reporting, common-grid
@@ -155,16 +155,26 @@ Linux and sanitizer CI await the hosted branch run. See the
 14. **Phase 5B interactive ideal-RC workbench**: manual `RcConfig` entry,
    `datasim::check_config()` validation, asynchronous `execute_rc_run()`, and
    read-only display of returned waveform, metrics, and run artifacts. Implemented
-   on `feat/phase-5b-rc-simulation-workbench`; local and hosted evidence is in
-   [Phase 5B validation](docs/PHASE_5B_VALIDATION.md). No physical measurement or
-   datasheet-approved simulation is claimed.
+   and merged via PR #17 at `5756e53446b7e3b4296a13493ab23b26802a7caa`; hosted
+   post-merge CI [42176199308](https://github.com/quocthaile/datasim/actions/runs/42176199308)
+   passed Windows UCRT64, Ubuntu Linux, and Linux sanitizers. See
+   [Phase 5B validation](docs/PHASE_5B_VALIDATION.md).
+15. **Phase 5C Datasheet Evidence Workbench**: implemented on the current review
+   branch with optional Qt PDF display, explicit-coordinate Poppler extraction,
+   and candidate-only presentation. Local Qt 6.11.1 build and 15/15 CTest suites
+   passed; GUI and hosted branch checks are NOT VERIFIED. See
+   [plan](docs/PHASE_5C_PLAN.md), [architecture](docs/PHASE_5C_ARCHITECTURE.md),
+   [implementation](docs/PHASE_5C_IMPLEMENTATION.md),
+   [validation](docs/PHASE_5C_VALIDATION.md), and
+   [ADR-0013](docs/decisions/ADR-0013-datasheet-evidence-workbench.md).
 
 This is not yet a general-purpose circuit simulator or datasheet processor. Arbitrary
 PDF layout recognition, OCR ingestion, persistent storage, general-purpose JSON
 serialization, automatic unit conversion, LLM integration, external SPICE subcircuit
 loading, semiconductor models, physical measurement validation (`MEASURED`), and
-general visualization workflows remain **PROPOSED**. Phase 5A is merged and
-Phase 5B is under review; see their validation records for verified functions.
+general visualization workflows remain **PROPOSED**. Phase 5A and Phase 5B are
+merged; Phase 5C remains under review and its validation record scopes verified
+functions.
 Real-datasheet extraction is evaluated
 offline only within the bounded Phase 4E pilot corpus (`docs/PHASE_4E_VALIDATION.md`);
 general multi-layout vendor datasheet accuracy is not claimed.
@@ -197,6 +207,7 @@ numerical or review authority.
 - [Phase 4 final validation](docs/PHASE_4_FINAL_VALIDATION.md) and [release summary](docs/PHASE_4_RELEASE_SUMMARY.md) for release closure
 - [Phase 5A plan](docs/PHASE_5A_PLAN.md), [architecture](docs/PHASE_5A_ARCHITECTURE.md), [validation](docs/PHASE_5A_VALIDATION.md), and [ADR-0011](docs/decisions/ADR-0011-desktop-visualization-foundation.md) for the optional read-only waveform viewer
 - [Phase 5B plan](docs/PHASE_5B_PLAN.md), [architecture](docs/PHASE_5B_ARCHITECTURE.md), [implementation](docs/PHASE_5B_IMPLEMENTATION.md), [validation](docs/PHASE_5B_VALIDATION.md), and [ADR-0012](docs/decisions/ADR-0012-interactive-rc-workbench.md) for the optional manual ideal-RC workbench
+- [Phase 5C plan](docs/PHASE_5C_PLAN.md), [architecture](docs/PHASE_5C_ARCHITECTURE.md), [implementation](docs/PHASE_5C_IMPLEMENTATION.md), [validation](docs/PHASE_5C_VALIDATION.md), and [ADR-0013](docs/decisions/ADR-0013-datasheet-evidence-workbench.md) for the optional PDF evidence workbench
 - [Annotated research references](docs/RESEARCH_REFERENCES.md) and [BibTeX](docs/REFERENCES.bib)
 - [Glossary](docs/GLOSSARY.md)
 - [ADR-0001: simulation backend boundary](docs/decisions/ADR-0001-simulation-backend-boundary.md)

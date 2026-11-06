@@ -30,7 +30,14 @@ The optional Qt 6 `datasim_viewer` provides read-only CSV visualization
 (Phase 5B). CSV loading is worker-threaded with bounded input/sample limits,
 and dense waveform painting uses a display-only extrema envelope. It is not a
 general circuit editor or approval workflow. See the [Phase 5B hardening audit](PHASE_5B_HARDENING_AUDIT.md)
-for local evidence and pending hosted Linux/sanitizer gates.
+for Phase 5B hardening evidence and historical gate details. Phase 5B is merged
+and post-merge verified (PR #17, hosted run `42176199308`). Phase 5C adds an
+optional Qt PDF evidence workspace at the application layer. Qt PDF is used for
+document display; existing Poppler-backed `datasim_pdf` remains responsible for
+bounded extraction. The application passes complete explicit requests and
+renders candidate evidence only; no automatic engineering approval occurs.
+See [Phase 5C architecture](PHASE_5C_ARCHITECTURE.md) and
+[ADR-0013](decisions/ADR-0013-datasheet-evidence-workbench.md).
 
 The isolated Phase 4B intake (`datasim_intake`), Phase 4C PDF table adapter
 (`datasim_pdf`), and Phase 4D PDF-to-Simulation integration gate are **IMPLEMENTED

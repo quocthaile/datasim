@@ -3,6 +3,10 @@
 #include "csv_load_worker.hpp"
 #include "waveform_widget.hpp"
 #include "workbench_service.hpp"
+#ifdef DATASIM_PDF_WORKBENCH
+#include "evidence_workbench.hpp"
+#include <QTabWidget>
+#endif
 
 #include <QApplication>
 #include <QCheckBox>
@@ -15,6 +19,9 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMainWindow>
+#ifdef DATASIM_PDF_WORKBENCH
+#include <QIcon>
+#endif
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStatusBar>
@@ -46,6 +53,9 @@ class WorkbenchWindow final : public QMainWindow {
 public:
     WorkbenchWindow() {
         setWindowTitle("Datasim Viewer — Manual Ideal-RC Simulation");
+#ifdef DATASIM_PDF_WORKBENCH
+        setWindowIcon(QIcon(QStringLiteral(":/datasim/branding/datasim-mark.svg")));
+#endif
         resize(1320, 820);
         build_ui();
         set_state("Idle", "Manual Ideal-RC Simulation. Enter values in SI units using decimal/scientific notation.");
@@ -154,7 +164,14 @@ private:
         plot_ = new datasim_viewer::WaveformWidget(central);
         root->addWidget(scroll, 0);
         root->addWidget(plot_, 1);
+#ifdef DATASIM_PDF_WORKBENCH
+        auto* tabs = new QTabWidget(this);
+        tabs->addTab(central, "Manual Ideal-RC Simulation");
+        tabs->addTab(new datasim_viewer::EvidenceWorkbench(tabs), "Datasheet Evidence Workbench");
+        setCentralWidget(tabs);
+#else
         setCentralWidget(central);
+#endif
 
         input_checkbox_ = new QCheckBox("Show input voltage", this);
         statusBar()->addPermanentWidget(input_checkbox_);

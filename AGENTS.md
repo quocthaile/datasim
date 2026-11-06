@@ -87,3 +87,15 @@ Phase 4J final validation and release closure are VERIFIED for run `42148338325`
 [release summary](docs/PHASE_4_RELEASE_SUMMARY.md). Do not mark Phase 4J VERIFIED
 until its own hosted branch CI has completed successfully. Do not merge PRs
 automatically.
+
+Phase 5B is merged via PR #17 at `5756e53446b7e3b4296a13493ab23b26802a7caa`
+and verified by post-merge hosted CI run `42176199308` (Windows UCRT64, Ubuntu
+Linux, and Linux sanitizers). Phase 5C authorizes an optional Qt PDF display
+workbench in the application only. Keep Qt out of all production libraries;
+preserve the Poppler-backed `datasim_pdf` boundary, explicit numeric Poppler
+coordinates, complete extraction requests, candidate-only results, and human
+review. Qt PDF is display-only. The feature is gated by
+`DATASIM_BUILD_PDF_WORKBENCH` and requires `DATASIM_BUILD_DESKTOP=ON`. Do not add
+OCR, persistence, inferred table geometry, automatic approval, model creation,
+or simulation routing. Require hosted feature-branch CI before review completion
+and do not merge automatically.
