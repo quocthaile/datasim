@@ -111,8 +111,8 @@ if(DATASIM_BUILD_PDF_WORKBENCH AND NOT DATASIM_BUILD_DESKTOP)
 endif()
 if(DATASIM_BUILD_DESKTOP)
     if(DATASIM_BUILD_PDF_WORKBENCH)
-        find_package(Qt6 6.11 REQUIRED COMPONENTS Widgets Pdf PdfWidgets)
-        foreach(required_target Qt6::Pdf Qt6::PdfWidgets)
+        find_package(Qt6 6.11 REQUIRED COMPONENTS Widgets Pdf PdfWidgets Svg)
+        foreach(required_target Qt6::Pdf Qt6::PdfWidgets Qt6::Svg)
             if(NOT TARGET ${required_target})
                 message(FATAL_ERROR "Qt PDF workbench requires CMake target ${required_target} (Qt 6.11.x)")
             endif()
@@ -136,9 +136,11 @@ if(DATASIM_BUILD_DESKTOP)
             apps/datasim_viewer/evidence_workbench.hpp
             apps/datasim_viewer/extraction_worker.cpp
             apps/datasim_viewer/extraction_worker.hpp
+            apps/datasim_viewer/review_session.cpp
+            apps/datasim_viewer/review_session.hpp
             assets/viewer.qrc)
         set_target_properties(datasim_viewer PROPERTIES AUTORCC ON)
-        target_link_libraries(datasim_viewer PRIVATE datasim_pdf Qt6::Pdf Qt6::PdfWidgets)
+        target_link_libraries(datasim_viewer PRIVATE datasim_pdf Qt6::Pdf Qt6::PdfWidgets Qt6::Svg)
         target_compile_definitions(datasim_viewer PRIVATE DATASIM_PDF_WORKBENCH=1)
     endif()
     set_target_properties(datasim_viewer PROPERTIES AUTOMOC ON)
@@ -307,11 +309,13 @@ if(BUILD_TESTING)
                 apps/datasim_viewer/evidence_workbench.hpp
                 apps/datasim_viewer/extraction_worker.cpp
                 apps/datasim_viewer/extraction_worker.hpp
+                apps/datasim_viewer/review_session.cpp
+                apps/datasim_viewer/review_session.hpp
                 tests/desktop/evidence_workbench_tests.cpp
                 assets/viewer.qrc)
             set_target_properties(evidence_workbench_tests PROPERTIES AUTOMOC ON AUTORCC ON)
             target_include_directories(evidence_workbench_tests PRIVATE apps/datasim_viewer)
-            target_link_libraries(evidence_workbench_tests PRIVATE datasim_pdf Qt6::Widgets Qt6::Pdf Qt6::PdfWidgets)
+            target_link_libraries(evidence_workbench_tests PRIVATE datasim_pdf Qt6::Widgets Qt6::Pdf Qt6::PdfWidgets Qt6::Svg)
             target_compile_definitions(evidence_workbench_tests PRIVATE
                 DATASIM_SYNTHETIC_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/synthetic_datasheet.pdf"
                 DATASIM_IMAGE_ONLY_PDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/image_only_datasheet.pdf")

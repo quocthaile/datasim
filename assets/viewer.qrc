@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="/datasim">
     <file alias="branding/datasim-mark.svg">branding/datasim-mark.svg</file>
+    <file alias="icons/review-candidate.svg">icons/review-candidate.svg</file>
+    <file alias="icons/review-needs-review.svg">icons/review-needs-review.svg</file>
+    <file alias="icons/review-approved.svg">icons/review-approved.svg</file>
+    <file alias="icons/review-rejected.svg">icons/review-rejected.svg</file>
+    <file alias="icons/review-superseded.svg">icons/review-superseded.svg</file>
+    <file alias="icons/evidence-location.svg">icons/evidence-location.svg</file>
   </qresource>
 </RCC>

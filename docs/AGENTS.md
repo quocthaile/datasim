@@ -129,11 +129,14 @@ automatically.
 
 Phase 5B is merged via PR #17 at `5756e53446b7e3b4296a13493ab23b26802a7caa`
 and post-merge verified by hosted CI run `42176199308` on Windows UCRT64, Ubuntu
-Linux, and Linux sanitizers. Phase 5C adds only an optional Qt PDF workbench to
-the desktop application. Preserve all production library APIs and the
-Poppler-backed `datasim_pdf` boundary. Use complete explicit
-`ExtractionRequest` values and numeric Poppler page coordinates; do not infer
-geometry or convert units. Display candidate data and provenance without
-applying review decisions. Gate Qt PDF behind
-`DATASIM_BUILD_PDF_WORKBENCH=ON` plus `DATASIM_BUILD_DESKTOP=ON`. Require hosted
-feature-branch CI before review completion and do not merge automatically.
+Linux, and Linux sanitizers. Phase 5C merged via PR #18 at
+`4fe5e2712ceef949f0c38903cf2a301360c739ed`; post-merge workflow `42182564491`
+passed Windows UCRT, Ubuntu Linux, and Linux ASan/UBSan. Phase 5D authorizes an
+application-owned volatile evidence review session. Preserve all production
+library APIs, candidate extraction, and the Poppler-backed `datasim_pdf`
+boundary. Use existing domain `ReviewDecision` validation and
+`apply_review_decision()`. No persistence, export, authentication,
+knowledge/model promotion, or simulation routing. Qt/Qt Svg stay in the optional
+application behind `DATASIM_BUILD_PDF_WORKBENCH=ON` plus
+`DATASIM_BUILD_DESKTOP=ON`. Require hosted feature-branch CI before review
+completion and do not merge automatically.
